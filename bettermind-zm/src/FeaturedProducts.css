@@ -1,0 +1,50 @@
+.featured-services {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.featured-services h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    color: #008080;
+    font-weight: bold;
+}
+
+.services-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: center;
+    gap: 30px;
+    
+}
+
+.service {
+    background-color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+
+.service h3 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #3333;
+}
+
+.service p {
+    font-size: 1.1rem;
+    color: #666666;
+    line-height: 1.6;
+}
+
+
+
+
+@media screen and (max-width: 768px) {
+    .services-container {
+        grid-template-columns: 1fr;
+    }
+    
+}

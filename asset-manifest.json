@@ -1,18 +1,19 @@
 {
   "files": {
-    "main.css": "./static/css/main.390abbf3.css",
-    "main.js": "./static/js/main.18bf4830.js",
+    "main.css": "./static/css/main.3884cab3.css",
+    "main.js": "./static/js/main.2b212549.js",
     "static/js/900.1ea4f60b.chunk.js": "./static/js/900.1ea4f60b.chunk.js",
     "static/js/453.b894efbb.chunk.js": "./static/js/453.b894efbb.chunk.js",
     "static/media/hero-background-img.jpg": "./static/media/hero-background-img.00a79a56547245968a11.jpg",
     "static/media/bettermind-logo-removebg-preview.png": "./static/media/bettermind-logo-removebg-preview.9f453581bd316dc83219.png",
+    "static/media/mental-health-1.jpeg": "./static/media/mental-health-1.a1c5968a3b2030f6442a.jpeg",
     "index.html": "./index.html",
-    "main.390abbf3.css.map": "./static/css/main.390abbf3.css.map",
-    "main.18bf4830.js.map": "./static/js/main.18bf4830.js.map",
+    "main.3884cab3.css.map": "./static/css/main.3884cab3.css.map",
+    "main.2b212549.js.map": "./static/js/main.2b212549.js.map",
     "453.b894efbb.chunk.js.map": "./static/js/453.b894efbb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.390abbf3.css",
-    "static/js/main.18bf4830.js"
+    "static/css/main.3884cab3.css",
+    "static/js/main.2b212549.js"
   ]
 }

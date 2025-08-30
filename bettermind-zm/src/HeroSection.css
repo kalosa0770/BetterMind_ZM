@@ -26,10 +26,13 @@
 }
 
 .hero-section h2 {
-    font-size: 36px;
-    color: #333333;
+    font-size: 2.5rem;
+    color: #008080;
     margin-bottom: 20px;
+    font-weight: bold;
 }
+
+
 
 .hero-section p {
     font-size: 18px;
@@ -47,4 +50,10 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+}
+
+.hero-section .get-started-btn:hover {
+    background-color: #0a5151;
+    transition: 0.5s ease-in-out;
+    box-sizing: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

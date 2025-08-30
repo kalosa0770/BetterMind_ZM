@@ -4,6 +4,7 @@ import Header from './Header.js';
 import HeroSection from './HeroSection.js';
 import FeaturedProducts from './FeaturedProducts.js';
 import SimpleSteps from './SimpleSteps.js';
+import Services from './Services.js';
 
 
 function App () {
@@ -13,6 +14,7 @@ function App () {
       <HeroSection />
       <SimpleSteps />
       <FeaturedProducts />
+      <Services />
     </div>
   )
   

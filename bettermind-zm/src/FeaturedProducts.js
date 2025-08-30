@@ -1,4 +1,5 @@
 import './FeaturedProducts.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const FeaturedProducts = () => {
     return (
@@ -6,6 +7,7 @@ const FeaturedProducts = () => {
             <h2>On a silver plate</h2>
             <div className="services-container">
                 <div className="service">
+                    <FontAwesomeIcon icon={['fas', 'video-camera']}size="2x" className='service-icon' />
                     <h3>Teletherapy</h3>
                     <p>
                         Connect with licensed therapists through secure video consultations.
@@ -15,6 +17,7 @@ const FeaturedProducts = () => {
                     
                 </div>
                 <div className="service">
+                    <FontAwesomeIcon icon={['fas', 'book']} size="2x" className='service-icon' />
                     <h3>Resource Hub</h3>
                     <p>
                         Access articles, videos, and tools to support your well-being.
@@ -24,6 +27,7 @@ const FeaturedProducts = () => {
                     
                 </div>
                  <div className="service">
+                    <FontAwesomeIcon icon={['fas', 'brain']} size="2x" className='service-icon' />
                     <h3>Mood Tracking</h3>
                     <p>
                         Monitor your mental health progress with our tracking tools.
@@ -33,6 +37,7 @@ const FeaturedProducts = () => {
                     
                 </div>
                 <div className="service">
+                    <FontAwesomeIcon icon={['fas', 'headset']} size="2x" className='service-icon' />
                     <h3>24/7 Support</h3>
                     <p>
                         Get immediate assistance whenever you need it.

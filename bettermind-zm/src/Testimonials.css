@@ -15,7 +15,7 @@
 
 .testimonial-cards {
     display: grid;
-    /* Creates a 3-column grid, each taking up an equal fraction of space */
+
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
 }
@@ -46,7 +46,6 @@
 
 @media (max-width: 768px) {
     .testimonial-cards {
-        /* On smaller screens, the cards will stack in a single column */
         grid-template-columns: 1fr;
     }
 

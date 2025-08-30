@@ -1,0 +1,111 @@
+/* src/components/TherapistSection.css */
+
+.therapist-section {
+  padding: 80px 20px;
+  background-color: #f4f5f6; /* Your Soft Gray background */
+  text-align: center;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: #008080; /* Your Deep Teal */
+  margin-bottom: 20px;
+}
+
+.section-subtitle {
+  color: #666666;
+  max-width: 800px;
+  margin: 0 auto 50px;
+  line-height: 1.5;
+}
+
+.therapist-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  /* These two lines center the grid and limit its width */
+  max-width: 1200px; 
+  margin: 0 auto 40px;
+}
+
+.therapist-card {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.therapist-card:hover {
+  transform: translateY(-5px);
+}
+
+.therapist-photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 15px;
+  object-fit: cover;
+  background-color: #9bb8a1;
+  padding: 10px;
+  border: 2px dotted #333333;
+}
+
+.therapist-info h3 {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333333;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.therapist-info h3 svg {
+  margin-left: 8px;
+  color: #333333;
+}
+
+.therapist-info p {
+  font-size: 0.875rem;
+  color: #333333;
+  margin: 0;
+}
+
+.see-more-btn {
+  background-color: transparent;
+  color: #008080;
+  border: 1px solid #008080;
+  padding: 12px 30px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.see-more-btn:hover {
+  background-color: #008080;
+  color: #ffffff;
+}
+
+@media (max-width: 992px) {
+  .therapist-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+    .therapist-card {
+        flex-direction: column;
+        text-align: center;
+    }
+  .therapist-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-title {
+    font-size: 2.1rem;
+  }
+    
+}

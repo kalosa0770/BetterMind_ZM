@@ -4,7 +4,8 @@ import {faBrain as fasBrain, faComments as fasComments,
         faBook as fasBook, faArrowRight as fasArrowRight,
         faSearch as fasSearch, faUserPlus as fasUserPlus,
         faStream as fasStream, faTimes as fasTimes,
-        faCheck as fasCheck} from '@fortawesome/free-solid-svg-icons';
+        faCheck as fasCheck, faVideoCamera as fasVideoCamera,
+        faHeadset as fasHeadset,faChartLine as fasChartLine} from '@fortawesome/free-solid-svg-icons';
 import {faTwitter, faInstagram} from '@fortawesome/free-brands-svg-icons';
 
 library.add(
@@ -19,5 +20,8 @@ library.add(
     fasUserPlus,
     fasStream, 
     fasTimes,
-    fasCheck
+    fasCheck,
+    fasVideoCamera,
+    fasHeadset,
+    fasChartLine
 )

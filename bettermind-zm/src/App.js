@@ -6,6 +6,9 @@ import FeaturedProducts from './FeaturedProducts.js';
 import SimpleSteps from './SimpleSteps.js';
 import Services from './Services.js';
 import Testimonials from './Testimonials.js';
+import HealthProviders from './HealthProviders.js';
+import FinalCTA from './FinalCTA.js';
+import Footer from './Footer.js';
 
 
 function App () {
@@ -17,7 +20,9 @@ function App () {
       <FeaturedProducts />
       <Services />
       <Testimonials />
-      
+      <HealthProviders />
+      <FinalCTA />
+      <Footer />
     </div>
   )
   

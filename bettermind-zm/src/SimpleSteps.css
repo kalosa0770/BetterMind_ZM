@@ -63,4 +63,8 @@
     .simple-steps h2 {
         font-size: 2.1rem;
     }
+
+    .step h3 {
+        font-size: 1.1rem;
+    }
 }

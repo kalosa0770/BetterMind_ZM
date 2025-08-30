@@ -10,6 +10,8 @@
     font-weight: bold;
 }
 
+
+
 .services-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -30,7 +32,8 @@
 .service h3 {
     font-size: 1.8rem;
     margin-bottom: 20px;
-    color: #3333;
+    color: #9bb8a1;
+    font-weight: 900;
 }
 
 .service p {

@@ -1,4 +1,5 @@
 import './App.css';
+import './icons.js'
 import Header from './Header.js';
 import HeroSection from './HeroSection.js';
 import FeaturedProducts from './FeaturedProducts.js';

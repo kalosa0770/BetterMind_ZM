@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/BetterMind_ZM/static/css/main.6fff8ff8.css",
-    "main.js": "/BetterMind_ZM/static/js/main.d8de4e07.js",
-    "static/js/900.1ea4f60b.chunk.js": "/BetterMind_ZM/static/js/900.1ea4f60b.chunk.js",
-    "static/js/453.b894efbb.chunk.js": "/BetterMind_ZM/static/js/453.b894efbb.chunk.js",
-    "static/media/hero-background-img.jpg": "/BetterMind_ZM/static/media/hero-background-img.00a79a56547245968a11.jpg",
-    "static/media/bettermind-logo-removebg-preview.png": "/BetterMind_ZM/static/media/bettermind-logo-removebg-preview.9f453581bd316dc83219.png",
-    "index.html": "/BetterMind_ZM/index.html",
-    "main.6fff8ff8.css.map": "/BetterMind_ZM/static/css/main.6fff8ff8.css.map",
-    "main.d8de4e07.js.map": "/BetterMind_ZM/static/js/main.d8de4e07.js.map",
-    "453.b894efbb.chunk.js.map": "/BetterMind_ZM/static/js/453.b894efbb.chunk.js.map"
+    "main.css": "/BetterMind_ZM/bettermind-zm/static/css/main.df2bcbfd.css",
+    "main.js": "/BetterMind_ZM/bettermind-zm/static/js/main.31b66c8b.js",
+    "static/js/900.1ea4f60b.chunk.js": "/BetterMind_ZM/bettermind-zm/static/js/900.1ea4f60b.chunk.js",
+    "static/js/453.b894efbb.chunk.js": "/BetterMind_ZM/bettermind-zm/static/js/453.b894efbb.chunk.js",
+    "static/media/hero-background-img.jpg": "/BetterMind_ZM/bettermind-zm/static/media/hero-background-img.00a79a56547245968a11.jpg",
+    "static/media/bettermind-logo-removebg-preview.png": "/BetterMind_ZM/bettermind-zm/static/media/bettermind-logo-removebg-preview.9f453581bd316dc83219.png",
+    "index.html": "/BetterMind_ZM/bettermind-zm/index.html",
+    "main.df2bcbfd.css.map": "/BetterMind_ZM/bettermind-zm/static/css/main.df2bcbfd.css.map",
+    "main.31b66c8b.js.map": "/BetterMind_ZM/bettermind-zm/static/js/main.31b66c8b.js.map",
+    "453.b894efbb.chunk.js.map": "/BetterMind_ZM/bettermind-zm/static/js/453.b894efbb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6fff8ff8.css",
-    "static/js/main.d8de4e07.js"
+    "static/css/main.df2bcbfd.css",
+    "static/js/main.31b66c8b.js"
   ]
 }

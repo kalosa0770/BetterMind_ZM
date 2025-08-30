@@ -5,6 +5,7 @@ import HeroSection from './HeroSection.js';
 import FeaturedProducts from './FeaturedProducts.js';
 import SimpleSteps from './SimpleSteps.js';
 import Services from './Services.js';
+import Testimonials from './Testimonials.js';
 
 
 function App () {
@@ -15,6 +16,8 @@ function App () {
       <SimpleSteps />
       <FeaturedProducts />
       <Services />
+      <Testimonials />
+      
     </div>
   )
   

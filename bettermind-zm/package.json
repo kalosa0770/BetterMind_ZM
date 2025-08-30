@@ -2,7 +2,7 @@
   "name": "bettermind-zm",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://kalosa0770.github.io/BetterMind_ZM/",
+  "homepage": "https://kalosa0770.github.io/BetterMind_ZM/bettermind-zm",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.0",
     "@fortawesome/free-brands-svg-icons": "^7.0.0",

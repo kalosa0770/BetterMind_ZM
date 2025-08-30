@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/BetterMind_ZM/bettermind-zm/static/css/main.df2bcbfd.css",
-    "main.js": "/BetterMind_ZM/bettermind-zm/static/js/main.31b66c8b.js",
-    "static/js/900.1ea4f60b.chunk.js": "/BetterMind_ZM/bettermind-zm/static/js/900.1ea4f60b.chunk.js",
-    "static/js/453.b894efbb.chunk.js": "/BetterMind_ZM/bettermind-zm/static/js/453.b894efbb.chunk.js",
-    "static/media/hero-background-img.jpg": "/BetterMind_ZM/bettermind-zm/static/media/hero-background-img.00a79a56547245968a11.jpg",
-    "static/media/bettermind-logo-removebg-preview.png": "/BetterMind_ZM/bettermind-zm/static/media/bettermind-logo-removebg-preview.9f453581bd316dc83219.png",
-    "index.html": "/BetterMind_ZM/bettermind-zm/index.html",
-    "main.df2bcbfd.css.map": "/BetterMind_ZM/bettermind-zm/static/css/main.df2bcbfd.css.map",
-    "main.31b66c8b.js.map": "/BetterMind_ZM/bettermind-zm/static/js/main.31b66c8b.js.map",
-    "453.b894efbb.chunk.js.map": "/BetterMind_ZM/bettermind-zm/static/js/453.b894efbb.chunk.js.map"
+    "main.css": "./static/css/main.390abbf3.css",
+    "main.js": "./static/js/main.18bf4830.js",
+    "static/js/900.1ea4f60b.chunk.js": "./static/js/900.1ea4f60b.chunk.js",
+    "static/js/453.b894efbb.chunk.js": "./static/js/453.b894efbb.chunk.js",
+    "static/media/hero-background-img.jpg": "./static/media/hero-background-img.00a79a56547245968a11.jpg",
+    "static/media/bettermind-logo-removebg-preview.png": "./static/media/bettermind-logo-removebg-preview.9f453581bd316dc83219.png",
+    "index.html": "./index.html",
+    "main.390abbf3.css.map": "./static/css/main.390abbf3.css.map",
+    "main.18bf4830.js.map": "./static/js/main.18bf4830.js.map",
+    "453.b894efbb.chunk.js.map": "./static/js/453.b894efbb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.df2bcbfd.css",
-    "static/js/main.31b66c8b.js"
+    "static/css/main.390abbf3.css",
+    "static/js/main.18bf4830.js"
   ]
 }

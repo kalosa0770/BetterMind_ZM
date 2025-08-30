@@ -55,3 +55,9 @@
     color: #ffffff;
     font-weight: bold;
 }
+
+@media screen and (max-width: 768px) {
+    .simple-steps h2 {
+        font-size: 2.1rem;
+    }
+}

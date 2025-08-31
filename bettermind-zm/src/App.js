@@ -9,12 +9,28 @@ import Testimonials from './Testimonials.js';
 import HealthProviders from './HealthProviders.js';
 import FinalCTA from './FinalCTA.js';
 import Footer from './Footer.js';
+import LoginForm from './LoginForm.js';
+import React, { useState } from 'react';
 
 
 function App () {
+  // creating a modal for login
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const openLoginModal = () => {
+    console.log("Modal state changing to true")
+    setIsLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
+
   return (
     <div className="App">
-      <Header />
+      <Header onLoginClick={openLoginModal} />
+      <LoginForm isOpen={isLoginModalOpen} onClose={closeLoginModal} />
       <HeroSection />
       <SimpleSteps />
       <FeaturedProducts />

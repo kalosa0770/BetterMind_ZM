@@ -1,9 +1,11 @@
+import React from 'react';
 import './Header.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import logo from './assets/bettermind-logo-removebg-preview.png';
 import { useState } from 'react';
 
-function Header() {
+// the onLoginClick is the function passed from App.js
+function Header({onLoginClick}) {
 
     const [openMenu, setOpenMenu] = useState(false);
     
@@ -26,7 +28,11 @@ function Header() {
                     <a href="#services">Services</a>
                     <a href="#contact">Contact</a>
                     <div className="auth-buttons">
-                        <button className="login-btn">Login</button>
+                        <button className="login-btn" onClick={(e) =>
+                                {
+                                    e.preventDefault(); // prevents link from navigating
+                                    onLoginClick(); //calls the onLoginClick prop function to open the modal
+                                } }>Sign in</button>
                         <button className="signup-btn">Sign Up</button>
                     </div>
                 </div>
@@ -50,7 +56,12 @@ function Header() {
                             <li><a href="#contact">Contact</a></li>
                         </div>
                         <div className="mobile-auth-buttons">
-                            <li><a href="login.js"className="mobile-login-btn">Login</a></li>
+                            <li><a href="#login"className="mobile-login-btn" onClick={(e) =>
+                                {
+                                    e.preventDefault(); // prevents link from navigating
+                                    onLoginClick(); //calls the onLoginClick prop function to open the modal
+                                }
+                            }>Sign in</a></li>
                             <li><a href='signup.js' className="mobile-signup-btn">Sign Up</a></li>
                             
                             

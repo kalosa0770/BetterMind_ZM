@@ -10,6 +10,7 @@ import HealthProviders from './HealthProviders.js';
 import FinalCTA from './FinalCTA.js';
 import Footer from './Footer.js';
 import LoginForm from './LoginForm.js';
+import SignUpForm from './SignUpForm.js';
 import React, { useState } from 'react';
 
 
@@ -26,11 +27,23 @@ function App () {
     setIsLoginModalOpen(false);
   };
 
+  // creating a signup form modal as props to be passed
+  const [isSignUpFormOpen, setIsSignUpFormOpen] = useState(false);
+
+  const openSignupForm = () => {
+    setIsSignUpFormOpen(true);
+  };
+
+  const closeSignUpForm = () => {
+    setIsSignUpFormOpen(false)
+  }
+
 
   return (
     <div className="App">
-      <Header onLoginClick={openLoginModal} />
+      <Header onLoginClick={openLoginModal} onSignUpClick={openSignupForm} />
       <LoginForm isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <SignUpForm signUpOpen={isSignUpFormOpen} signUpClose={closeSignUpForm} />
       <HeroSection />
       <SimpleSteps />
       <FeaturedProducts />

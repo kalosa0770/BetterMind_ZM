@@ -5,7 +5,7 @@ import logo from './assets/bettermind-logo-removebg-preview.png';
 import { useState } from 'react';
 
 // the onLoginClick is the function passed from App.js
-function Header({onLoginClick}) {
+function Header({onLoginClick, onSignUpClick}) {
 
     const [openMenu, setOpenMenu] = useState(false);
     
@@ -33,7 +33,12 @@ function Header({onLoginClick}) {
                                     e.preventDefault(); // prevents link from navigating
                                     onLoginClick(); //calls the onLoginClick prop function to open the modal
                                 } }>Sign in</button>
-                        <button className="signup-btn">Sign Up</button>
+                        <button className="signup-btn" onClick={(e) =>
+                            {
+                                e.preventDefault();
+                                onSignUpClick();
+                            }
+                        }>Sign Up</button>
                     </div>
                 </div>
             </div>
@@ -62,7 +67,12 @@ function Header({onLoginClick}) {
                                     onLoginClick(); //calls the onLoginClick prop function to open the modal
                                 }
                             }>Sign in</a></li>
-                            <li><a href='signup.js' className="mobile-signup-btn">Sign Up</a></li>
+                            <li><a href='signup.js' className="mobile-signup-btn" onClick={(e) =>
+                                {
+                                    e.preventDefault();
+                                    onSignUpClick();
+                                }
+                            }>Sign Up</a></li>
                             
                             
                         </div>

@@ -170,8 +170,8 @@
     .signup-container {
         align-items: center;
         justify-content: center;
-        margin: auto;
-        padding-top: 40px;
+        margin: 40px auto;
+        padding-top: 80px;
     }
     .signup-form {
         padding: 30px 20px; /* Reduce padding on smaller screens */

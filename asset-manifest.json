@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.e345c14d.css",
-    "main.js": "./static/js/main.3ee743b6.js",
+    "main.css": "./static/css/main.8a55c959.css",
+    "main.js": "./static/js/main.3c9704bc.js",
     "static/js/900.1ea4f60b.chunk.js": "./static/js/900.1ea4f60b.chunk.js",
     "static/js/453.b894efbb.chunk.js": "./static/js/453.b894efbb.chunk.js",
     "static/media/hero-background-img.jpg": "./static/media/hero-background-img.00a79a56547245968a11.jpg",
@@ -9,12 +9,12 @@
     "static/media/mental-health-1.jpeg": "./static/media/mental-health-1.a1c5968a3b2030f6442a.jpeg",
     "static/media/emoji-icon.png": "./static/media/emoji-icon.74811b440b86a64f6e35.png",
     "index.html": "./index.html",
-    "main.e345c14d.css.map": "./static/css/main.e345c14d.css.map",
-    "main.3ee743b6.js.map": "./static/js/main.3ee743b6.js.map",
+    "main.8a55c959.css.map": "./static/css/main.8a55c959.css.map",
+    "main.3c9704bc.js.map": "./static/js/main.3c9704bc.js.map",
     "453.b894efbb.chunk.js.map": "./static/js/453.b894efbb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e345c14d.css",
-    "static/js/main.3ee743b6.js"
+    "static/css/main.8a55c959.css",
+    "static/js/main.3c9704bc.js"
   ]
 }

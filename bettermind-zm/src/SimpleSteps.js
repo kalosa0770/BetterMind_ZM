@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 function SimpleSteps() {
   return (
     <div className='simple-steps'>
-        <h2>Simple Steps to Better Your Mind</h2>
+        <h2>Simple steps to better your mind</h2>
         <div className='steps-container'>
           <div className='step'>
             <h3>01 Sign Up</h3>

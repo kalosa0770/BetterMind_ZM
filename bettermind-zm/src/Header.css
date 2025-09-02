@@ -167,6 +167,9 @@
         right: 16px;
         font-size: 1.3rem;
         color: #333333;
+        border: none;
+        background: transparent;
+        cursor: pointer;
     }
 
     .mobile-nav-links ul {

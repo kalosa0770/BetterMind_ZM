@@ -38,6 +38,10 @@
   transition: background-color 0.3s;
 }
 
+.arrow-right {
+  margin-left: 8px;
+}
+
 .cta-button:hover {
   background-color: #006666; /* A slightly darker teal on hover */
 }

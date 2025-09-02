@@ -6,7 +6,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: max-content;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -114,7 +114,7 @@
    align-items: flex-start; /* Align checkbox to top if label wraps */
    gap: 10px;
    margin-top: 15px; /* Space above the checkbox */
-   margin-bottom: 25px; /* Space below the checkbox before button */
+   margin-bottom: 15px; /* Space below the checkbox before button */
 }
 
 .signup-checkbox {
@@ -165,20 +165,27 @@
     text-decoration: underline;
 }
 
+.signup-message {
+  margin-top: 20px;
+  color: #008080;
+  font-weight: bold;
+}
+
 /* Responsive adjustments */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
     .signup-container {
         align-items: center;
         justify-content: center;
-        margin: 40px auto;
-        padding-top: 80px;
+        padding-bottom: 80px;
+        margin-bottom: 60px;
+    
     }
     .signup-form {
         padding: 30px 20px; /* Reduce padding on smaller screens */
     }
 
     .signup-form h3 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
 
     .signup-form p {
@@ -190,7 +197,7 @@
     }
     
     .form-details-checkbox {
-        flex-direction: column; /* Stack checkbox and label on very small screens if needed */
+        flex-direction: row; /* Stack checkbox and label on very small screens if needed */
         align-items: flex-start;
     }
 

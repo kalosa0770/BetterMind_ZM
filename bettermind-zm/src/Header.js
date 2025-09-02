@@ -53,7 +53,7 @@ function Header({onLoginClick, onSignUpClick}) {
                 </div>
                 <nav className={`mobile-nav-links ${openMenu ? 'open' : ''}`}>
                     <ul>
-                        <button><FontAwesomeIcon icon={['fas', 'times']} onClick={toggleMenuList} className='close-menu' /></button>
+                        <button className='close-menu'><FontAwesomeIcon icon={['fas', 'times']} onClick={toggleMenuList}  /></button>
                         <div className='mobile-links'>
                             <li><a href="#home">Home</a></li>
                             <li><a href="#about">About</a></li>

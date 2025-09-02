@@ -2,7 +2,7 @@ import './Testimonials.css';
 const Testimonials = () => {
     return (
         <div className="testimonials">
-            <h2>The Breakthrough</h2>
+            <h2>The breakthrough</h2>
             <div className="testimonial-cards">
                 <div className="testimonial-card">
                     <p>"BetterMind has transformed my life. The therapy sessions have been incredibly helpful."</p>

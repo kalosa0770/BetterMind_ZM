@@ -6,7 +6,7 @@ const HeroSection = () => {
     return (
         <div className='hero-section' style={{ backgroundImage: `url(${HeroBackground})` }}>
             <div className='hero-overlay'>
-                <h2>Start Your Journey to a Better Mind</h2>
+                <h2>Start your journey to a better mind</h2>
                 <p>
                     Get personalized support, track your well-being, and connect
                     with licenced therapists, all in one safe space.

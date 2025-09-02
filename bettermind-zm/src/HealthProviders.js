@@ -19,7 +19,7 @@ const TherapistSection = () => {
 
   return (
     <div className="therapist-section">
-      <h2 className="section-title">Find the Right Therapist for You</h2>
+      <h2 className="section-title">Find the right therapist for You</h2>
       <p className="section-subtitle">
         Our network of licensed therapists and mental health professionals are here 
         to support you on your journey to better mental health.
@@ -37,7 +37,7 @@ const TherapistSection = () => {
         ))}
       </div>
       
-      <button className="see-more-btn">SEE ALL EXPERTS</button>
+      <button className="see-more-btn">SEE ALL EXPERTS <FontAwesomeIcon icon={['fas', 'arrow-right']} className='arrow-right'/></button>
     </div>
   );
 };

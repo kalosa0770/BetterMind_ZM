@@ -1,56 +1,49 @@
 import React, { useState } from "react";
 import './SignUp.css';
+import axios from 'axios';
+// import { useNavigate } from 'react-router-dom';
 
 const SignUpForm = ({ signUpOpen, signUpClose }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [message, setMessage] = useState('');
+  const [firstName, setFirstName] = useState();
+  const [lastName, setLastName] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const[message, setMessage] = useState("");
+
   
-  const { firstName, lastName, email, password, confirmPassword } = formData;
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault()
 
-    if (password !== confirmPassword) {
-      setMessage("Passwords do not match");
+    axios.post('http://localhost:3001/register', {firstName, lastName, email, password})
+    .then(result => {
+      console.log(result)
+      setMessage("Registration successful!");
+
+    })
+    .catch(err => {
+      console.log(err)
+    })
+
+    if (!termsAccepted) {
+      setMessage("You must agree to the terms of service and privacy policy.");
       return;
     }
 
-    try {
-      const response = await fetch('http://localhost:5000/api/users/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          password
-        })
-      });
+    // Reset form fields
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPassword("");
+    setTermsAccepted(false);
+    setMessage("Registration successful!");
+  }
 
-      const data = await response.json();
+  
 
-      if (response.status === 201) {
-        setMessage('Sign-up successful! You can now log in.');
-      } else {
-        setMessage(data.msg || 'An error occurred during sign-up.');
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage('Network error. Please try again.');
-    }
-  };
 
   if (!signUpOpen) {
       return null;
@@ -70,7 +63,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
               name="firstName" 
               placeholder="First Name" 
               value={firstName} 
-              onChange={handleChange} 
+              onChange={(e) => setFirstName(e.target.value)}
               className='signup-input-details'
               required 
             />
@@ -83,7 +76,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
               name="lastName" 
               placeholder="Last Name" 
               value={lastName} 
-              onChange={handleChange} 
+              onChange={(e) => setLastName(e.target.value)} 
               className='signup-input-details'
               required 
             />
@@ -95,7 +88,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
               name="email" 
               placeholder="Email Address" 
               value={email} 
-              onChange={handleChange} 
+              onChange={(e) => setEmail(e.target.value)} 
               className='signup-input-details'
               required 
             />
@@ -108,25 +101,17 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
               name="password" 
               placeholder="Password" 
               value={password} 
-              onChange={handleChange} 
-              required 
-            />
-          </div>
-          <div className='signup-form-details'>
-            <label htmlFor='confirm-password'>Confirm Password</label>
-             <input 
-              type="password" 
-              name="confirmPassword" 
-              placeholder="Confirm Password" 
-              value={confirmPassword} 
-              onChange={handleChange} 
-              className='signup-input-details'
+              onChange={(e) => setPassword(e.target.value)} 
               required 
             />
           </div>
 
           <div className='form-details-checkbox'>
-            <input type="checkbox" name="terms" id="terms-checkbox" className='signup-checkbox' />
+            <input type="checkbox" 
+              name={termsAccepted}
+              className='signup-checkbox' 
+              onChange={(e) => setTermsAccepted(e.target.value)}
+             />
             <label htmlFor='terms-checkbox'>I agree to the <a href="#terms-of-service">terms of service</a> and <a href="#privacy-policy">privacy policy</a> of BetterMind</label>
           </div>
 

@@ -5,7 +5,7 @@ import logo from './assets/bettermind-logo-removebg-preview.png';
 import { useState } from 'react';
 
 // the onLoginClick is the function passed from App.js
-function Header({onLoginClick, onSignUpClick}) {
+function Header({openLoginModal, openSignupForm}) {
 
     const [openMenu, setOpenMenu] = useState(false);
     
@@ -31,12 +31,12 @@ function Header({onLoginClick, onSignUpClick}) {
                         <button className="login-btn" onClick={(e) =>
                                 {
                                     e.preventDefault(); // prevents link from navigating
-                                    onLoginClick(); //calls the onLoginClick prop function to open the modal
+                                    openLoginModal(); //calls the onLoginClick prop function to open the modal
                                 } }>Sign in</button>
                         <button className="signup-btn" onClick={(e) =>
                             {
                                 e.preventDefault();
-                                onSignUpClick();
+                                openSignupForm();
                             }
                         }>Sign Up</button>
                     </div>
@@ -64,13 +64,13 @@ function Header({onLoginClick, onSignUpClick}) {
                             <li><a href="#login"className="mobile-login-btn" onClick={(e) =>
                                 {
                                     e.preventDefault(); // prevents link from navigating
-                                    onLoginClick(); //calls the onLoginClick prop function to open the modal
+                                    openLoginModal(); //calls the onLoginClick prop function to open the modal
                                 }
                             }>Sign in</a></li>
                             <li><a href='signup.js' className="mobile-signup-btn" onClick={(e) =>
                                 {
                                     e.preventDefault();
-                                    onSignUpClick();
+                                    openSignupForm();
                                 }
                             }>Sign Up</a></li>
                             

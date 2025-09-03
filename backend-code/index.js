@@ -9,6 +9,23 @@ app.use(cors());
 
 mongoose.connect('mongodb://localhost:27017/bettermind_zm');
 
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  UserModel.findOne({ email: email})
+  .then(user => {
+    if (user) {
+      if (password === user.password) {
+        res.json("Success");
+      }else {
+        res.json("Password did not match");
+      }
+    } else {
+      res.json("User not registered");
+    }
+  })
+})
+
+
 app.post('/register', (req, res) => {
   UserModel.create(req.body)
   .then(users => res.json(users))

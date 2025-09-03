@@ -12,14 +12,31 @@ import Footer from './Footer.js';
 import LoginForm from './LoginForm.js';
 import SignUpForm from './SignUpForm.js';
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Dashboard from './Dashboard.js';
 
+// HomePage component to group all the main page content
+const HomePage = ({ openLoginModal, openSignupForm, isLoginModalOpen, closeLoginModal, isSignUpFormOpen, closeSignUpForm }) => (
+  <>
+    <Header openLoginModal={openLoginModal} openSignupForm={openSignupForm} />
+    <HeroSection />
+    <FeaturedProducts />
+    <SimpleSteps />
+    <Services />
+    <Testimonials />
+    <HealthProviders />
+    <FinalCTA />
+    <LoginForm isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+    <SignUpForm signUpOpen={isSignUpFormOpen} signUpClose={closeSignUpForm} />
+    <Footer />
+  </>
+);
 
 function App () {
   // creating a modal for login
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const openLoginModal = () => {
-    console.log("Modal state changing to true")
     setIsLoginModalOpen(true);
   };
 
@@ -38,24 +55,31 @@ function App () {
     setIsSignUpFormOpen(false)
   }
 
-
   return (
-    <div className="App">
-      <Header onLoginClick={openLoginModal} onSignUpClick={openSignupForm} />
-      <LoginForm isOpen={isLoginModalOpen} onClose={closeLoginModal} />
-      <SignUpForm signUpOpen={isSignUpFormOpen} signUpClose={closeSignUpForm} />
-      <HeroSection />
-      <SimpleSteps />
-      <FeaturedProducts />
-      <Services />
-      <Testimonials />
-      <HealthProviders />
-      <FinalCTA />
-      <Footer />
-    </div>
-  )
-  
-  
+    // Only one BrowserRouter at the top level
+    <BrowserRouter>
+      <div className="App">
+        <Routes>
+          {/* Main page route, which renders all the home page components */}
+          <Route 
+            path="/" 
+            element={
+              <HomePage
+                openLoginModal={openLoginModal} 
+                openSignupForm={openSignupForm} 
+                isLoginModalOpen={isLoginModalOpen} 
+                closeLoginModal={closeLoginModal} 
+                isSignUpFormOpen={isSignUpFormOpen} 
+                closeSignUpForm={closeSignUpForm} 
+              />
+            } 
+          />
+          {/* Dashboard route */}
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

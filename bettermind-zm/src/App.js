@@ -56,11 +56,11 @@ function App () {
   }
 
   return (
-    // Only one BrowserRouter at the top level
+    // Only one BrowserRouter
     <BrowserRouter>
       <div className="App">
         <Routes>
-          {/* Main page route, which renders all the home page components */}
+          {/* Main page route, the home page components */}
           <Route 
             path="/" 
             element={

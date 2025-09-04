@@ -23,13 +23,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     color: #333333; /* Charcoal Gray */
     text-align: center;
-<<<<<<< HEAD
-}
-
-.step h3 {
-    margin-bottom: 10px;
-    color: #9bb8a1;
-=======
     position: relative;
 }
 
@@ -43,7 +36,6 @@
 
 .step p {
     padding-top: 30px;
->>>>>>> db3aa00713bbcd7d34fb501f053515caedf073d8
 }
 
 .step-signup p, .step-connect p, .step-thrive p {
@@ -60,10 +52,7 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
-<<<<<<< HEAD
-=======
     font-size: 1rem;
->>>>>>> db3aa00713bbcd7d34fb501f053515caedf073d8
 }
 
 .step button:hover {
@@ -85,10 +74,6 @@
     }
 
     .step h3 {
-<<<<<<< HEAD
-        font-size: 1.1rem;
-=======
         font-size: 1.3rem;
->>>>>>> db3aa00713bbcd7d34fb501f053515caedf073d8
     }
 }

@@ -2,11 +2,7 @@ import './Testimonials.css';
 const Testimonials = () => {
     return (
         <div className="testimonials">
-<<<<<<< HEAD
-            <h2>The Breakthrough</h2>
-=======
             <h2>The breakthrough</h2>
->>>>>>> db3aa00713bbcd7d34fb501f053515caedf073d8
             <div className="testimonial-cards">
                 <div className="testimonial-card">
                     <p>"BetterMind has transformed my life. The therapy sessions have been incredibly helpful."</p>

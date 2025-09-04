@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "./static/css/main.510f5d91.css",
+    "main.css": "./static/css/main.8bf27b4b.css",
     "main.js": "./static/js/main.95c5d7bb.js",
     "static/js/900.1ea4f60b.chunk.js": "./static/js/900.1ea4f60b.chunk.js",
     "static/js/453.b894efbb.chunk.js": "./static/js/453.b894efbb.chunk.js",
@@ -9,12 +9,12 @@
     "static/media/mental-health-1.jpeg": "./static/media/mental-health-1.a1c5968a3b2030f6442a.jpeg",
     "static/media/emoji-icon.png": "./static/media/emoji-icon.74811b440b86a64f6e35.png",
     "index.html": "./index.html",
-    "main.510f5d91.css.map": "./static/css/main.510f5d91.css.map",
+    "main.8bf27b4b.css.map": "./static/css/main.8bf27b4b.css.map",
     "main.95c5d7bb.js.map": "./static/js/main.95c5d7bb.js.map",
     "453.b894efbb.chunk.js.map": "./static/js/453.b894efbb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.510f5d91.css",
+    "static/css/main.8bf27b4b.css",
     "static/js/main.95c5d7bb.js"
   ]
 }

@@ -9,29 +9,6 @@ import Testimonials from './Testimonials.js';
 import HealthProviders from './HealthProviders.js';
 import FinalCTA from './FinalCTA.js';
 import Footer from './Footer.js';
-<<<<<<< HEAD
-
-
-function App () {
-  return (
-    <div className="App">
-      <Header />
-      <HeroSection />
-      <SimpleSteps />
-      <FeaturedProducts />
-      <Services />
-      <Testimonials />
-      <HealthProviders />
-      <FinalCTA />
-      <Footer />
-    </div>
-  )
-  
-  
-}
-
-export default App
-=======
 import LoginForm from './LoginForm.js';
 import SignUpForm from './SignUpForm.js';
 import React, { useState } from 'react';
@@ -106,4 +83,3 @@ function App () {
 }
 
 export default App;
->>>>>>> db3aa00713bbcd7d34fb501f053515caedf073d8

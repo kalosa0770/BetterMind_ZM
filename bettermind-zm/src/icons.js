@@ -5,7 +5,9 @@ import {faBrain as fasBrain, faComments as fasComments,
         faSearch as fasSearch, faUserPlus as fasUserPlus,
         faStream as fasStream, faTimes as fasTimes,
         faCheck as fasCheck, faVideoCamera as fasVideoCamera,
-        faHeadset as fasHeadset,faChartLine as fasChartLine} from '@fortawesome/free-solid-svg-icons';
+        faHeadset as fasHeadset,faChartLine as fasChartLine,
+        faOm as fasOm, faFileCirclePlus as fasFileCirclePlus,
+        faCalendarCheck as fasCalendarCheck, faHome as fasHome, faUser as fasUser} from '@fortawesome/free-solid-svg-icons';
 import {faTwitter, faInstagram} from '@fortawesome/free-brands-svg-icons';
 
 library.add(
@@ -23,5 +25,10 @@ library.add(
     fasCheck,
     fasVideoCamera,
     fasHeadset,
-    fasChartLine
+    fasChartLine, 
+    fasOm,
+    fasFileCirclePlus,
+    fasCalendarCheck,
+    fasHome,
+    fasUser
 )

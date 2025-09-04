@@ -4,7 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 function SimpleSteps() {
   return (
     <div className='simple-steps'>
+<<<<<<< HEAD
         <h2>Simple Steps to Better Your Mind</h2>
+=======
+        <h2>Simple steps to better your mind</h2>
+>>>>>>> db3aa00713bbcd7d34fb501f053515caedf073d8
         <div className='steps-container'>
           <div className='step'>
             <h3>01 Sign Up</h3>

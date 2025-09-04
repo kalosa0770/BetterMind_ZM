@@ -49,6 +49,7 @@
     position: absolute;
     top: 20px;
     left: 20px;
+    font-size: 1.3rem;
 }
 
 
@@ -64,7 +65,7 @@
     }
 
     .service h3 {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
     }
 
     .service p {

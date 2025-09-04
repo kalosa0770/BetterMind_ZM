@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import logo from './assets/bettermind-logo-removebg-preview.png';
 import { useState } from 'react';
 
-function Header() {
+// the onLoginClick is the function passed from App.js
+function Header({openLoginModal, openSignupForm}) {
 
     const [openMenu, setOpenMenu] = useState(false);
     
@@ -26,8 +27,17 @@ function Header() {
                     <a href="#services">Services</a>
                     <a href="#contact">Contact</a>
                     <div className="auth-buttons">
-                        <button className="login-btn">Login</button>
-                        <button className="signup-btn">Sign Up</button>
+                        <button className="login-btn" onClick={(e) =>
+                                {
+                                    e.preventDefault(); // prevents link from navigating
+                                    openLoginModal(); //calls the onLoginClick prop function to open the modal
+                                } }>Sign in</button>
+                        <button className="signup-btn" onClick={(e) =>
+                            {
+                                e.preventDefault();
+                                openSignupForm();
+                            }
+                        }>Sign Up</button>
                     </div>
                 </div>
             </div>
@@ -42,7 +52,7 @@ function Header() {
                 </div>
                 <nav className={`mobile-nav-links ${openMenu ? 'open' : ''}`}>
                     <ul>
-                        <button><FontAwesomeIcon icon={['fas', 'times']} onClick={toggleMenuList} className='close-menu' /></button>
+                        <button className='close-menu'><FontAwesomeIcon icon={['fas', 'times']} onClick={toggleMenuList}  /></button>
                         <div className='mobile-links'>
                             <li><a href="#home">Home</a></li>
                             <li><a href="#about">About</a></li>
@@ -50,8 +60,18 @@ function Header() {
                             <li><a href="#contact">Contact</a></li>
                         </div>
                         <div className="mobile-auth-buttons">
-                            <li><a href="login.js"className="mobile-login-btn">Login</a></li>
-                            <li><a href='signup.js' className="mobile-signup-btn">Sign Up</a></li>
+                            <li><a href="#login"className="mobile-login-btn" onClick={(e) =>
+                                {
+                                    e.preventDefault(); // prevents link from navigating
+                                    openLoginModal(); //calls the onLoginClick prop function to open the modal
+                                }
+                            }>Sign in</a></li>
+                            <li><a href='signup.js' className="mobile-signup-btn" onClick={(e) =>
+                                {
+                                    e.preventDefault();
+                                    openSignupForm();
+                                }
+                            }>Sign Up</a></li>
                             
                             
                         </div>

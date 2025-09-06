@@ -1,37 +1,46 @@
 import React, { useState } from "react";
 import './SignUp.css';
 import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpForm = ({ signUpOpen, signUpClose }) => {
-  const [firstName, setFirstName] = useState();
-  const [lastName, setLastName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const[message, setMessage] = useState("");
-
-  
-
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-
-    axios.post('http://localhost:3001/register', {firstName, lastName, email, password})
-    .then(result => {
-      console.log(result)
-      setMessage("Registration successful!");
-
-    })
-    .catch(err => {
-      console.log(err)
-    })
+    e.preventDefault();
+    setMessage(''); // Clear any previous messages
 
     if (!termsAccepted) {
       setMessage("You must agree to the terms of service and privacy policy.");
       return;
     }
+
+    axios.post('http://localhost:3001/api/auth/register', {firstName, lastName, email, password})
+    .then(result => {
+      console.log(result);
+      if (result.status === 201) {
+        setMessage("Registration successful! You can now log in.");
+        // Optional: Navigate to login page after successful registration
+        
+      } else {
+        setMessage(result.data.msg || "An unexpected error occurred during registration.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      if (err.response && err.response.data && err.response.data.msg) {
+        setMessage(err.response.data.msg);
+      } else {
+        setMessage("An error occurred during registration.");
+      }
+    });
 
     // Reset form fields
     setFirstName("");
@@ -39,11 +48,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
     setEmail("");
     setPassword("");
     setTermsAccepted(false);
-    setMessage("Registration successful!");
   }
-
-  
-
 
   if (!signUpOpen) {
       return null;
@@ -107,10 +112,12 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
           </div>
 
           <div className='form-details-checkbox'>
-            <input type="checkbox" 
-              name={termsAccepted}
+            <input 
+              type="checkbox" 
+              name="termsAccepted"
               className='signup-checkbox' 
-              onChange={(e) => setTermsAccepted(e.target.value)}
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
              />
             <label htmlFor='terms-checkbox'>I agree to the <a href="#terms-of-service">terms of service</a> and <a href="#privacy-policy">privacy policy</a> of BetterMind</label>
           </div>
@@ -120,7 +127,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
           </div>
 
           <div className='signup-other-details'>
-            <p>Already have an account? <a href='#signin'>Sign in</a></p>
+            <p>Already have an account? <a href="LoginForm.js">Sign in</a></p>
           </div>
         </form>
 

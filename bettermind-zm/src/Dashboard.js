@@ -145,35 +145,35 @@ const Dashboard = () => {
                         <ul className="mobile-dashboard-nav-links">
                             <li>
                                 <a href="#profile" >
-                                    <FontAwesomeIcon icon={['fas', 'home']} />
+                                    <FontAwesomeIcon icon={['fas', 'home']} className="icon-nav-links"/>
                                     <p >Dashboard</p>
                                 </a>
                                 
                             </li>
                             <li>
                                 <a href="#profile" >
-                                    <FontAwesomeIcon icon={['fas', 'file-circle-plus']} />
+                                    <FontAwesomeIcon icon={['fas', 'file-circle-plus']} className="icon-nav-links" />
                                     <p >Journey</p>
                                 </a>
                                 
                             </li>
                             <li>
                                 <a href="#profile" >
-                                    <FontAwesomeIcon icon={['fas', 'video']} />
+                                    <FontAwesomeIcon icon={['fas', 'video']} className="icon-nav-links" />
                                     <p >Teletherapy</p>
                                 </a>
                                 
                             </li>
                             <li>
                                 <a href="#profile" >
-                                    <FontAwesomeIcon icon={['fas', 'comments']} />
-                                    <p >Community Forum</p>
+                                    <FontAwesomeIcon icon={['fas', 'comments']}  className="icon-nav-links"/>
+                                    <p >Forum</p>
                                 </a>
                                 
                             </li>
                              <li>
                                 <a href="#profile" >
-                                    <FontAwesomeIcon icon={['fas', 'user']} />
+                                    <FontAwesomeIcon icon={['fas', 'user']} className="icon-nav-links" />
                                     <p >Account</p>
                                 </a>
                                 

@@ -1,53 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import './Dashboard.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from 'axios';
+import UserAvatar from "./user-dashboard-components/UserAvatar";
 
 const Dashboard = () => {
     
-    const [initials, setInitials] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchInitials = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    throw new Error ('No token found');
-                }
-
-                // Use axios and the correct Authorization header
-                const response = await axios.get('http://localhost:3001/api/my-initials', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                
-                if (response.data.initials) {
-                    setInitials(response.data.initials);
-                } else {
-                    throw new Error('Initials not found in response');
-                }
-
-            } catch (e) {
-                setError(e.message);
-                console.error("Authentication Error:", e);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchInitials();
-    }, []);
-
-    if (loading) {
-        return <div>loading...</div>
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>
-    }
+    
     
     return (
         <div className="dashboard">
@@ -65,7 +23,13 @@ const Dashboard = () => {
                             <li><a href="/#contact">Community Forum</a></li>
                             <li><a href="/#account">Account & Settings</a></li>
                         </ul>
+                        
+                        <ul className="logout-btn">
+                            <li><button>Log out</button></li>
+                        </ul>
+                    
                     </nav>
+                   
                 </header>
                 
                 
@@ -73,10 +37,13 @@ const Dashboard = () => {
                 <main className="dashboard-main-content">
                     <header className="header-bar">
                         <div className="bar-content">
-                            <h1 className="bar-name">
-                                {initials}
-                            </h1>
-                            <FontAwesomeIcon icon={['fas' , 'bell']} className="bar-notification"></FontAwesomeIcon>
+                          
+                                <UserAvatar />
+                            
+                            <div className="bar-icons">
+                                <FontAwesomeIcon icon={['fas' , 'bell']} className="bar-notification"></FontAwesomeIcon>
+                                <FontAwesomeIcon icon={['fas', 'user']} className="user-profile" />
+                            </div>
                         </div>
                     </header>
                     <section className="section-main-content">
@@ -171,13 +138,7 @@ const Dashboard = () => {
                                 </a>
                                 
                             </li>
-                             <li>
-                                <a href="#profile" >
-                                    <FontAwesomeIcon icon={['fas', 'user']} className="icon-nav-links" />
-                                    <p >Account</p>
-                                </a>
-                                
-                            </li>
+                            
 
                             
                             

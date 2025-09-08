@@ -25,6 +25,10 @@
   .dashboard-layout {
     flex-direction: row;
   }
+
+  .dashboard-header {
+    width: 100%;
+  }
 }
 
 /* Sidebar/Header */
@@ -73,6 +77,28 @@
   padding-right: 25px;
   list-style: none;
   color: var(--text-color);
+}
+
+.logout-btn {
+  position: absolute;
+  bottom: 40px;
+  right: 10px;
+  width: 100%;
+}
+
+.logout-btn li {
+  list-style: none;
+  width: 100%;
+}
+
+.logout-btn li button {
+  border: none;
+  background-color: #008080;
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: #ffffff;
+  width: 140px;
+  
 }
 
 @media (max-width: 767px) {
@@ -132,6 +158,12 @@
     display: none;
   }
 
+  .section-main-content .container-contents {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
 }
 
 .header-title {
@@ -177,6 +209,7 @@
 .section-main-content {
   flex-grow: 1;
   padding: 1.6rem;
+  margin: 0px 0px 90px;
 }
 
 /* Widget Styles */
@@ -211,6 +244,8 @@
   .section-main-content .grid-contents {
     grid-template-columns: repeat(2, 1fr);
   }
+
+
 }
 
 .section-main-content .daily-tips-card,
@@ -245,7 +280,7 @@
 /* Quick Links Section */
 .section-main-content .container-contents {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(2, 1fr));
   gap: 1.5rem;
 }
 
@@ -315,5 +350,11 @@
 
 .bar-notification {
   font-size: 1.5rem;
+  padding-right: 30px;
 }
+
+.user-profile {
+  font-size: 1.5rem;
+}
+
 

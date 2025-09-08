@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './SignUp.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 const SignUpForm = ({ signUpOpen, signUpClose }) => {
   const [firstName, setFirstName] = useState('');
@@ -11,7 +11,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
 
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -28,7 +28,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
       if (result.status === 201) {
         setMessage("Registration successful! You can now log in.");
         // Optional: Navigate to login page after successful registration
-        
+        // navigate('/login');
       } else {
         setMessage(result.data.msg || "An unexpected error occurred during registration.");
       }

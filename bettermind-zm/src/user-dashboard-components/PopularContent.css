@@ -1,0 +1,59 @@
+  /* PopularContent Component Styles */
+          .popular-content-container {
+            margin-top: 2rem; /* mt-8 */
+            margin-bottom: 60px;
+            padding-bottom: 5rem;
+            
+          }
+          .popular-content-heading {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700; /* font-bold */
+            color: var(--text-color-secondary);
+            margin-bottom: 1rem; /* mb-4 */
+            text-align: left;
+          }
+          .content-grid {
+            width: 100%;
+            height: 100%;
+          }
+          .content-card {
+            background-color: var(--surface-color);
+            padding: 1.5rem; /* p-6 */
+            border-radius: var(--border-radius-2xl);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+            height: 100%;
+          }
+          .content-card:hover {
+            transform: scale(1.02);
+          }
+          .card-title {
+            font-weight: 600; /* font-semibold */
+            font-size: 1.125rem; /* text-lg */
+            color: var(--text-color-secondary);
+            margin-bottom: 0.25rem; /* mb-1 */
+          }
+          .card-text {
+            font-size: 0.875rem; /* text-sm */
+            color: var( --subtitle-color);
+          }
+          .card-tag {
+            display: inline-block;
+            margin-top: 1rem; /* mt-4 */
+            padding: 0.25rem 0.75rem; /* px-3 py-1 */
+            font-size: 0.75rem; /* text-sm */
+            border-radius: 9999px; /* rounded-full */
+          }
+          .tag-mindfulness {
+            background-color: #3b304f;
+            color: #bb86fc;
+          }
+          .tag-therapy {
+            background-color: #303b4f;
+            color: #87ceeb;
+          }
+          .tag-self-care {
+            background-color: #4f303b;
+            color: #f77a98;
+          }

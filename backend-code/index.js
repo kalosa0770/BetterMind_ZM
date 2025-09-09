@@ -5,6 +5,7 @@ const dotenv = require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const HOST = '0.0.0.0'; // This allows connections from all network interfaces
 
 // Middleware
 app.use(cors());
@@ -23,6 +24,8 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/bettermind_
 app.use('/api', userRoutes);
 app.use('/api/auth', authRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on http://${HOST}:${PORT}`);
+  console.log(`Access from laptop: http://localhost:${PORT}`);
+  console.log(`Access from other devices:  http://192.168.20.116:${PORT}`);
 });

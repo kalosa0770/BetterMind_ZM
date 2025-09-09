@@ -12,13 +12,29 @@ function LoginForm({isOpen, onClose}) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:3001/api/auth/login', { email, password })
+
+        // Get the current hostname from the browser
+        const hostname = window.location.hostname;
+        
+        // Use a conditional to choose the correct base URL
+        let baseURL;
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            baseURL = `http://localhost:3001`;
+        } else {
+            // Use the dynamic hostname for other devices
+            baseURL = `http://${hostname}:3001`;
+        }
+
+        // The full API endpoint
+        const loginURL = `${baseURL}/api/auth/login`;
+
+        axios.post(loginURL, { email, password })
         .then(result => {
             if (result.data.token) {
-            localStorage.setItem('token', result.data.token);
-            navigate('/dashboard');
+                localStorage.setItem('token', result.data.token);
+                navigate('/dashboard');
             } else {
-            console.error("Login failed: No token received.");
+                console.error("Login failed: No token received.");
             }
         })
         .catch(err => {

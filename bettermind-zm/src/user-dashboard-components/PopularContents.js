@@ -5,7 +5,6 @@ import './PopularContent.css';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-
 const PopularContent = () => {
   const contentData = [
     {
@@ -30,36 +29,34 @@ const PopularContent = () => {
     }
   ];
 
- 
-
-   
-
-
-
   return (
     <div className="popular-content-container">
         <h3 className="popular-content-heading">Popular Resources</h3>
         <Swiper
-        modules={[Pagination]}
-        initialSlide={1}
-        grabCursor
-        slideToClickedSlide
-        slidesPerView="auto"
-        speed={800}
-        pagination={{ clickable: true }}
-        breakpoints={
-            {
-                760: {slidesPerView: 2,spaceBetween: 30},
-                1020: {slidesPerView: 4,spaceBetween: 40},
-                400: {slidesPerView: 1, spaceBetween: 20}
-            }
+          modules={[Pagination]}
+          centeredSlides
+          slidesPerView={1.2} 
+          spaceBetween={15}
+          grabCursor
+          pagination={{ clickable: true }}
+          style={{
+            '--swiper-pagination-color': '#008080',
+            '--swiper-pagination-bullet-inactive-color': '#333333',
+            '--swiper-pagination-bullet-inactive-opacity': '0.5',
+            '--swiper-pagination-bullet-size': '10px',
+          }}
 
-        }
-      
-      >
+          breakpoints={
+              {
+                  768: {slidesPerView: 2, spaceBetween: 20},
+                  1020: {slidesPerView: 4, spaceBetween: 50},
+              }
+
+          }
+        
+        >
         {contentData.map((data, index) => (
           <SwiperSlide key={index}>
-            
             <div className="content-grid">
                 <div className="content-card">
                     <div className="card-img-placeholder">

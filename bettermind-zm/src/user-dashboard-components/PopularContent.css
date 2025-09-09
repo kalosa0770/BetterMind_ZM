@@ -1,59 +1,89 @@
-  /* PopularContent Component Styles */
-          .popular-content-container {
-            margin-top: 2rem; /* mt-8 */
-            margin-bottom: 60px;
-            padding-bottom: 5rem;
-            
-          }
-          .popular-content-heading {
-            font-size: 1.25rem; /* text-xl */
-            font-weight: 700; /* font-bold */
-            color: var(--text-color-secondary);
-            margin-bottom: 1rem; /* mb-4 */
-            text-align: left;
-          }
-          .content-grid {
-            width: 100%;
-            height: 100%;
-          }
-          .content-card {
-            background-color: var(--surface-color);
-            padding: 1.5rem; /* p-6 */
-            border-radius: var(--border-radius-2xl);
-            box-shadow: var(--shadow-md);
-            transition: transform 0.3s ease-in-out;
-            cursor: pointer;
-            height: 100%;
-          }
-          .content-card:hover {
-            transform: scale(1.02);
-          }
-          .card-title {
-            font-weight: 600; /* font-semibold */
-            font-size: 1.125rem; /* text-lg */
-            color: var(--text-color-secondary);
-            margin-bottom: 0.25rem; /* mb-1 */
-          }
-          .card-text {
-            font-size: 0.875rem; /* text-sm */
-            color: var( --subtitle-color);
-          }
-          .card-tag {
-            display: inline-block;
-            margin-top: 1rem; /* mt-4 */
-            padding: 0.25rem 0.75rem; /* px-3 py-1 */
-            font-size: 0.75rem; /* text-sm */
-            border-radius: 9999px; /* rounded-full */
-          }
-          .tag-mindfulness {
-            background-color: #3b304f;
-            color: #bb86fc;
-          }
-          .tag-therapy {
-            background-color: #303b4f;
-            color: #87ceeb;
-          }
-          .tag-self-care {
-            background-color: #4f303b;
-            color: #f77a98;
-          }
+/* PopularContent Component Styles */
+.popular-content-container {
+  margin-top: 2rem; /* mt-8 */
+  padding: 1rem;
+}
+
+.popular-content-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color-secondary);
+  font-weight: 500;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+/* Swiper Slide/Card Container */
+.swiper-slide {
+  height: auto;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Adjust this to control the card width on mobile */
+}
+
+/* The actual card content container */
+.content-card {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.content-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-placeholder {
+  width: 100%;
+  height: 160px; /* Adjust height as needed */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.card-img-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image fills the space */
+  display: block;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--text-color-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.card-text {
+  font-size: 0.875rem;
+  color: var(--subtitle-color);
+}
+
+/* Swiper Pagination Styles */
+.swiper-pagination {
+  margin-top: 1rem;
+  position: relative !important;
+}
+
+.swiper-pagination-bullet {
+  background-color: #ffffff;
+  width: 10px;
+  height: 10px;
+  opacity: 0.5;
+  margin: 0 6px;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--swiper-pagination-color, #007bff);
+  opacity: 1;
+}

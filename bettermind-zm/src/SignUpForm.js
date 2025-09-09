@@ -8,39 +8,43 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [message, setMessage] = useState("");
-  // const navigate = useNavigate();
+  const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessage(''); // Clear any previous messages
+    setMessage('');
 
     if (!termsAccepted) {
       setMessage("You must agree to the terms of service and privacy policy.");
       return;
     }
+    
+    // Determine the base URL dynamically
+    const hostname = window.location.hostname;
+    const baseURL = (hostname === 'localhost' || hostname === '127.0.0.1')
+      ? 'http://localhost:3001'
+      : `http://${hostname}:3001`;
 
-    axios.post('http://localhost:3001/api/auth/register', {firstName, lastName, email, password})
-    .then(result => {
-      console.log(result);
-      if (result.status === 201) {
-        setMessage("Registration successful! You can now log in.");
-        // Optional: Navigate to login page after successful registration
-        // navigate('/login');
-      } else {
-        setMessage(result.data.msg || "An unexpected error occurred during registration.");
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      if (err.response && err.response.data && err.response.data.msg) {
-        setMessage(err.response.data.msg);
-      } else {
-        setMessage("An error occurred during registration.");
-      }
-    });
+    const registerURL = `${baseURL}/api/auth/register`;
+
+    axios.post(registerURL, { firstName, lastName, email, password })
+      .then(result => {
+        console.log(result);
+        if (result.status === 201) {
+          setMessage("Registration successful! You can now log in.");
+        } else {
+          setMessage(result.data.msg || "An unexpected error occurred during registration.");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        if (err.response && err.response.data && err.response.data.msg) {
+          setMessage(err.response.data.msg);
+        } else {
+          setMessage("An error occurred during registration.");
+        }
+      });
 
     // Reset form fields
     setFirstName("");
@@ -48,7 +52,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
     setEmail("");
     setPassword("");
     setTermsAccepted(false);
-  }
+  };
 
   if (!signUpOpen) {
       return null;

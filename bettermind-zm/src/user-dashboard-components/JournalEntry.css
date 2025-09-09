@@ -1,0 +1,51 @@
+/* Card Container */
+.mood-tracker-container {
+    margin: 1rem auto;
+    width: 100%;
+    background-color: #ffffff;
+    color: var(--text-color-primary);
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+/* The left icon (File Plus) */
+.mood-tracker-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    box-sizing: border-box; 
+    width: 30px;
+    height: 30px;
+}
+
+/* The middle text content */
+.mood-tracker-content {
+    flex-grow: 1; 
+    text-align: left; /* Center the text */
+}
+
+/* The right icon (Chevron Right) */
+.mood-tracker-icon-end {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    box-sizing: border-box; 
+    width: 30px;
+    height: 30px;
+}
+
+/* The Mood Text */
+.mood-tracker-text {
+    text-align: left;
+    padding: 15px;
+    font-size: 1.3rem;
+}

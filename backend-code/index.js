@@ -5,7 +5,7 @@ const dotenv = require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const HOST = '0.0.0.0'; // This allows connections from all network interfaces
+const HOST = '0.0.0.0'; 
 
 // Middleware
 app.use(cors());
@@ -14,6 +14,7 @@ app.use(express.json());
 // Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const journalRoutes = require('./routes/journal'); // Import the new journal route
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/bettermind_zm')
@@ -23,6 +24,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/bettermind_
 // Register routes
 app.use('/api', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api', journalRoutes); // Register the new journal route
 
 app.listen(PORT, HOST, () => {
   console.log(`Server is running on http://${HOST}:${PORT}`);

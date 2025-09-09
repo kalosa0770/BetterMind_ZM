@@ -49,7 +49,7 @@ const PopularContent = () => {
           breakpoints={
               {
                   768: {slidesPerView: 2, spaceBetween: 20},
-                  1020: {slidesPerView: 4, spaceBetween: 50},
+                  1020: {slidesPerView: 2, spaceBetween: 50},
               }
 
           }

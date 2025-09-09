@@ -1,0 +1,153 @@
+/* The modal overlay. This covers the entire screen. */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  z-index: 1000; 
+}
+
+/* The modal content box */
+.modal-content {
+  background-color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 70%;
+  max-width: 100%;
+  position: relative;
+  animation: slideUp 0.5s ease-out;
+  padding: 2rem;
+  overflow: hidden; /* Hides the other steps that are off-screen */
+}
+
+/* Modal header with the close button */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  width: 35px;
+  height: 35px;
+  font-weight: 100;
+  cursor: pointer;
+  color: #008080;
+  transition: color 0.2s;
+  position: absolute;
+  right: 20px;
+  top: 10px;
+}
+
+.modal-close-button:hover {
+  color: #9bb8a1;
+}
+
+.form-modal-title {
+    font-size: 1.5rem;
+    color: #008080;
+}
+
+/* --- Multi-Step Form Styling --- */
+.modal-step-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  padding: 40px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.modal-step {
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-step p {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 1.5rem;
+}
+
+.mood-rating-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.mood-rating-button {
+    background-color: #f1f5f9;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    padding: 0.5rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mood-rating-button:hover {
+    background-color: #e2e8f0;
+}
+
+.mood-rating-button.selected {
+    background-color: #008080;
+    color: #fff;
+    border-color: #008080;
+}
+
+
+/* Common styles for all text areas and buttons */
+.form-modal-textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 150px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.form-modal-next-button,
+.form-modal-submit-button {
+    background-color: #008080;
+    padding: 10px 15px;
+    width: 100%;
+    border: none;
+    border-radius: 50px;
+    color: #ffffff;
+    font-size: 1rem;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-modal-next-button:hover,
+.form-modal-submit-button:hover {
+    background-color: #9bb8a1;
+}
+
+
+/* New slide-up animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

@@ -8,19 +8,19 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-color-secondary);
-  font-weight: 500;
   margin-bottom: 2rem;
   text-align: left;
 }
 
-/* Swiper Slide/Card Container */
+/* Base Styles for Swiper Slide/Card Container (Mobile First) */
 .swiper-slide {
   height: auto;
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  width: 100%; /* Adjust this to control the card width on mobile */
+  width: 280px; /* Adjust this to control the card width on mobile */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 /* The actual card content container */
@@ -29,12 +29,12 @@
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   cursor: pointer;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  text-align: left;
 }
 
 .content-card:hover {
@@ -44,7 +44,7 @@
 
 .card-img-placeholder {
   width: 100%;
-  height: 160px; /* Adjust height as needed */
+  height: 160px;
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 1rem;
@@ -53,7 +53,7 @@
 .card-img-placeholder img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the image fills the space */
+  object-fit: cover;
   display: block;
 }
 
@@ -71,7 +71,7 @@
 
 /* Swiper Pagination Styles */
 .swiper-pagination {
-  margin-top: 1rem;
+  margin-top: 2rem;
   position: relative !important;
 }
 
@@ -86,4 +86,41 @@
 .swiper-pagination-bullet-active {
   background-color: var(--swiper-pagination-color, #007bff);
   opacity: 1;
+}
+
+/* ------------------ Media Queries for Large Screens ------------------ */
+
+/* Tablet and larger screens (>= 768px) */
+@media (min-width: 768px) {
+  .popular-content-heading {
+    font-size: 1.75rem; /* text-2xl */
+  }
+
+  /* Adjust spacing and width for tablets */
+  .swiper-slide {
+    width: auto;
+  }
+
+  .content-card {
+    padding: 2rem; /* Larger padding for more space */
+  }
+
+  .card-title {
+    font-size: 1.5rem; /* text-xl */
+  }
+
+  .card-text {
+    font-size: 1rem; /* text-base */
+  }
+}
+
+/* Desktop and larger screens (>= 1020px) */
+@media (min-width: 1020px) {
+  .popular-content-heading {
+    font-size: 2rem; /* text-3xl */
+  }
+
+  .content-card {
+    padding: 2.5rem;
+  }
 }

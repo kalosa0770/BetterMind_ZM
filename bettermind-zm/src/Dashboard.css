@@ -172,10 +172,11 @@
             transform: scale(1.02);
           }
           .card-heading {
-            font-size: 1.125rem; /* text-lg */
+            font-size: 1.1rem; /* text-lg */
             font-weight: 600; /* font-semibold */
-            color: var(--text-color-primary);
+            color: var(--text-color-secondary);
             margin-bottom: 0.5rem; /* mb-2 */
+            text-align: left;
           }
           .card-text {
             font-size: 0.875rem; /* text-sm */
@@ -297,6 +298,127 @@
 
           @media (min-width: 1024px) { /* lg breakpoint */
             .card-grid {
-              grid-template-columns: repeat(3, 1fr);
+              grid-template-columns: repeat(2, 1fr);
             }
           }
+
+          .mood-chart-container {
+            background-color: #9bb8a1;
+            width: 100%;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-top: 5rem;
+          }
+
+          .chart-heading {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            align-items: flex-start;
+            justify-content: flex-start;
+          }
+
+          .chart-icon {
+            color: #ffffff;
+            font-size: 1.5rem;
+            text-align: left;
+          }
+
+         
+          .mood-chart-heading {
+            color: #ffffff;
+            font-size: 1.5rem;
+            text-align: left;
+          }
+
+          .mood-chart-data {
+            display: flex;
+            padding: 20px;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            padding-right: 10px;
+            gap: 20px;
+          }
+          
+
+          .mood-chart-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            width: max-content;
+            padding: 10px;
+            text-align: left;
+          }
+
+
+/* My Goals Card */
+.goals-card {
+    background-color: #ffffff; /* Lighter background for distinction */
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    color: #ffffff; /* Darker text for readability */
+}
+
+/* Goals List Container */
+.goals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Space between goal items */
+    margin-top: 1rem;
+}
+
+.goal-button {
+  border: none;
+  background: none;
+  color: #333333;
+  cursor: pointer;
+}
+
+/* Individual Goal Item */
+.goal-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.goal-title {
+    font-weight: 500;
+    color: #333333;
+    text-align: left; /* Slightly darker for titles */
+}
+
+/* Progress Bar Container */
+.progress-bar-container {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    height: 10px;
+    margin-top: 0.5rem;
+}
+
+/* Progress Bar Fill */
+.progress-bar {
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(to right, #9bb8a1, #008080); /* A nice gradient */
+    transition: width 0.5s ease-in-out;
+}
+
+/* Goal Completion Text */
+.goal-completion-text {
+    text-align: right;
+    font-size: 0.875rem; /* 14px */
+    color: #333333;
+    margin-top: 0.25rem;
+}
+
+/* Adjustments to the card heading for the goals card */
+.goals-card .card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+

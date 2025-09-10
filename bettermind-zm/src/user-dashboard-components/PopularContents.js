@@ -34,8 +34,7 @@ const PopularContent = () => {
         <h3 className="popular-content-heading">Popular Resources</h3>
         <Swiper
           modules={[Pagination]}
-          centeredSlides
-          slidesPerView={1.2} 
+          slidesPerView={1.1} 
           spaceBetween={15}
           grabCursor
           pagination={{ clickable: true }}

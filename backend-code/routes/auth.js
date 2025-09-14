@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const logger = require('../utils/logger');
+const rateLimit = require('express-rate-limit');
 const UserModel = require('../models/Users');
+const { error } = require('winston');
 
 // Registration route
 router.post('/register', async (req, res) => {
@@ -28,42 +31,80 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Login Limiter 
+const loginLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes trying to access the account
+  max: 5, // Maximum of 5 attempts
+  message: 'Too many login attempts tried, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// lock out the account
+const maxAttempts = 5;
+const lockTime = 15 * 60 * 1000;
+
 // Login route
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimit, async (req, res) => {
   const { email, password } = req.body;
-  
-  // LOGGING 1: Log the details of the incoming request
-  console.log('Login attempt received:', { email, password });
 
   try {
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
+
+    if (!email || !password) {
+      return res.status(400).send({ message: 'Email address and Password are required' });
     }
 
-    // LOGGING 2: Show the data before comparison
-    console.log('User found:', user.email);
-    console.log('Comparing passwords:', {
-      provided: password,
-      stored: user.password
-    });
+    // finding the registered user by email address
+    const user = await UserModel.findOne({ email });
 
+    // logging a failed attempt for an unknown user
+    if (!user) {
+      logger.warn(`Failed login attempt for unknown user with email: ${email} from IP: ${req.ip}`);
+      return res.status(404).send({ message: 'Invalid credentials.' });
+    }
+
+    // checking if user account is locked
+    if (user.isLocked) {
+      logger.warn(`Locked account login attempt for user with email: ${email} from IP: ${req.ip}`);
+      return res.status(401).send({ message: 'Account is Locked. Please try again later.' });
+    }
+
+    // comparing the provided password with the stored hashed password
     const isMatch = await bcrypt.compare(password.trim(), user.password);
 
-    // NEW LOGGING: Log the result of the bcrypt comparison
-    console.log('bcrypt.compare result:', isMatch);
+    if (isMatch) {
+      // On a successful login attempt
+      await UserModel.updateOne({ id: user._id }, {loginAttempts: 0});
+      // a successful login message
+      logger.info(`Successful login for user with email: ${email} from IP: ${req.ip}`);
 
-    if (!isMatch) {
-      return res.status(401).json({ msg: 'Invalid credentials' });
+      // Generate JWT
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      res.status(200).send({ token, user: { id: user._id, firstName: user.firstName, lastName: user.lastName } });
+    } else {
+      // On a failed login attempt
+      await UserModel.updateOne({ id: user._id }, {$inc: {loginAttempts: 1 } });
+      const updateUser = await UserModel.findOne({ email });
+
+      if ( updateUser.loginAttempts >= maxAttempts) {
+        const lockUntil = Date.now() + lockTime;
+        await UserModel.updateOne({ id: user._id }, {lockUntil});
+
+        logger.error(`Account locked for user with email: ${email} after ${maxAttempts} failed attempts.`);
+        return res.status(401).send({ message: 'Too many failed login attempts. Your account is locked. Try again later.' });
+      }
     }
 
-    // Generate JWT
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, user: { id: user._id, firstName: user.firstName, lastName: user.lastName } });
+    // logging a failed attemp for an unknown user with an incorrect password
+    logger.warn(`Failed login attempt for user with email: ${email} with invalid password from IP: ${req.ip}. 
+                    Attempts: ${updateUser.loginAttempts} / ${maxAttempts}`);
+    return res.status(401).send({ message: 'Invalid credentials.' });
+    
+  } catch (error) {
 
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    //logging any server errors
+    logger.error(`Server error during login for user with email: ${email}. Error: ${error.message}`, {stack: error.stack});
+    res.status(500).send({ message: 'Server error.' });
   }
 });
 

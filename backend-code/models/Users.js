@@ -19,6 +19,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    loginAttempts: { 
+        type: Number,
+        required: true,
+        default: 0
+    },
+    lockUntil: {
+        type: Number
+    },
+});
+
+userSchema.virtual('isLocked').get(function() {
+    return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
 // Mongoose pre-save hook to hash the password before saving
@@ -26,7 +38,7 @@ userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         next();
     }
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
 });
 

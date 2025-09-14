@@ -36,11 +36,12 @@ const Dashboard = ({ fullname }) => {
     const [error, setError] = useState(null);
     const [isJournalModalOpen, setJournalModalOpen] = useState(false);
     const [journalEntries, setJournalEntries] = useState([]);
+    const [selectedEntry, setSelectedEntry] = useState(null);
 
     // Sample goals data
     const [goals, setGoals] = useState([
       { id: 1, title: 'Meditate for 10 minutes', current: 3, total: 5 },
-      { id: 2, title: 'How to Manage Stress', current: 1, total: 7 },
+      { id: 2, title: 'Practice Gratitude', current: 1, total: 7 },
     ]);
 
     const fetchData = async () => {
@@ -97,12 +98,18 @@ const Dashboard = ({ fullname }) => {
     }
 
     const openJournalModal = () => {
+        setSelectedEntry(null);
         setJournalModalOpen(true);
     };
 
     const closeJournalModal = () => {
         setJournalModalOpen(false);
         fetchData();
+    };
+
+    const handleViewEntry = (entry) => {
+        setSelectedEntry(entry);
+        setJournalModalOpen(true);
     };
 
     const getChartData = () => {
@@ -186,8 +193,8 @@ const Dashboard = ({ fullname }) => {
                         <div className="goals-card">
                             <h3 className="card-heading flex items-center justify-between">
                                 My Goals
-                                <button className="goal-button">
-                                    <Plus className="goal-btn" />
+                                <button className="ml-2 bg-white text-gray-800 p-1 rounded-full hover:bg-gray-200">
+                                    <Plus className="w-4 h-4" />
                                 </button>
                             </h3>
                             <div className="goals-list">
@@ -215,7 +222,7 @@ const Dashboard = ({ fullname }) => {
                 <JournalEntry onOpenJournalModal={openJournalModal} />
                 
                 {/* Conditionally render the modal based on state */}
-                {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} />}
+                {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry} />}
 
                 <div className="mood-chart-container">
                     <div className='chart-heading'>
@@ -261,6 +268,36 @@ const Dashboard = ({ fullname }) => {
                         ) : ( <p className="card-text">No journal entries yet.</p>)}
                 </div>
                 
+                {/* New Journal Entries Section */}
+                <section className="journal-entries-section">
+                    <h3 className="journal-entries-heading">Your Journal History</h3>
+                    <div className="journal-entries-list">
+                        {journalEntries.length > 0 ? (
+                            // Sort entries by timestamp in descending order and render each
+                            journalEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map(entry => (
+                                <div key={entry._id} className="journal-entry-card" onClick={() => handleViewEntry(entry)}>
+                                    <div className="journal-entry-header">
+                                        <p className="journal-entry-date">
+                                            {new Date(entry.timestamp).toLocaleDateString()}
+                                        </p>
+                                        <span className="journal-entry-mood">Mood: {entry.moodRating}/10</span>
+                                    </div>
+                                    <p className="journal-entry-text">
+                                        {entry.moodEntryText
+                                            ? entry.moodEntryText.length > 100
+                                                ? `${entry.moodEntryText.substring(0, 100)}...`
+                                                : entry.moodEntryText
+                                            : 'No entry text available.'
+                                        }
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-gray-500 text-center">No journal entries to display.</p>
+                        )}
+                    </div>
+                </section>
+
                 {/* Mobile footer navigation */}
                 <header className="mobile-footer-bar">
                     <nav>

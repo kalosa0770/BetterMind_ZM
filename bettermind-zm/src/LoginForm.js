@@ -7,11 +7,16 @@ import {useNavigate} from 'react-router-dom';
 function LoginForm({isOpen, onClose}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState(''); // State to hold the user message
+    const [isSuccess, setIsSuccess] = useState(false); // State to track success or failure
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setMessage(''); // Clear previous messages
 
         // Get the current hostname from the browser
         const hostname = window.location.hostname;
@@ -28,22 +33,38 @@ function LoginForm({isOpen, onClose}) {
         // The full API endpoint
         const loginURL = `${baseURL}/api/auth/login`;
 
-        axios.post(loginURL, { email, password })
-        .then(result => {
-            if (result.data.token) {
-                localStorage.setItem('token', result.data.token);
+        try {
+            const response = await axios.post(loginURL, { email, password });
+            
+            // Success: The backend sent a 200 OK status
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                setIsSuccess(true);
+                setMessage(response.data.message);
                 navigate('/dashboard');
             } else {
-                console.error("Login failed: No token received.");
+                // This case handles a malformed successful response without a token.
+                setIsSuccess(false);
+                setMessage("Login failed: No token received from the server.");
             }
-        })
-        .catch(err => {
-            console.error("An error occurred during login:", err.response ? err.response.data : err.message);
-        });
+        } catch (error) {
+            // Failure: The backend sent a non-200 status (e.g., 401, 429, 500)
+            setIsSuccess(false);
+            
+            if (error.response) {
+                // The API responded with an error message
+                setMessage(error.response.data.message);
+            } else if (error.request) {
+                // The request was made but no response was received (network error)
+                setMessage('Network error. Please check your internet connection.');
+            } else {
+                // Something else happened in setting up the request
+                setMessage('An unexpected error occurred.');
+            }
+        } finally {
+            setLoading(false);
+        }
     };
-
-
-
 
     if (!isOpen) {
         return null; //Does not render anything if the modal is not open
@@ -76,12 +97,18 @@ function LoginForm({isOpen, onClose}) {
                             onChange={(e) => setPassword(e.target.value)} />
                     </div>
                     <div className='login-btn'>
-                        <input type='submit' value='Sign in' className='submit-btn'/>
+                        <input type='submit' value='Sign in' className='submit-btn' disabled={loading}/>
                     </div>
                     <div className='other-details'>
                         <a href='#forgot'>Forgot Password?</a>
                         <p>New to BetterMind?<a href='#signup'>Sign up</a></p>
                     </div>
+                    {/* Display the message to the user based on the state */}
+                    {message && (
+                        <p className={isSuccess ? 'success-message' : 'error-message'}>
+                            {message}
+                        </p>
+                    )}
                 </form>
             </div>
         </div>

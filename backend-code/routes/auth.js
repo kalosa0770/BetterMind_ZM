@@ -51,7 +51,7 @@ router.post('/login', loginLimit, async (req, res) => {
   try {
 
     if (!email || !password) {
-      return res.status(400).send({ message: 'Email address and Password are required' });
+      return res.status(401).json({ message: 'Email address and Password are required' });
     }
 
     // finding the registered user by email address
@@ -60,13 +60,13 @@ router.post('/login', loginLimit, async (req, res) => {
     // logging a failed attempt for an unknown user
     if (!user) {
       logger.warn(`Failed login attempt for unknown user with email: ${email} from IP: ${req.ip}`);
-      return res.status(404).send({ message: 'Invalid credentials.' });
+      return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
     // checking if user account is locked
     if (user.isLocked) {
       logger.warn(`Locked account login attempt for user with email: ${email} from IP: ${req.ip}`);
-      return res.status(401).send({ message: 'Account is Locked. Please try again later.' });
+      return res.status(401).json({ message: 'Account is Locked. Please try again later.' });
     }
 
     // comparing the provided password with the stored hashed password
@@ -80,7 +80,7 @@ router.post('/login', loginLimit, async (req, res) => {
 
       // Generate JWT
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      res.status(200).send({ token, user: { id: user._id, firstName: user.firstName, lastName: user.lastName } });
+      res.status(200).json({ token, user: { id: user._id, firstName: user.firstName, lastName: user.lastName } });
     } else {
       // On a failed login attempt
       await UserModel.updateOne({ id: user._id }, {$inc: {loginAttempts: 1 } });
@@ -91,20 +91,20 @@ router.post('/login', loginLimit, async (req, res) => {
         await UserModel.updateOne({ id: user._id }, {lockUntil});
 
         logger.error(`Account locked for user with email: ${email} after ${maxAttempts} failed attempts.`);
-        return res.status(401).send({ message: 'Too many failed login attempts. Your account is locked. Try again later.' });
+        return res.status(401).json({ message: 'Too many failed login attempts. Your account is locked. Try again later.' });
       }
     }
 
     // logging a failed attemp for an unknown user with an incorrect password
     logger.warn(`Failed login attempt for user with email: ${email} with invalid password from IP: ${req.ip}. 
                     Attempts: ${updateUser.loginAttempts} / ${maxAttempts}`);
-    return res.status(401).send({ message: 'Invalid credentials.' });
-    
+    return res.status(401).json({ message: 'Invalid credentials.' });
+
   } catch (error) {
 
     //logging any server errors
     logger.error(`Server error during login for user with email: ${email}. Error: ${error.message}`, {stack: error.stack});
-    res.status(500).send({ message: 'Server error.' });
+    res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 });
 

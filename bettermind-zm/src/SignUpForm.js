@@ -8,18 +8,43 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasUpperCase: false,
+    hasLowerCase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [message, setMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  // Validates the password against a more secure policy
+  const validatePassword = (password) => {
+    setPasswordValidation({
+      minLength: password.length >= 6,
+      hasUpperCase: /[A-Z]/.test(password),
+      hasLowerCase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%&*?]/.test(password),
+    });
+  };
+
+  const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setMessage('');
+    setIsSuccess(false);
 
     if (!termsAccepted) {
       setMessage("You must agree to the terms of service and privacy policy.");
+      setLoading(false);
       return;
     }
-    
+
     // Determine the base URL dynamically
     const hostname = window.location.hostname;
     const baseURL = (hostname === 'localhost' || hostname === '127.0.0.1')
@@ -28,35 +53,45 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
 
     const registerURL = `${baseURL}/api/auth/register`;
 
-    axios.post(registerURL, { firstName, lastName, email, password })
-      .then(result => {
-        console.log(result);
-        if (result.status === 201) {
-          setMessage("Registration successful! You can now log in.");
-        } else {
-          setMessage(result.data.msg || "An unexpected error occurred during registration.");
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        if (err.response && err.response.data && err.response.data.msg) {
-          setMessage(err.response.data.msg);
-        } else {
-          setMessage("An error occurred during registration.");
-        }
-      });
+    try {
+      const response = await axios.post(registerURL, { firstName, lastName, email, password });
 
-    // Reset form fields
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPassword("");
-    setTermsAccepted(false);
+      // Handle successful registration response (HTTP 201)
+      if (response.status === 201) {
+        setMessage("Registration successful! You can now log in.");
+        setIsSuccess(true);
+      } else {
+        // This case handles unexpected responses
+        setMessage(response.data.msg || "An unexpected error occurred during registration.");
+      }
+    } catch (err) {
+      // Handle failed registration attempts (e.g., HTTP 400, 500)
+      console.error(err);
+      if (err.response && err.response.data && err.response.data.msg) {
+        setMessage(err.response.data.msg);
+      } else if (err.response && err.response.data && err.response.data.errors) {
+        // Display validation errors from the backend
+        const validationErrors = err.response.data.errors.map(error => error.msg).join(' ');
+        setMessage(validationErrors);
+      } else {
+        setMessage("An error occurred during registration.");
+      }
+      setIsSuccess(false);
+    } finally {
+      // Reset form fields after submission attempt
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPassword("");
+      setTermsAccepted(false);
+      setLoading(false);
+    }
   };
 
   if (!signUpOpen) {
-      return null;
+    return null;
   }
+
   return (
     <div className='signup-container'>
       <div className='signup-form'>
@@ -64,70 +99,78 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
         <h3>Sign up for a better mind</h3>
         <p>Join BetterMind ZM today and connect your mental wellness to a peaceful journey</p>
         <form className='signup-form-container' onSubmit={handleSubmit}>
-          {/* Change 1: Added First Name input */}
           <div className='signup-form-details'>
             <label htmlFor='first-name'>First Name</label>
-             <input 
-              type="text" 
-              name="firstName" 
-              placeholder="First Name" 
-              value={firstName} 
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className='signup-input-details'
-              required 
+              required
             />
           </div>
-          {/* Change 2: Added Last Name input */}
           <div className='signup-form-details'>
             <label htmlFor='last-name'>Last Name</label>
-             <input 
-              type="text" 
-              name="lastName" 
-              placeholder="Last Name" 
-              value={lastName} 
-              onChange={(e) => setLastName(e.target.value)} 
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               className='signup-input-details'
-              required 
+              required
             />
           </div>
           <div className='signup-form-details'>
             <label htmlFor='email-address'>Email Address</label>
-            <input 
-              type="email" 
-              name="email" 
-              placeholder="Email Address" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className='signup-input-details'
-              required 
+              required
             />
           </div>
           <div className='signup-form-details'>
             <label htmlFor='password'>Password</label>
-             <input 
+            <input
               className='signup-input-details'
-              type="password" 
-              name="password" 
-              placeholder="Password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); validatePassword(e.target.value); }}
+              required
             />
+            <div className="password-validation">
+              <p>Password should contain at least</p>
+              <ul className="password-validation-list">
+                <li style={{ color: passwordValidation.minLength ? '#008080' : 'red' }}>6 characters,</li>
+                <li style={{ color: passwordValidation.hasUpperCase ? '#008080' : 'red' }}>1 uppercase letter,</li>
+                <li style={{ color: passwordValidation.hasLowerCase ? '#008080' : 'red' }}>1 lowercase letter,</li>
+                <li style={{ color: passwordValidation.hasNumber ? '#008080' : 'red' }}>1 number,</li>
+                <li style={{ color: passwordValidation.hasSpecialChar ? '#008080' : 'red' }}>1 special character.</li>
+              </ul>
+            </div>
           </div>
 
           <div className='form-details-checkbox'>
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               name="termsAccepted"
-              className='signup-checkbox' 
+              className='signup-checkbox'
               checked={termsAccepted}
               onChange={(e) => setTermsAccepted(e.target.checked)}
-             />
+            />
             <label htmlFor='terms-checkbox'>I agree to the <a href="#terms-of-service">terms of service</a> and <a href="#privacy-policy">privacy policy</a> of BetterMind</label>
           </div>
 
           <div className='signup-btn'>
-            <input type='submit' value='Sign up' className='signup-submit-btn' />
+            <input type='submit' value='Sign up' className='signup-submit-btn' disabled={!isPasswordValid || loading} />
           </div>
 
           <div className='signup-other-details'>
@@ -135,7 +178,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
           </div>
         </form>
 
-        {message && <p className="signup-message">{message}</p>}
+        {message && <p className={`signup-message ${isSuccess ? 'success-msg' : 'error-msg'}`}>{message}</p>}
       </div>
     </div>
   );

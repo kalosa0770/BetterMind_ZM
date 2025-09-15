@@ -6,30 +6,46 @@ const logger = require('../utils/logger');
 const rateLimit = require('express-rate-limit');
 const UserModel = require('../models/Users');
 const { error } = require('winston');
+const { body, validationResult } = require('express-validator');
 
 // Registration route
-router.post('/register', async (req, res) => {
-  try {
-    const { firstName, lastName, email, password } = req.body;
-    const existingUser = await UserModel.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ msg: 'User already exists' });
+router.post('/register',
+  [
+    body('email').isEmail().withMessage('Invalid email address.').normalizeEmail(), // Added normalizeEmail()
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long.') 
+    .matches(/[A-Z]/).withMessage('Password must contain at least 1 uppercase letter.')
+    .matches(/[a-z]/).withMessage('Password must contain at least 1 lowercase letter')
+    .matches(/[0-9]/).withMessage('Password must contain at least 1 number.')
+    .matches(/[!@#$%&*?]/).withMessage('Password must contain at least 1 special character.'),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    
-    // The password will be hashed automatically by the pre-save hook in the user model
-    const newUser = await UserModel.create({
-      firstName,
-      lastName,
-      email: email.trim(),
-      password: password.trim()
-    });
+    try {
+      const { firstName, lastName, email, password } = req.body;
+      const existingUser = await UserModel.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ msg: 'User already exists' });
+      }
+      
+      // The password will be hashed automatically by the pre-save hook in the user model
+      const newUser = await UserModel.create({
+        firstName,
+        lastName,
+        email: email.trim(),
+        password: password.trim()
+      });
 
-    res.status(201).json({ msg: 'User registered successfully', userId: newUser._id });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-});
+      res.status(201).json({ msg: 'User registered successfully', userId: newUser._id });
+    } catch (err) {
+        // Log the full error to your secure logging system
+        logger.error(`Registration server error: ${err.message}`, { stack: err.stack }); 
+        // Return a generic error message to the client
+        res.status(500).json({ msg: 'Server error. Please try again later.' });
+    }
+  });
 
 // Login Limiter 
 const loginLimit = rateLimit({

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './SignUp.css';
 import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
+import { EyeClosed, Eye } from "lucide-react";
 
 const SignUpForm = ({ signUpOpen, signUpClose }) => {
   const [firstName, setFirstName] = useState('');
@@ -15,6 +15,8 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
     hasNumber: false,
     hasSpecialChar: false,
   });
+  const [validationField, setValidationField] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
@@ -33,6 +35,16 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
 
   const isPasswordValid = Object.values(passwordValidation).every(Boolean);
 
+  // show password validation after user clicks the password field
+  const showValidationField = () => {
+    setValidationField(true);
+  };
+  
+  // function to toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -45,7 +57,6 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
       return;
     }
 
-    // Determine the base URL dynamically
     const hostname = window.location.hostname;
     const baseURL = (hostname === 'localhost' || hostname === '127.0.0.1')
       ? 'http://localhost:3001'
@@ -55,22 +66,17 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
 
     try {
       const response = await axios.post(registerURL, { firstName, lastName, email, password });
-
-      // Handle successful registration response (HTTP 201)
       if (response.status === 201) {
         setMessage("Registration successful! You can now log in.");
         setIsSuccess(true);
       } else {
-        // This case handles unexpected responses
         setMessage(response.data.msg || "An unexpected error occurred during registration.");
       }
     } catch (err) {
-      // Handle failed registration attempts (e.g., HTTP 400, 500)
       console.error(err);
       if (err.response && err.response.data && err.response.data.msg) {
         setMessage(err.response.data.msg);
       } else if (err.response && err.response.data && err.response.data.errors) {
-        // Display validation errors from the backend
         const validationErrors = err.response.data.errors.map(error => error.msg).join(' ');
         setMessage(validationErrors);
       } else {
@@ -78,7 +84,6 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
       }
       setIsSuccess(false);
     } finally {
-      // Reset form fields after submission attempt
       setFirstName("");
       setLastName("");
       setEmail("");
@@ -99,6 +104,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
         <h3>Sign up for a better mind</h3>
         <p>Join BetterMind ZM today and connect your mental wellness to a peaceful journey</p>
         <form className='signup-form-container' onSubmit={handleSubmit}>
+          {/* ... other form fields ... */}
           <div className='signup-form-details'>
             <label htmlFor='first-name'>First Name</label>
             <input
@@ -137,27 +143,37 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
           </div>
           <div className='signup-form-details'>
             <label htmlFor='password'>Password</label>
-            <input
-              className='signup-input-details'
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); validatePassword(e.target.value); }}
-              required
-            />
-            <div className="password-validation">
-              <p>Password should contain at least</p>
-              <ul className="password-validation-list">
-                <li style={{ color: passwordValidation.minLength ? '#008080' : 'red' }}>6 characters,</li>
-                <li style={{ color: passwordValidation.hasUpperCase ? '#008080' : 'red' }}>1 uppercase letter,</li>
-                <li style={{ color: passwordValidation.hasLowerCase ? '#008080' : 'red' }}>1 lowercase letter,</li>
-                <li style={{ color: passwordValidation.hasNumber ? '#008080' : 'red' }}>1 number,</li>
-                <li style={{ color: passwordValidation.hasSpecialChar ? '#008080' : 'red' }}>1 special character.</li>
-              </ul>
+            <div className="password-field">
+              <input
+                className='signup-input-details'
+                // Conditionally set the input type
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); validatePassword(e.target.value); }}
+                onClick={showValidationField}
+                required
+              />
+              {showPassword ? (
+                <Eye className="eye-icon" onClick={togglePasswordVisibility} />
+              ) : (
+                <EyeClosed className="eye-icon" onClick={togglePasswordVisibility} />
+              )}
             </div>
+            {validationField &&
+              <div className="password-validation">
+                <p>Password should contain at least</p>
+                <ul className="password-validation-list">
+                  <li style={{ color: passwordValidation.minLength ? '#008080' : 'red' }}>6 characters,</li>
+                  <li style={{ color: passwordValidation.hasUpperCase ? '#008080' : 'red' }}>1 uppercase letter,</li>
+                  <li style={{ color: passwordValidation.hasLowerCase ? '#008080' : 'red' }}>1 lowercase letter,</li>
+                  <li style={{ color: passwordValidation.hasNumber ? '#008080' : 'red' }}>1 number,</li>
+                  <li style={{ color: passwordValidation.hasSpecialChar ? '#008080' : 'red' }}>1 special character.</li>
+                </ul>
+              </div>
+            }
           </div>
-
           <div className='form-details-checkbox'>
             <input
               type="checkbox"
@@ -168,16 +184,13 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
             />
             <label htmlFor='terms-checkbox'>I agree to the <a href="#terms-of-service">terms of service</a> and <a href="#privacy-policy">privacy policy</a> of BetterMind</label>
           </div>
-
           <div className='signup-btn'>
             <input type='submit' value='Sign up' className='signup-submit-btn' disabled={!isPasswordValid || loading} />
           </div>
-
           <div className='signup-other-details'>
             <p>Already have an account? <a href="LoginForm.js">Sign in</a></p>
           </div>
         </form>
-
         {message && <p className={`signup-message ${isSuccess ? 'success-msg' : 'error-msg'}`}>{message}</p>}
       </div>
     </div>

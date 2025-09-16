@@ -75,6 +75,24 @@
     box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2);
 }
 
+/* Password field with icon */
+.password-field {
+    position: relative;
+}
+
+/* Style the eye icon */
+.eye-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
 /* Sign Up Button */
 .signup-submit-btn {
     padding: 12px;
@@ -178,7 +196,6 @@
   margin-top: 20px;
   font-weight: bold;
   text-align: center;
-  /* Added a message container to provide a visual cue for success or error */
   padding: 10px;
   border-radius: 5px;
 }

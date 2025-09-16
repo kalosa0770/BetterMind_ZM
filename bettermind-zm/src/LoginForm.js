@@ -3,6 +3,7 @@ import './Login.css';
 import { useState } from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
+import {Eye, EyeClosed} from 'lucide-react';
 
 function LoginForm({isOpen, onClose}) {
     const [email, setEmail] = useState('');
@@ -10,8 +11,14 @@ function LoginForm({isOpen, onClose}) {
     const [message, setMessage] = useState(''); // State to hold the user message
     const [isSuccess, setIsSuccess] = useState(false); // State to track success or failure
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
+
+    // set password visibility
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -88,13 +95,20 @@ function LoginForm({isOpen, onClose}) {
                     </div>
                     <div className='form-details'>
                         <label htmlFor='password'>Password</label>
-                        <input 
-                            type='password'
+                        <div className='password-fields'>
+                            <input 
+                            type={ showPassword ? 'text' : 'password' }
                             className='input-details'
                             id='password'
                             name='password'
                             value={password}
                             onChange={(e) => setPassword(e.target.value)} />
+                            {showPassword ? (
+                                <Eye onClick={togglePasswordVisibility} className='eye-icon'/>
+                            ) : (
+                                <EyeClosed onClick={togglePasswordVisibility } className='eye-icon'/>
+                            )}
+                        </div>
                     </div>
                     <div className='login-btn'>
                         <input type='submit' value='Sign in' className='submit-btn' disabled={loading}/>

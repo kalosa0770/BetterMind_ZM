@@ -11,9 +11,10 @@ import FinalCTA from './FinalCTA.js';
 import Footer from './Footer.js';
 import LoginForm from './LoginForm.js';
 import SignUpForm from './SignUpForm.js';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard.js';
+import api from './api/axios.js';
 
 // HomePage component to group all the main page content
 const HomePage = ({ openLoginModal, openSignupForm, isLoginModalOpen, closeLoginModal, isSignUpFormOpen, closeSignUpForm }) => (
@@ -33,6 +34,24 @@ const HomePage = ({ openLoginModal, openSignupForm, isLoginModalOpen, closeLogin
 );
 
 function App () {
+
+  useEffect (() => {
+    // Function to fetch the CSRF(Cross Site Request Forgery) token
+    const fetchCsrfToken = async () => {
+      try {
+        const { data } = await api.get('csrf-token');
+        api.defaults.headers.common['csrf-token'] = data.csrfToken;
+        console.log ('CSRF token fetched successfully.');
+      } catch (error) {
+        console.error('Failed to fetch CSRF token:', error);
+      }
+    };
+
+    fetchCsrfToken();
+
+  }, []);
+  
+  
   // creating a modal for login
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 

@@ -1,7 +1,6 @@
 /* src/components/Login.css */
 
 .login-container {
-  /* This is great as is */
   position: fixed;
   top: 0;
   left: 0;
@@ -28,19 +27,18 @@
 
 .login-form h3 {
   color: #333333;
-  text-align: center; /* Centering the title looks better with the form */
+  text-align: center;
   margin-bottom: 25px;
 }
 
 .form-container {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Use gap for spacing between form elements */
-  padding: 10px 0; /* Adjust padding here */
+  gap: 20px;
+  padding: 10px 0;
 }
 
 .form-details {
-  /* Remove redundant alignment styles */
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -58,6 +56,28 @@
   color: #333333;
   margin-bottom: 5px;
   font-weight: 500;
+}
+
+/* the password field */
+.password-fields {
+  position: relative;
+}
+
+.password-fields input {
+    width: 100%;
+}
+
+/* the eye icon */
+.eye-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0.5;
 }
 
 .submit-btn {
@@ -92,13 +112,13 @@
   margin-top: 30px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the content */
-  gap: 10px; /* Add gap between the elements */
+  align-items: center;
+  gap: 10px;
 }
 
 .other-details a {
   text-decoration: none;
-  color: #008080; /* Use your brand color for the link */
+  color: #008080;
 }
 
 .other-details p {

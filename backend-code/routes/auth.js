@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const logger = require('../utils/logger');
 const rateLimit = require('express-rate-limit');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer')
 const UserModel = require('../models/Users');
 const { error } = require('winston');
 const { body, validationResult } = require('express-validator');
@@ -121,6 +123,44 @@ router.post('/login', loginLimit, async (req, res) => {
     //logging any server errors
     logger.error(`Server error during login for user with email: ${email}. Error: ${error.message}`, {stack: error.stack});
     res.status(500).json({ message: 'Server error. Please try again later.' });
+  }
+});
+
+// Reset password route
+router.post('/forgot-password', async (req, res) => {
+
+  try {
+
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({ message: 'If a matching account is found, a password reset link has been sent to your email.'});
+    }
+
+    // A secure token Generation
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const expirationToken = Date.now() + 3600000; // 1 hour
+
+    await UserModel.updateOne({ id: user._id }, { resetToken: hashedToken, resetTokenExpiration: expirationToken });
+
+    // Sending the email with plain text token
+    const transporter = nodemailer.createTransport({/* email configuration here */});
+    const resetUrl = `https://bettermindzm.com/reset-password?token=${resetToken}&id=${user._id}`;
+
+    await transporter.sendMail({
+      from: 'noreply@bettermindzm.com',
+      to: user.email,
+      subject: 'Password Reset Request',
+      html: `<p>You requsted a password reset. Click this link to reset your password: <a href="${resetUrl}">${resetUrl}</a></p>`,
+    });
+
+    res.status(200).json({ message: 'If a matching account is found, a password reset link has been sent to your email.' });
+  } catch (error) {
+    // logging the error for server-side monitoring
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred. Please try again later.' });
   }
 });
 

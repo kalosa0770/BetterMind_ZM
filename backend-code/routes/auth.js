@@ -126,7 +126,7 @@ router.post('/login', loginLimit, async (req, res) => {
   }
 });
 
-// Reset password route
+// forgot password route
 router.post('/forgot-password', async (req, res) => {
 
   try {
@@ -162,6 +162,44 @@ router.post('/forgot-password', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'An error occurred. Please try again later.' });
   }
+});
+
+
+// reset password route endpoint
+
+router.post('/reset-password', async (req, res) => {
+
+  try {
+    const { userId, token, newPassword } = req.body;
+    const user = await UserModel.findById(userId);
+
+    if (!user || !user.resetToken) {
+      return res.status(400).json({ message: 'Invalid or expired password reset link.'});
+    }
+
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    if (hashedToken !== user.resetToken || user.resetTokenExpiration < Date.now()) {
+      return res.status(400).json({ message: 'Invalid or expired password reset link.'});
+    }
+
+    const salt = await bcrypt.genSalt(12);
+    const newHashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = newHashedPassword;
+
+    user.resetToken = undefined;
+    user.resetTokenExpiration = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: 'You have successfully changed your password.' }); 
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'an error occured. Please try again later.'})
+  }
+  
 });
 
 module.exports = router;

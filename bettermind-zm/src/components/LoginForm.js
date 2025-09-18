@@ -1,5 +1,6 @@
 import React from 'react';
 import './Login.css';
+import ForgotPassword from './ForgotPassword';
 import { useState } from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
@@ -114,7 +115,7 @@ function LoginForm({isOpen, onClose}) {
                         <input type='submit' value='Sign in' className='submit-btn' disabled={loading}/>
                     </div>
                     <div className='other-details'>
-                        <a href='#forgot'>Forgot Password?</a>
+                        <button>Forgot Password?</button>
                         <p>New to BetterMind?<a href='#signup'>Sign up</a></p>
                     </div>
                     {/* Display the message to the user based on the state */}

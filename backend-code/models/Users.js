@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema({
     lockUntil: {
         type: Number
     },
+    resetToken: {
+        type: String
+    },
+    resetTokenExpiration: {
+        type: Number
+    }
 });
 
 userSchema.virtual('isLocked').get(function() {
@@ -36,10 +42,10 @@ userSchema.virtual('isLocked').get(function() {
 // Mongoose pre-save hook to hash the password before saving
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
-        next();
+        const salt = await bcrypt.genSalt(12);
+        this.password = await bcrypt.hash(this.password, salt);  
     }
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
+    next();    
 });
 
 const UserModel = mongoose.model('users', userSchema);

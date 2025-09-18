@@ -11,7 +11,7 @@ function ResetPassword() {
     const [loading, setLoading] = useState(false);
 
     const token = searhParams.get('token');
-    const userId = searhParams.get('id');
+    const userId = searhParams.get('userId');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,7 +22,7 @@ function ResetPassword() {
         }
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:3001/routes/auth', {
+            const response = await axios.post('http://localhost:3001/api/auth/reset-password', {
                 userId,
                 token,
                 newPassword,

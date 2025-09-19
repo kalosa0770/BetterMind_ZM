@@ -21,7 +21,7 @@ import api from './api/axios.js';
 const HomePage = ({
   openLoginModal, openSignupForm,
   isLoginModalOpen, closeLoginModal, isSignUpFormOpen, closeSignUpForm,
-  openForgotPasswordModal, isForgotPasswordModalOpen, closeForgotPasswordModal
+  openForgotPasswordModal, isForgotPasswordModalOpen, goBack
 }) => (
   <>
     <Header openLoginModal={openLoginModal} openSignupForm={openSignupForm} openForgotPasswordModal={openForgotPasswordModal}/>
@@ -45,7 +45,8 @@ const HomePage = ({
     />
     <ForgotPassword
       isOpen={isForgotPasswordModalOpen}
-      onClose={closeForgotPasswordModal}
+      onClose={goBack}
+      
     />
     <Footer />
   </>
@@ -87,6 +88,11 @@ function App () {
     }));
   };
 
+  const goBackToLoginModal = () => {
+    closeModal('forgotPassword');
+    openModal('login');
+  }
+
   return (
     <BrowserRouter>
       <div className="App">
@@ -106,7 +112,7 @@ function App () {
                 isSignUpFormOpen={modalState.signup} 
                 closeSignUpForm={() => closeModal('signup')} 
                 isForgotPasswordModalOpen={modalState.forgotPassword}
-                closeForgotPasswordModal={() => closeModal('forgotPassword')}
+                goBack={() => goBackToLoginModal()}
               />
             } 
           />

@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 import { X } from 'lucide-react';
+import './ForgotPasswordForm.css'
 
 const ForgotPassword = ({isOpen, onClose}) => {
     const [enterEmail, setEnterEmail] = useState('');
@@ -31,6 +32,8 @@ const ForgotPassword = ({isOpen, onClose}) => {
             setLoading(false)
         }
     };
+
+    
 
     if (!isOpen) {
         return null;

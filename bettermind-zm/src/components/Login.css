@@ -38,20 +38,20 @@
   padding: 10px 0;
 }
 
-.form-details {
+.login-form-details {
   display: flex;
   flex-direction: column;
   text-align: left;
 }
 
-.form-details input {
+.login-form-details input {
   padding: 12px;
   border: 1px dotted #ccc;
   border-radius: 5px;
   width: 100%;
 }
 
-.form-details label {
+.login-form-details label {
   font-size: 0.9rem;
   color: #333333;
   margin-bottom: 5px;

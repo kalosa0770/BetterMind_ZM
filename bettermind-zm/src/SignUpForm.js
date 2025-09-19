@@ -3,7 +3,7 @@ import './SignUp.css';
 import axios from 'axios';
 import { EyeClosed, Eye } from "lucide-react";
 
-const SignUpForm = ({ signUpOpen, signUpClose }) => {
+const SignUpForm = ({ signUpOpen, signUpClose, onLoginClick }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -92,6 +92,12 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
       setLoading(false);
     }
   };
+
+  const loginClick = (e) => {
+    e.preventDefault();
+    signUpClose();
+    onLoginClick();
+  }
 
   if (!signUpOpen) {
     return null;
@@ -188,7 +194,7 @@ const SignUpForm = ({ signUpOpen, signUpClose }) => {
             <input type='submit' value='Sign up' className='signup-submit-btn' disabled={!isPasswordValid || loading} />
           </div>
           <div className='signup-other-details'>
-            <p>Already have an account? <a href="LoginForm.js">Sign in</a></p>
+            <p>Already have an account? <a href="#login" onClick={loginClick}>Sign in</a></p>
           </div>
         </form>
         {message && <p className={`signup-message ${isSuccess ? 'success-msg' : 'error-msg'}`}>{message}</p>}

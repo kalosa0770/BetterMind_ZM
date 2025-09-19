@@ -1,12 +1,11 @@
 import React from 'react';
 import './Login.css';
-import ForgotPassword from './ForgotPassword';
 import { useState } from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import {Eye, EyeClosed} from 'lucide-react';
 
-function LoginForm({isOpen, onClose}) {
+function LoginForm({isOpen, onClose, onForgotPasswordClick, onSignupClick}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState(''); // State to hold the user message
@@ -74,6 +73,18 @@ function LoginForm({isOpen, onClose}) {
         }
     };
 
+    const handleForgotPasswordClick = (e) => {
+        e.preventDefault();
+        onClose(); // closing the login modal
+        onForgotPasswordClick(); //Opens the forgot password modal
+    };
+
+    const handleSignUpClick = (e) => {
+        e.preventDefault();
+        onClose(); // closing the login modal
+        onSignupClick(); //Opens the signup modal
+    };
+
     if (!isOpen) {
         return null; //Does not render anything if the modal is not open
     }
@@ -84,22 +95,22 @@ function LoginForm({isOpen, onClose}) {
                 <button className='close-btn' onClick={onClose}>&times;</button>
                 <h3>Sign in to your Journey</h3>
                 <form className='form-container' onSubmit={handleSubmit}>
-                    <div className='form-details'>
+                    <div className='login-form-details'>
                         <label htmlFor='email-address'>Email Address</label>
                         <input 
                             type='email' 
-                            className='input-details' 
+                            className='login-input-details' 
                             id='email-address'
                             name='email'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)} />
                     </div>
-                    <div className='form-details'>
+                    <div className='login-form-details'>
                         <label htmlFor='password'>Password</label>
                         <div className='password-fields'>
                             <input 
                             type={ showPassword ? 'text' : 'password' }
-                            className='input-details'
+                            className='login-input-details'
                             id='password'
                             name='password'
                             value={password}
@@ -115,8 +126,8 @@ function LoginForm({isOpen, onClose}) {
                         <input type='submit' value='Sign in' className='submit-btn' disabled={loading}/>
                     </div>
                     <div className='other-details'>
-                        <button>Forgot Password?</button>
-                        <p>New to BetterMind?<a href='#signup'>Sign up</a></p>
+                        <a href='#forgot' onClick={handleForgotPasswordClick}>Forgot Password?</a>
+                        <p>New to BetterMind?<a href='#signup' onClick={handleSignUpClick}>Sign up</a></p>
                     </div>
                     {/* Display the message to the user based on the state */}
                     {message && (
@@ -126,6 +137,8 @@ function LoginForm({isOpen, onClose}) {
                     )}
                 </form>
             </div>
+
+            {/* <ForgotPassword /> */}
         </div>
     )
 }

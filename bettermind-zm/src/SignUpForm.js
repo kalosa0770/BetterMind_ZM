@@ -8,6 +8,7 @@ const SignUpForm = ({ signUpOpen, signUpClose, onLoginClick }) => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState(''); // State for phone number
   const [passwordValidation, setPasswordValidation] = useState({
     minLength: false,
     hasUpperCase: false,
@@ -65,7 +66,7 @@ const SignUpForm = ({ signUpOpen, signUpClose, onLoginClick }) => {
     const registerURL = `${baseURL}/api/auth/register`;
 
     try {
-      const response = await axios.post(registerURL, { firstName, lastName, email, password });
+      const response = await axios.post(registerURL, { firstName, lastName, email, password, phoneNumber });
       if (response.status === 201) {
         setMessage("Registration successful! You can now log in.");
         setIsSuccess(true);
@@ -88,6 +89,7 @@ const SignUpForm = ({ signUpOpen, signUpClose, onLoginClick }) => {
       setLastName("");
       setEmail("");
       setPassword("");
+      setPhoneNumber(""); // Clear the phone number field on submission
       setTermsAccepted(false);
       setLoading(false);
     }
@@ -110,7 +112,6 @@ const SignUpForm = ({ signUpOpen, signUpClose, onLoginClick }) => {
         <h3>Sign up for a better mind</h3>
         <p>Join BetterMind ZM today and connect your mental wellness to a peaceful journey</p>
         <form className='signup-form-container' onSubmit={handleSubmit}>
-          {/* ... other form fields ... */}
           <div className='signup-form-details'>
             <label htmlFor='first-name'>First Name</label>
             <input
@@ -143,6 +144,18 @@ const SignUpForm = ({ signUpOpen, signUpClose, onLoginClick }) => {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className='signup-input-details'
+              required
+            />
+          </div>
+          <div className='signup-form-details'>
+            <label htmlFor='phone-number'>Phone Number</label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              placeholder="Phone Number (e.g., +26097xxxxxxx)"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
               className='signup-input-details'
               required
             />

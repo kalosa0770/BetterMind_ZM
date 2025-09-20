@@ -12,8 +12,9 @@ import Footer from './Footer.js';
 import LoginForm from './components/LoginForm.js';
 import SignUpForm from './SignUpForm.js';
 import ForgotPassword from './components/ForgotPassword.js';
+import OTPVerificationForm from './components/OTPVerificationForm.js';
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Dashboard from './Dashboard.js';
 import api from './api/axios.js';
 
@@ -21,7 +22,9 @@ import api from './api/axios.js';
 const HomePage = ({
   openLoginModal, openSignupForm,
   isLoginModalOpen, closeLoginModal, isSignUpFormOpen, closeSignUpForm,
-  openForgotPasswordModal, isForgotPasswordModalOpen, goBack
+  openForgotPasswordModal, isForgotPasswordModalOpen, goBack,
+  isOTPModalOpen, closeOTPModal, currentUserId, onOTPVerificationSuccess,
+  onLoginSuccess, // Pass this new handler down to the LoginForm
 }) => (
   <>
     <Header openLoginModal={openLoginModal} openSignupForm={openSignupForm} openForgotPasswordModal={openForgotPasswordModal}/>
@@ -37,22 +40,34 @@ const HomePage = ({
       onClose={closeLoginModal}
       onForgotPasswordClick={openForgotPasswordModal}
       onSignupClick={openSignupForm}
+      // This is the CORRECT way to pass the callback function
+      onLoginSuccess={onLoginSuccess}
     />
-    <SignUpForm 
-      signUpOpen={isSignUpFormOpen} 
+    <SignUpForm
+      signUpOpen={isSignUpFormOpen}
       signUpClose={closeSignUpForm}
       onLoginClick={openLoginModal}
     />
     <ForgotPassword
       isOpen={isForgotPasswordModalOpen}
       onClose={goBack}
-      
+    />
+    <OTPVerificationForm
+      // The isOpen prop must be a boolean
+      isOpen={isOTPModalOpen}
+      // The onClose prop should just close the modal
+      onClose={closeOTPModal}
+      // We must pass the userId so the form knows which user to verify
+      userId={currentUserId}
+      // We must pass a success handler for when OTP verification succeeds
+      onVerificationSuccess={onOTPVerificationSuccess}
     />
     <Footer />
   </>
 );
 
 function App () {
+  const navigate = useNavigate(); // Hook to enable navigation
 
   useEffect (() => {
     const fetchCsrfToken = async () => {
@@ -66,18 +81,23 @@ function App () {
     };
     fetchCsrfToken();
   }, []);
-  
+
   const [modalState, setModalState] = useState({
     login: false,
     signup: false,
-    forgotPassword: false
+    forgotPassword: false,
+    otp: false,
   });
+
+  // Store userId temporarily after successful password login
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const openModal = (modalName) => {
     setModalState({
       login: modalName === 'login',
       signup: modalName === 'signup',
-      forgotPassword: modalName === 'forgotPassword'
+      forgotPassword: modalName === 'forgotPassword',
+      otp: modalName === 'otp',
     });
   };
 
@@ -93,33 +113,55 @@ function App () {
     openModal('login');
   }
 
+  // This function will be called by the LoginForm when the login is successful
+  const handleLoginSuccess = (userId) => {
+    // This is where you pass the userId to the App's state
+    setCurrentUserId(userId);
+    closeModal('login'); // Close the login modal
+    openModal('otp'); // Open the OTP modal
+  }
+
+  // This function will be called by the OTPVerificationForm after a successful verification
+  const handleOTPVerificationSuccess = () => {
+    closeModal('otp'); // Close the OTP modal
+    navigate('/dashboard'); // Navigate to the dashboard
+  }
+
   return (
-    <BrowserRouter>
-      <div className="App">
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <HomePage
-                openLoginModal={() => openModal('login')} 
-                openSignupForm={() => openModal('signup')} 
-                openForgotPasswordModal={() => {
-                  closeModal('login'); // Close login modal first
-                  openModal('forgotPassword'); // Then open forgot password modal
-                }}
-                isLoginModalOpen={modalState.login} 
-                closeLoginModal={() => closeModal('login')} 
-                isSignUpFormOpen={modalState.signup} 
-                closeSignUpForm={() => closeModal('signup')} 
-                isForgotPasswordModalOpen={modalState.forgotPassword}
-                goBack={() => goBackToLoginModal()}
-              />
-            } 
-          />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+    <div className="App">
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              openLoginModal={() => openModal('login')}
+              openSignupForm={() => openModal('signup')}
+              openForgotPasswordModal={() => {
+                closeModal('login');
+                openModal('forgotPassword');
+              }}
+              isLoginModalOpen={modalState.login}
+              closeLoginModal={() => closeModal('login')}
+              isSignUpFormOpen={modalState.signup}
+              closeSignUpForm={() => closeModal('signup')}
+              isForgotPasswordModalOpen={modalState.forgotPassword}
+              goBack={() => goBackToLoginModal()}
+              // Correctly pass the boolean state to the OTP form
+              isOTPModalOpen={modalState.otp}
+              // Correctly pass the close handler for the OTP form
+              closeOTPModal={() => closeModal('otp')}
+              // Correctly pass the userId state
+              currentUserId={currentUserId}
+              // Correctly pass the success handler for OTP verification
+              onOTPVerificationSuccess={handleOTPVerificationSuccess}
+              // Correctly pass the login success handler
+              onLoginSuccess={handleLoginSuccess}
+            />
+          }
+        />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </div>
   );
 }
 

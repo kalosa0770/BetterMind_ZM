@@ -10,6 +10,7 @@ const speakeasy = require('speakeasy');
 const twilio = require('twilio');
 const UserModel = require('../models/Users');
 const { body, validationResult } = require('express-validator');
+const { protect } = require('../middleware/auth');
 
 // Twilio credentials from your Twilio Console
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -22,6 +23,9 @@ const twilioClient = new twilio(accountSid, authToken);
 const generateSecret = () => {
   return speakeasy.generateSecret({ length: 20 });
 };
+
+// In-memory set for revoked tokens. In a production app, you would use a persistent store like Redis.
+const revokedTokens = new Set();
 
 // Registration route
 router.post('/register',
@@ -255,6 +259,12 @@ router.post('/reset-password', async (req, res) => {
 router.post('/verify-otp', async (req, res) => {
   const { userId, otp } = req.body;
 
+  // Check if token is revoked before continuing
+  const token = req.headers.authorization?.split(' ')[1];
+  if (revokedTokens.has(token)) {
+    return res.status(401).json({ message: 'Token has been revoked.' });
+  }
+
   try {
     const user = await UserModel.findById(userId);
 
@@ -297,6 +307,27 @@ router.post('/verify-otp', async (req, res) => {
     logger.error('OTP verification error:', error);
     res.status(500).json({ message: 'An error occurred during OTP verification.' });
   }
+});
+
+// New Logout Route
+router.post('/logout', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (token) {
+    revokedTokens.add(token);
+    return res.status(200).json({ message: 'Logout successful.' });
+  }
+  return res.status(400).json({ message: 'No token provided.' });
+});
+
+// New protected route
+router.get('/protected', protect, (req, res) => {
+  res.status(200).json({
+    message: 'You have accessed a protected route!',
+    data: {
+      user: 'Super Secure User',
+      info: 'This data is only available to authenticated users.'
+    }
+  });
 });
 
 module.exports = router;

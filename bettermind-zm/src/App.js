@@ -15,7 +15,7 @@ import ForgotPassword from './components/ForgotPassword.js';
 import OTPVerificationForm from './components/OTPVerificationForm.js';
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import Dashboard from './Dashboard.js';
+import Dashboard from './user-dashboard-components/Dashboard.js';
 import api from './api/axios.js';
 
 // HomePage component to group all the main page content
@@ -67,7 +67,10 @@ const HomePage = ({
 );
 
 function App () {
-  const navigate = useNavigate(); // Hook to enable navigation
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  // Fetch CSRF token on app load
 
   useEffect (() => {
     const fetchCsrfToken = async () => {
@@ -127,6 +130,25 @@ function App () {
     navigate('/dashboard'); // Navigate to the dashboard
   }
 
+  // handle logout
+  const handleLogout = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        await api.post('/auth/logout', null, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    }
+    // Clear token and state regardless of API response
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
+
   return (
     <div className="App">
       <Routes>
@@ -159,7 +181,7 @@ function App () {
             />
           }
         />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard onLogout={handleLogout}/>} />
       </Routes>
     </div>
   );

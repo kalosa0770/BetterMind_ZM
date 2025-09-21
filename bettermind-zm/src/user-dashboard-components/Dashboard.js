@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, User, Home, FilePlus, Video, MessageCircle, Plus, ChartBar, LampDesk } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import {
+  Bell, User, Home, FilePlus, Video, MessageCircle, Plus, ChartBar, LampDesk
+} from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -13,24 +17,23 @@ import PopularContent from './PopularContents';
 import UserAvatar from './UserAvatar';
 import JournalEntry from './JournalEntry';
 import JournalEntryModal from './JournalEntryModal';
-import axios from 'axios';
-
-import './Dashboard.css';
+import './UserDashboard.css';
 
 // Custom Tooltip component for the chart
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="p-2 rounded-lg text-white" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-        <p className="font-bold">{label}</p>
-        <p>Mood: {payload[0].value.toFixed(1)}</p>
+      <div className="custom-chart-tooltip">
+        <p className="custom-tooltip-label">{label}</p>
+        <p className="custom-tooltip-mood">Mood: {payload[0].value.toFixed(1)}</p>
       </div>
     );
   }
   return null;
 };
 
-const Dashboard = ({ fullname }) => {
+const Dashboard = ({ onLogout }) => {
+    const navigate = useNavigate();
     const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -45,27 +48,26 @@ const Dashboard = ({ fullname }) => {
     ]);
 
     const fetchData = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            onLogout();
+            return;
+        }
+
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No token found');
-            }
-            
             const hostname = window.location.hostname;
             const baseURL = (hostname === 'localhost' || hostname === '127.0.0.1')
                 ? 'http://localhost:3001'
                 : `http://${hostname}:3001`;
 
-            const apiUrl = `${baseURL}/api/my-initials`;
-
-            const response = await axios.get(apiUrl, {
+            const nameResponse = await axios.get(`${baseURL}/api/my-initials`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            if (response.data.fullName) {
-                setFullName(response.data.fullName);
+            if (nameResponse.data.fullName) {
+                setFullName(nameResponse.data.fullName);
             } else {
                 throw new Error('Full name not in response');
             }
@@ -80,6 +82,7 @@ const Dashboard = ({ fullname }) => {
         } catch (e) {
             setError(e.message);
             console.error("Error fetching data:", e);
+            onLogout();
         } finally {
             setLoading(false);
         }
@@ -87,7 +90,7 @@ const Dashboard = ({ fullname }) => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [onLogout]);
 
     if (loading) {
         return <div>loading...</div>;
@@ -163,7 +166,7 @@ const Dashboard = ({ fullname }) => {
                     </ul>
                 </nav>
                 <div className="mt-auto">
-                    <button className="logout-button">Log out</button>
+                    <button className="logout-button" onClick={onLogout}>Log out</button>
                 </div>
             </header>
 
@@ -192,10 +195,10 @@ const Dashboard = ({ fullname }) => {
                         </div>
                         
                         <div className="goals-card">
-                            <h3 className="card-heading flex items-center justify-between">
+                            <h3 className="card-heading goal-card-header">
                                 My Goals
-                                <button className="ml-2 bg-white text-gray-800 p-1 rounded-full hover:bg-gray-200">
-                                    <Plus className="w-4 h-4"/>
+                                <button className="add-goal-button">
+                                    <Plus className="add-goal-icon"/>
                                 </button>
                             </h3>
                             <div className="goals-list">
@@ -294,7 +297,7 @@ const Dashboard = ({ fullname }) => {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-gray-500 text-center">No journal entries to display.</p>
+                            <p className="journal-entries-empty-text">No journal entries to display.</p>
                         )}
                     </div>
                 </section>

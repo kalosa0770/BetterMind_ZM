@@ -33,18 +33,16 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const Dashboard = ({ onLogout }) => {
+const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, showHeaderBar }) => {
     const navigate = useNavigate();
 
-    const [showMainContent, setShowMainContent] = useState(true);
+    
     const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isJournalModalOpen, setJournalModalOpen] = useState(false);
     const [journalEntries, setJournalEntries] = useState([]);
     const [selectedEntry, setSelectedEntry] = useState(null);
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
-
     // Sample goals data
     const [goals, setGoals] = useState([
       { id: 1, title: 'Meditate for 10 minutes', current: 3, total: 5 },
@@ -86,15 +84,23 @@ const Dashboard = ({ onLogout }) => {
         } catch (e) {
             setError(e.message);
             console.error("Error fetching data:", e);
-            onLogout();
+            
+            // Here's the change: check for an authentication error
+            if (e.response && e.response.status === 401) {
+                // If it's a 401 error, it means the token is invalid, so log out
+                onLogout();
+            }
+            // For other errors, don't log the user out.
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchData();
-    }, [onLogout]);
+        if (activeIcon === 'dashboard') {
+            fetchData();
+        }
+    }, [activeIcon, onLogout]);
 
     if (loading) {
         return <div>loading...</div>;
@@ -153,10 +159,7 @@ const Dashboard = ({ onLogout }) => {
         ? (journalEntries.reduce((sum, entry) => sum + entry.moodRating, 0) / totalEntries).toFixed(1)
         : 'N/A';
     
-    const showProfile = () => {
-      setIsProfileOpen(!isProfileOpen);
-      setShowMainContent(!showMainContent);
-    };
+   
     return (
         <div className="dashboard-container">
             {/* Sidebar for desktop */}
@@ -179,16 +182,18 @@ const Dashboard = ({ onLogout }) => {
 
             {/* Main content area */}
             <main className="main-content">
-                <header className="header-bar">
+                {showHeaderBar &&
+                    <header className="header-bar">
                     <UserAvatar />
                     <div className="header-icons">
                         <Bell className="header-icon" />
                         <div className="md:hidden">
-                            <User className="header-icon" onClick={showProfile}/>
+                            <User className="header-icon" />
                         </div>
                     </div>
                 </header>
-                {isProfileOpen && <UserProfile  showMainContent = {showMainContent}/>}
+                }
+                {activeIcon === 'profile' && <UserProfile showMainContent={showMainContent} />}
 
                 {showMainContent && 
                     <div className="main-dashboard-content">
@@ -318,11 +323,43 @@ const Dashboard = ({ onLogout }) => {
                 <header className="mobile-footer-bar">
                     <nav className='mobile-footer-nav'>
                         <ul className="footer-bar-links">
-                            <li><a href="/#" className="icon-bar-footer active"><Home className="mobile-footer-icon" /><span className="mobile-footer-icon-name">Dashboard</span></a></li>
-                            <li><a href="/#" className="icon-bar-footer"><FilePlus className="mobile-footer-icon" /><span className="mobile-footer-icon-name">Journal</span></a></li>
-                            <li><a href="/#" className="icon-bar-footer"><LampDesk className="mobile-footer-icon" /><span className="mobile-footer-icon-name">Explore</span></a></li>
-                            <li><a href="/#" className="icon-bar-footer"><Video className="mobile-footer-icon" /><span className="mobile-footer-icon-name">Teletherapy</span></a></li>
-                            <li><a href="/#" className="icon-bar-footer"><MessageCircle className="mobile-footer-icon" /><span className="mobile-footer-icon-name">Forum</span></a></li>
+                            <li onClick={() => handleIconClick('dashboard')}>
+                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'dashboard' ? 'active' : ''}`}>
+                                    <Home className="mobile-footer-icon" />
+                                    <span className="mobile-footer-icon-name">Dashboard</span>
+                                </a>
+                            </li>
+                            <li onClick={() => handleIconClick('journal')}>
+                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'journal' ? 'active' : ''}`}>
+                                    <FilePlus className="mobile-footer-icon" />
+                                    <span className="mobile-footer-icon-name">Journal</span>
+                                </a>
+                            </li>
+                            <li onClick={() => handleIconClick('explore')}>
+                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'explore' ? 'active' : ''}`}>
+                                    <LampDesk className="mobile-footer-icon" />
+                                    <span className="mobile-footer-icon-name">Explore</span>
+                                </a>
+                            </li>
+                            <li onClick={() => handleIconClick('teletherapy')}>
+                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'teletherapy' ? 'active' : ''}`}>
+                                    <Video className="mobile-footer-icon" />
+                                    <span className="mobile-footer-icon-name">Teletherapy</span>
+                                </a>
+                            </li>
+                            <li onClick={() => handleIconClick('forum')}>
+                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'forum' ? 'active' : ''}`}>
+                                    <MessageCircle className="mobile-footer-icon" />
+                                    <span className="mobile-footer-icon-name">Forum</span>
+                                </a>
+                            </li>
+                            {/* The profile click handler is now simplified */}
+                            <li onClick={() => handleIconClick('profile')}>
+                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'profile' ? 'active' : ''}`}>
+                                    <User className="mobile-footer-icon" />
+                                    <span className="mobile-footer-icon-name">Profile</span>
+                                </a>
+                            </li>
                         </ul>
                     </nav>
                 </header>

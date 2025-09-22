@@ -16,6 +16,7 @@ import OTPVerificationForm from './components/OTPVerificationForm.js';
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Dashboard from './user-dashboard-components/Dashboard.js';
+import UserProfile from './user-dashboard-components/UserProfile.js';
 import api from './api/axios.js';
 
 // HomePage component to group all the main page content
@@ -68,6 +69,9 @@ const HomePage = ({
 
 function App () {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [activeIcon, setActiveIcon] = useState('dashboard');
+  const [showMainContent, setShowMainContent] = useState(true);
+  const [showHeaderBar, setShowHeaderBar] = useState(true);
   const navigate = useNavigate();
 
   // Fetch CSRF token on app load
@@ -148,6 +152,19 @@ function App () {
     navigate('/');
   };
 
+  const handleIconClick = (iconName) => {
+      setActiveIcon(iconName);
+      
+      // Logic to show/hide content based on the clicked icon
+      if (iconName === 'profile') {
+        setShowMainContent(false);
+        setShowHeaderBar(false);
+      } else {
+        setShowMainContent(true);
+        setShowHeaderBar(true);
+      }
+    };
+
 
   return (
     <div className="App">
@@ -181,7 +198,22 @@ function App () {
             />
           }
         />
-        <Route path="/dashboard" element={<Dashboard onLogout={handleLogout}/>} />
+        <Route path="/dashboard" 
+               element={
+                <>
+                  <Dashboard onLogout={handleLogout}
+                              activeIcon={activeIcon} 
+                              handleIconClick={handleIconClick}
+                              showMainContent={showMainContent}
+                              showHeaderBar={showHeaderBar}
+                    />
+                 {activeIcon === 'profile' && <UserProfile />}
+                </>
+                  
+                 
+                }
+                 
+        />
       </Routes>
     </div>
   );

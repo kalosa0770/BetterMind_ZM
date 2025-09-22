@@ -1,6 +1,6 @@
 import React from 'react';
-import './UserProfile.css';
-import { X, Cog, CheckCircle, FileCheck, ClipboardCheck} from 'lucide-react'
+import './UserDashboard.css';
+import { X, Cog, CheckCircle, FileCheck, ClipboardCheck, Route} from 'lucide-react'
 
 const myJourneyData = [
   { id: 1, title: 'Therapy Completed', number: '3', icon: <CheckCircle size={20} /> },
@@ -32,8 +32,12 @@ function UserProfile() {
               <div className="journey-detail-number">{item.number}</div>
             </div>
           ))}
+          
         </div>
+        <button className='view-journey-content-btn'><Route size={18} /> View Journey Content</button>
       </div>
+
+
     </div>
   )
 }

@@ -17,6 +17,7 @@ import PopularContent from './PopularContents';
 import UserAvatar from './UserAvatar';
 import JournalEntry from './JournalEntry';
 import JournalEntryModal from './JournalEntryModal';
+import UserProfile from './UserProfile';
 import './UserDashboard.css';
 
 // Custom Tooltip component for the chart
@@ -34,12 +35,15 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const Dashboard = ({ onLogout }) => {
     const navigate = useNavigate();
+
+    const [showMainContent, setShowMainContent] = useState(true);
     const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isJournalModalOpen, setJournalModalOpen] = useState(false);
     const [journalEntries, setJournalEntries] = useState([]);
     const [selectedEntry, setSelectedEntry] = useState(null);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     // Sample goals data
     const [goals, setGoals] = useState([
@@ -149,7 +153,10 @@ const Dashboard = ({ onLogout }) => {
         ? (journalEntries.reduce((sum, entry) => sum + entry.moodRating, 0) / totalEntries).toFixed(1)
         : 'N/A';
     
-    
+    const showProfile = () => {
+      setIsProfileOpen(!isProfileOpen);
+      setShowMainContent(!showMainContent);
+    };
     return (
         <div className="dashboard-container">
             {/* Sidebar for desktop */}
@@ -177,130 +184,135 @@ const Dashboard = ({ onLogout }) => {
                     <div className="header-icons">
                         <Bell className="header-icon" />
                         <div className="md:hidden">
-                            <User className="header-icon" />
+                            <User className="header-icon" onClick={showProfile}/>
                         </div>
                     </div>
                 </header>
+                {isProfileOpen && <UserProfile  showMainContent = {showMainContent}/>}
 
-                <section className="welcome-section">
-                    <div className="mb-6">
-                        <h2 className="welcome-heading">Welcome back {fullName}</h2>
-                        <p className="welcome-text-msg">Let's make today a great day.</p>
-                    </div>
+                {showMainContent && 
+                    <div className="main-dashboard-content">
+                        <section className="welcome-section">
+                            <div className="mb-6">
+                                <h2 className="welcome-heading">Welcome back {fullName}</h2>
+                                <p className="welcome-text-msg">Let's make today a great day.</p>
+                            </div>
 
-                    <div className="card-grid">
-                        <div className="card">
-                            <h3 className="card-heading">Daily Tip</h3>
-                            <p className="card-text">Mindfulness can reduce stress. Try a 5-minute breathing exercise today.</p>
+                            <div className="card-grid">
+                                <div className="card">
+                                    <h3 className="card-heading">Daily Tip</h3>
+                                    <p className="card-text">Mindfulness can reduce stress. Try a 5-minute breathing exercise today.</p>
+                                </div>
+                                
+                                <div className="goals-card">
+                                    <h3 className="card-heading goal-card-header">
+                                        My Goals
+                                        <button className="add-goal-button">
+                                            <Plus className="add-goal-icon"/>
+                                        </button>
+                                    </h3>
+                                    <div className="goals-list">
+                                        {goals.map(goal => (
+                                            <div key={goal.id} className="goal-item">
+                                                <p className="goal-title">{goal.title}</p>
+                                                <div className="progress-bar-container">
+                                                    <div 
+                                                        className="progress-bar" 
+                                                        style={{ width: `${(goal.current / goal.total) * 100}%` }}
+                                                    ></div>
+                                                </div>
+                                                <div className="goal-completion-text">
+                                                    {goal.current}/{goal.total} completed
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <PopularContent />
+                        
+                        {/* Correctly passing the function as a prop */}
+                        <JournalEntry onOpenJournalModal={openJournalModal} />
+                        
+                        {/* Conditionally render the modal based on state */}
+                        {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry} />}
+
+                        <div className="mood-chart-container">
+                            <div className='chart-heading'>
+                                <ChartBar className='chart-icon'/>
+                                <h3 className="mood-chart-heading">Your Journey</h3>
+                            </div>
+                            {journalEntries.length > 0 ? 
+                                (
+                                    <>
+                                        <ResponsiveContainer width="100%" height={350}>
+                                            <LineChart
+                                                data={chartData}
+                                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="date" stroke="#ffffff" />
+                                                <YAxis domain={[1, 10]} stroke="#ffffff" />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="mood"
+                                                    stroke="#ffffff"
+                                                    strokeWidth={2}
+                                                    dot={{ fill: '#ffffff', stroke: '#8884d8', strokeWidth: 2 }}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                        <div className="mood-chart-data">
+                                            <div className="mood-chart-card">
+                                                <p className="mood-rating">{latestMood}/10</p>
+                                                <p>Latest Mood</p>
+                                            </div>
+                                            <div className="mood-chart-card">
+                                                <p className="mood-rating">{averageMood}/10</p>
+                                                <p>Average Mood</p>
+                                            </div>
+                                            <div className="mood-chart-card">
+                                                <p className="mood-rating">{totalEntries}</p>
+                                                <p>Total Entries</p>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : ( <p className="card-text">No journal entries yet.</p>)}
                         </div>
                         
-                        <div className="goals-card">
-                            <h3 className="card-heading goal-card-header">
-                                My Goals
-                                <button className="add-goal-button">
-                                    <Plus className="add-goal-icon"/>
-                                </button>
-                            </h3>
-                            <div className="goals-list">
-                                {goals.map(goal => (
-                                    <div key={goal.id} className="goal-item">
-                                        <p className="goal-title">{goal.title}</p>
-                                        <div className="progress-bar-container">
-                                            <div 
-                                                className="progress-bar" 
-                                                style={{ width: `${(goal.current / goal.total) * 100}%` }}
-                                            ></div>
+                        {/* New Journal Entries Section */}
+                        <section className="journal-entries-section">
+                            <h3 className="journal-entries-heading">Your Journal History</h3>
+                            <div className="journal-entries-list">
+                                {journalEntries.length > 0 ? (
+                                    // Sort entries by timestamp in descending order and render each
+                                    journalEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map(entry => (
+                                        <div key={entry._id} className="journal-entry-card" onClick={() => handleViewEntry(entry)}>
+                                            <div className="journal-entry-header">
+                                                <p className="journal-entry-date">
+                                                    {new Date(entry.timestamp).toLocaleDateString()}
+                                                </p>
+                                                <span className="journal-entry-mood">Mood: {entry.moodRating}/10</span>
+                                            </div>
+                                            <p className="journal-entry-text">
+                                                {entry.moodEntryText
+                                                    ? entry.moodEntryText.length > 100
+                                                        ? `${entry.moodEntryText.substring(0, 100)}...`
+                                                        : entry.moodEntryText
+                                                    : 'No entry text available.'
+                                                }
+                                            </p>
                                         </div>
-                                        <div className="goal-completion-text">
-                                            {goal.current}/{goal.total} completed
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))
+                                ) : (
+                                    <p className="journal-entries-empty-text">No journal entries to display.</p>
+                                )}
                             </div>
-                        </div>
+                        </section>
                     </div>
-                </section>
-                <PopularContent />
-                
-                {/* Correctly passing the function as a prop */}
-                <JournalEntry onOpenJournalModal={openJournalModal} />
-                
-                {/* Conditionally render the modal based on state */}
-                {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry} />}
-
-                <div className="mood-chart-container">
-                    <div className='chart-heading'>
-                        <ChartBar className='chart-icon'/>
-                        <h3 className="mood-chart-heading">Your Journey</h3>
-                    </div>
-                    {journalEntries.length > 0 ? 
-                        (
-                            <>
-                                <ResponsiveContainer width="100%" height={350}>
-                                    <LineChart
-                                        data={chartData}
-                                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="date" stroke="#ffffff" />
-                                        <YAxis domain={[1, 10]} stroke="#ffffff" />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="mood"
-                                            stroke="#ffffff"
-                                            strokeWidth={2}
-                                            dot={{ fill: '#ffffff', stroke: '#8884d8', strokeWidth: 2 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                                <div className="mood-chart-data">
-                                    <div className="mood-chart-card">
-                                        <p className="mood-rating">{latestMood}/10</p>
-                                        <p>Latest Mood</p>
-                                    </div>
-                                    <div className="mood-chart-card">
-                                        <p className="mood-rating">{averageMood}/10</p>
-                                        <p>Average Mood</p>
-                                    </div>
-                                    <div className="mood-chart-card">
-                                        <p className="mood-rating">{totalEntries}</p>
-                                        <p>Total Entries</p>
-                                    </div>
-                                </div>
-                            </>
-                        ) : ( <p className="card-text">No journal entries yet.</p>)}
-                </div>
-                
-                {/* New Journal Entries Section */}
-                <section className="journal-entries-section">
-                    <h3 className="journal-entries-heading">Your Journal History</h3>
-                    <div className="journal-entries-list">
-                        {journalEntries.length > 0 ? (
-                            // Sort entries by timestamp in descending order and render each
-                            journalEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map(entry => (
-                                <div key={entry._id} className="journal-entry-card" onClick={() => handleViewEntry(entry)}>
-                                    <div className="journal-entry-header">
-                                        <p className="journal-entry-date">
-                                            {new Date(entry.timestamp).toLocaleDateString()}
-                                        </p>
-                                        <span className="journal-entry-mood">Mood: {entry.moodRating}/10</span>
-                                    </div>
-                                    <p className="journal-entry-text">
-                                        {entry.moodEntryText
-                                            ? entry.moodEntryText.length > 100
-                                                ? `${entry.moodEntryText.substring(0, 100)}...`
-                                                : entry.moodEntryText
-                                            : 'No entry text available.'
-                                        }
-                                    </p>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="journal-entries-empty-text">No journal entries to display.</p>
-                        )}
-                    </div>
-                </section>
+                }
 
                 {/* Mobile footer navigation */}
                 <header className="mobile-footer-bar">

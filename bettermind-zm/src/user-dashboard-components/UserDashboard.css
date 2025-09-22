@@ -14,7 +14,7 @@
   --border-radius-2xl: 1rem;
 }
           
-body {
+/* body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   background-color: var(--bg-color);
@@ -22,7 +22,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
-}
+} */
 
 .dashboard-container {
   display: flex;

@@ -456,7 +456,7 @@
   height: 100%;
   z-index: 1;
   margin: 0;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .user-profile-header {
@@ -599,11 +599,32 @@
   margin: 20px 0;
 }
 
+.mood-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .mood-summary-section h2 {
   color: var(--accent-color);
   text-align: left;
-  margin-bottom: 20px;
   font-size: 1.1rem;
+}
+
+.view-all-entries-btn {
+  padding: 10px;
+  background-color: var(--accent-color);
+  color: var(--text-color-secondary);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
 .mood-summary-card {
@@ -625,4 +646,28 @@
   justify-content: flex-start;
   padding: 10px;
   gap: 10px;
+}
+
+.mood-summary-footer {
+  margin-top: 20px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.add-entry-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--text-color-primary);
+  color: var(--accent-color);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }

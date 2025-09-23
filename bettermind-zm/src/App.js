@@ -13,11 +13,12 @@ import LoginForm from './components/LoginForm.js';
 import SignUpForm from './SignUpForm.js';
 import ForgotPassword from './components/ForgotPassword.js';
 import OTPVerificationForm from './components/OTPVerificationForm.js';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Dashboard from './user-dashboard-components/Dashboard.js';
 import UserProfile from './user-dashboard-components/UserProfile.js';
 import api from './api/axios.js';
+
 
 // HomePage component to group all the main page content
 const HomePage = ({
@@ -152,6 +153,8 @@ function App () {
     navigate('/');
   };
 
+  const onLogout = useCallback(handleLogout, []);
+
   const handleIconClick = (iconName) => {
       setActiveIcon(iconName);
       
@@ -200,19 +203,16 @@ function App () {
         />
         <Route path="/dashboard" 
                element={
-                <>
-                  <Dashboard onLogout={handleLogout}
-                              activeIcon={activeIcon} 
-                              handleIconClick={handleIconClick}
-                              showMainContent={showMainContent}
-                              showHeaderBar={showHeaderBar}
-                    />
-                 {activeIcon === 'profile' && <UserProfile />}
-                </>
-                  
-                 
-                }
-                 
+                  <>
+                    <Dashboard onLogout={onLogout}
+                                activeIcon={activeIcon} 
+                                handleIconClick={handleIconClick}
+                                showMainContent={showMainContent}
+                                showHeaderBar={showHeaderBar}
+                      />
+                  {activeIcon === 'profile' && <UserProfile />}
+                  </>
+                }      
         />
       </Routes>
     </div>

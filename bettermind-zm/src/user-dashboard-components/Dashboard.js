@@ -324,41 +324,41 @@ const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, sho
                     <nav className='mobile-footer-nav'>
                         <ul className="footer-bar-links">
                             <li onClick={() => handleIconClick('dashboard')}>
-                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'dashboard' ? 'active' : ''}`}>
+                                <p className={`icon-bar-footer ${activeIcon === 'dashboard' ? 'active' : ''}`}>
                                     <Home className="mobile-footer-icon" />
                                     <span className="mobile-footer-icon-name">Dashboard</span>
-                                </a>
+                                </p>
                             </li>
                             <li onClick={() => handleIconClick('journal')}>
-                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'journal' ? 'active' : ''}`}>
+                                <p className={`icon-bar-footer ${activeIcon === 'journal' ? 'active' : ''}`}>
                                     <FilePlus className="mobile-footer-icon" />
                                     <span className="mobile-footer-icon-name">Journal</span>
-                                </a>
+                                </p>
                             </li>
                             <li onClick={() => handleIconClick('explore')}>
-                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'explore' ? 'active' : ''}`}>
+                                <p className={`icon-bar-footer ${activeIcon === 'explore' ? 'active' : ''}`}>
                                     <LampDesk className="mobile-footer-icon" />
                                     <span className="mobile-footer-icon-name">Explore</span>
-                                </a>
+                                </p>
                             </li>
                             <li onClick={() => handleIconClick('teletherapy')}>
-                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'teletherapy' ? 'active' : ''}`}>
+                                <p className={`icon-bar-footer ${activeIcon === 'teletherapy' ? 'active' : ''}`}>
                                     <Video className="mobile-footer-icon" />
                                     <span className="mobile-footer-icon-name">Teletherapy</span>
-                                </a>
+                                </p>
                             </li>
                             <li onClick={() => handleIconClick('forum')}>
-                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'forum' ? 'active' : ''}`}>
+                                <p className={`icon-bar-footer ${activeIcon === 'forum' ? 'active' : ''}`}>
                                     <MessageCircle className="mobile-footer-icon" />
                                     <span className="mobile-footer-icon-name">Forum</span>
-                                </a>
+                                </p>
                             </li>
                             {/* The profile click handler is now simplified */}
                             <li onClick={() => handleIconClick('profile')}>
-                                <a href="/#" className={`icon-bar-footer ${activeIcon === 'profile' ? 'active' : ''}`}>
+                                <p className={`icon-bar-footer ${activeIcon === 'profile' ? 'active' : ''}`}>
                                     <User className="mobile-footer-icon" />
                                     <span className="mobile-footer-icon-name">Profile</span>
-                                </a>
+                                </p>
                             </li>
                         </ul>
                     </nav>

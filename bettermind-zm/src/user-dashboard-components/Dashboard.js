@@ -227,10 +227,11 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                     </div>
                 </header>
                 }
-                {activeIcon === 'profile' && <UserProfile showMainContent={showMainContent} journalEntries={journalEntries} />}
-                {activeSideBar === 'profile' && <UserProfile showMainContent={showMainContent} journalEntries={journalEntries} />}
-
-                {showMainContent && 
+                
+                {(activeIcon === 'profile' || activeSideBar === 'profile') ? (
+                    <UserProfile showMainContent={showMainContent} journalEntries={journalEntries} />
+                ) : (
+                    showMainContent && 
                     <div className="main-dashboard-content">
                         <section className="welcome-section">
                             <div className="mb-6">
@@ -352,7 +353,8 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                             </div>
                         </section>
                     </div>
-                }
+                )}
+                
 
                 {/* Mobile footer navigation */}
                 <header className="mobile-footer-bar">

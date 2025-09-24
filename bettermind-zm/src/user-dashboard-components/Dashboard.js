@@ -172,7 +172,9 @@ const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, sho
                         <li><a href="/#"><Video className="w-5 h-5 mr-3" />My Resources</a></li>
                         <li><a href="/#"><Video className="w-5 h-5 mr-3" />My Therapist</a></li>
                         <li><a href="/#"><MessageCircle className="w-5 h-5 mr-3" />Community Forum</a></li>
-                        <li><a href="/#"><User className="w-5 h-5 mr-3" />Account & Settings</a></li>
+                        <li onClick={() => handleIconClick('profile')}>
+                            <p><User className="w-5 h-5 mr-3" />Account & Settings</p>
+                        </li>
                     </ul>
                 </nav>
                 <div className="mt-auto">
@@ -193,7 +195,7 @@ const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, sho
                     </div>
                 </header>
                 }
-                {activeIcon === 'profile' && <UserProfile showMainContent={showMainContent} />}
+                {activeIcon === 'profile' && <UserProfile showMainContent={showMainContent} journalEntries={journalEntries} />}
 
                 {showMainContent && 
                     <div className="main-dashboard-content">

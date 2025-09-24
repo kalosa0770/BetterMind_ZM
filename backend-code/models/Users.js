@@ -41,19 +41,15 @@ const userSchema = new mongoose.Schema({
   },
   resetToken: String,
   resetTokenExpiration: Date,
-  // Add the new field to store the permanent secret for 2FA
+  // New field to store the permanent secret for 2FA
   twoFactorSecret: {
     type: String,
-    required: true,
+    required: false, // This is not a required field upon initial user creation
   },
-  // We can remove the old otp and otpExpires fields
-  otp: {
-    type: String,
-    required: false,
-  },
-  otpExpires: {
-    type: Number,
-    required: false,
+  // New flag to indicate whether 2FA is enabled for the user
+  is2FAEnabled: {
+    type: Boolean,
+    default: false,
   },
 });
 

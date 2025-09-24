@@ -1,6 +1,7 @@
 import React from 'react';
 import { Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles } from 'lucide-react';
 import './UserDashboard.css';
+import axios from 'axios';
 
 // A helper function to calculate the current streak of journal entries
 const calculateCurrentStreak = (entries) => {
@@ -81,6 +82,29 @@ function UserProfile({ journalEntries = [], onLogout }) {
       }
       return calendarDays;
     };
+
+    const fetchJournalEntries = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3001/api/journal-entries', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching journal entries:", error);
+        return [];
+      }
+    };
+
+    React.useEffect(() => {
+      // Fetch journal entries when the component mounts
+      const loadEntries = async () => {
+        const entries = await fetchJournalEntries();
+        // Assuming you want to update the journalEntries prop, you might need to lift state up
+        // or use a context/store depending on your app structure.
+      };
+      loadEntries();
+    }, []);
     
     const calendarDays = generateCalendar();
     
@@ -94,8 +118,9 @@ function UserProfile({ journalEntries = [], onLogout }) {
                 <h2>Profile</h2>
             </div>
             
-            {/* My journey */}
-            <div className="my-journey-section">
+            <div className='user-profile-content'>
+              {/* My journey */}
+              <div className="my-journey-section">
                 <h2>My Journey</h2>
                 <div className="journey-card">
                     {myJourneyData.map((item) => (
@@ -107,53 +132,58 @@ function UserProfile({ journalEntries = [], onLogout }) {
                     ))}
                 </div>
                 <button className='view-journey-content-btn'><ArrowRight size={18} /> View Journey Content</button>
-            </div>
-            
-            {/* New Streak Card with Calendar */}
-            <div className="streak-card">
-                <div className="streak-header">
-                    <Sparkles size={20} />
-                    <h3 className="streak-title">Current Streak</h3>
-                </div>
-                <div className="streak-value">{currentStreak} days</div>
-                <div className="calendar-grid">
-                    {calendarDays.map((day, index) => (
-                        <div key={index} className="calendar-day">
-                            <span className="day-of-week">{day.dayOfWeek}</span>
-                            <div className={`day-circle ${day.isJournalDay ? 'filled' : ''}`}></div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+              </div>
+              
+              {/* New Streak Card with Calendar */}
+              <div className="streak-card">
+                  <div className="streak-header">
+                      <Sparkles size={20} />
+                      <h3 className="streak-title">Current Streak</h3>
+                  </div>
+                  <div className="streak-value">{currentStreak} days</div>
+                  <div className="calendar-grid">
+                      {calendarDays.map((day, index) => (
+                          <div key={index} className="calendar-day">
+                              <span className="day-of-week">{day.dayOfWeek}</span>
+                              <div className={`day-circle ${day.isJournalDay ? 'filled' : ''}`}></div>
+                          </div>
+                      ))}
+                  </div>
+              </div>
 
-            {/* Mood Summary */}
-            <div className="mood-summary-section">
-                <div className="mood-summary-header">
-                    <h2>Mood Summary</h2>
-                    <button className="view-all-entries-btn">View All Entries <ArrowRight size={15} /></button>
-                </div>
-                <div className="mood-summary-card">
-                    {latestEntries.length > 0 ? (
-                        latestEntries.map((entry) => (
-                            <div key={entry._id} className="mood-entry">
-                                <div className="mood-entry-header">
-                                    <span className="mood-entry-date">{new Date(entry.timestamp).toLocaleDateString()}</span>
-                                    <span className="mood-entry-rating">Mood: {entry.moodRating}/10</span>
-                                </div>
-                                <div className="mood-entry-content">
-                                    { (entry.moodEntryText || '').length > 100 
-                                      ? (entry.moodEntryText || '').substring(0, 100) + '...' 
-                                      : (entry.moodEntryText || '') }
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="no-entries-text">No entries to display.</p>
-                    )}
-                </div>
-                <div className="mood-summary-footer">
-                    <button className="add-entry-btn"><FilePlus size={18} />Add New Entry</button>
-                </div>
+              {/* Mood Summary */}
+              <div className="mood-summary-section">
+                  <div className="mood-summary-header">
+                      <h2>Mood Summary</h2>
+                      <button className="view-all-entries-btn">Show All</button>
+                  </div>
+                  <div className="mood-summary-card">
+                      {latestEntries.length > 0 ? (
+                          latestEntries.map((entry) => (
+                              <div key={entry._id} className="mood-entry">
+                                  <div className="mood-entry-header">
+                                      <div className="mood-entry-date-rating">
+                                        <span className="mood-entry-date">{new Date(entry.timestamp).toLocaleDateString()}</span>
+                                        <span className="mood-entry-rating">Mood: {entry.moodRating}/10</span>
+                                      </div>
+                                      <div className='view-entry-icon'> <p>view record</p><ArrowRight size={15} /></div>
+                                  </div>
+                                  
+                                  <div className="mood-entry-content">
+                                      { (entry.moodEntryText || '').length > 100 
+                                        ? (entry.moodEntryText || '').substring(0, 100) + '...' 
+                                        : (entry.moodEntryText || '') }
+                                  </div>
+                              </div>
+                          ))
+                      ) : (
+                          <p className="no-entries-text">No entries to display.</p>
+                      )}
+                  </div>
+                  <div className="mood-summary-footer">
+                      <button className="add-entry-btn"><FilePlus size={18} />Add New Entry</button>
+                  </div>
+              </div>
             </div>
         </div>
     );

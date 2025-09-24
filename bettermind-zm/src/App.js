@@ -12,7 +12,6 @@ import Footer from './Footer.js';
 import LoginForm from './components/LoginForm.js';
 import SignUpForm from './SignUpForm.js';
 import ForgotPassword from './components/ForgotPassword.js';
-import OTPVerificationForm from './components/OTPVerificationForm.js';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Dashboard from './user-dashboard-components/Dashboard.js';
@@ -25,7 +24,6 @@ const HomePage = ({
   openLoginModal, openSignupForm,
   isLoginModalOpen, closeLoginModal, isSignUpFormOpen, closeSignUpForm,
   openForgotPasswordModal, isForgotPasswordModalOpen, goBack,
-  isOTPModalOpen, closeOTPModal, currentUserId, onOTPVerificationSuccess,
   onLoginSuccess, // Pass this new handler down to the LoginForm
 }) => (
   <>
@@ -42,7 +40,6 @@ const HomePage = ({
       onClose={closeLoginModal}
       onForgotPasswordClick={openForgotPasswordModal}
       onSignupClick={openSignupForm}
-      // This is the CORRECT way to pass the callback function
       onLoginSuccess={onLoginSuccess}
     />
     <SignUpForm
@@ -53,16 +50,6 @@ const HomePage = ({
     <ForgotPassword
       isOpen={isForgotPasswordModalOpen}
       onClose={goBack}
-    />
-    <OTPVerificationForm
-      // The isOpen prop must be a boolean
-      isOpen={isOTPModalOpen}
-      // The onClose prop should just close the modal
-      onClose={closeOTPModal}
-      // We must pass the userId so the form knows which user to verify
-      userId={currentUserId}
-      // We must pass a success handler for when OTP verification succeeds
-      onVerificationSuccess={onOTPVerificationSuccess}
     />
     <Footer />
   </>
@@ -94,18 +81,13 @@ function App () {
     login: false,
     signup: false,
     forgotPassword: false,
-    otp: false,
   });
-
-  // Store userId temporarily after successful password login
-  const [currentUserId, setCurrentUserId] = useState(null);
 
   const openModal = (modalName) => {
     setModalState({
       login: modalName === 'login',
       signup: modalName === 'signup',
       forgotPassword: modalName === 'forgotPassword',
-      otp: modalName === 'otp',
     });
   };
 
@@ -122,18 +104,11 @@ function App () {
   }
 
   // This function will be called by the LoginForm when the login is successful
-  const handleLoginSuccess = (userId) => {
-    // This is where you pass the userId to the App's state
-    setCurrentUserId(userId);
+  const handleLoginSuccess = (data) => {
     closeModal('login'); // Close the login modal
-    openModal('otp'); // Open the OTP modal
-  }
-
-  // This function will be called by the OTPVerificationForm after a successful verification
-  const handleOTPVerificationSuccess = () => {
-    closeModal('otp'); // Close the OTP modal
-    navigate('/dashboard'); // Navigate to the dashboard
-  }
+    localStorage.setItem('token', data.token); // Store the JWT token
+    navigate('/dashboard'); // Navigate directly to the dashboard
+  };
 
   // handle logout
   const handleLogout = async () => {
@@ -188,14 +163,6 @@ function App () {
               closeSignUpForm={() => closeModal('signup')}
               isForgotPasswordModalOpen={modalState.forgotPassword}
               goBack={() => goBackToLoginModal()}
-              // Correctly pass the boolean state to the OTP form
-              isOTPModalOpen={modalState.otp}
-              // Correctly pass the close handler for the OTP form
-              closeOTPModal={() => closeModal('otp')}
-              // Correctly pass the userId state
-              currentUserId={currentUserId}
-              // Correctly pass the success handler for OTP verification
-              onOTPVerificationSuccess={handleOTPVerificationSuccess}
               // Correctly pass the login success handler
               onLoginSuccess={handleLoginSuccess}
             />
@@ -210,7 +177,6 @@ function App () {
                                 showMainContent={showMainContent}
                                 showHeaderBar={showHeaderBar}
                       />
-                  {activeIcon === 'profile' && <UserProfile />}
                   </>
                 }      
         />

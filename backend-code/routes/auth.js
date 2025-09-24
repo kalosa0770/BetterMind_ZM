@@ -6,23 +6,9 @@ const logger = require('../utils/logger');
 const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const speakeasy = require('speakeasy');
-const twilio = require('twilio');
 const UserModel = require('../models/Users');
 const { body, validationResult } = require('express-validator');
 const { protect } = require('../middleware/auth');
-
-// Twilio credentials from your Twilio Console
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioNumber = process.env.TWILIO_PHONE_NUMBER; // Your Twilio phone number
-
-const twilioClient = new twilio(accountSid, authToken);
-
-// Speakeasy secret key management - this should be generated ONCE per user
-const generateSecret = () => {
-  return speakeasy.generateSecret({ length: 20 });
-};
 
 // In-memory set for revoked tokens. In a production app, you would use a persistent store like Redis.
 const revokedTokens = new Set();
@@ -58,9 +44,6 @@ router.post('/register',
         return res.status(400).json({ msg: 'User already exists' });
       }
 
-      // Generate a permanent secret for this user's 2FA
-      const twoFactorSecret = generateSecret().base32;
-
       // The password will be hashed automatically by the pre-save hook in the user model
       const newUser = await UserModel.create({
         firstName,
@@ -68,7 +51,7 @@ router.post('/register',
         email: email.trim(),
         phoneNumber: phoneNumber.trim(),
         password: password.trim(),
-        twoFactorSecret, // Save the permanent secret with the user
+        twoFactorSecret: null,
       });
 
       res.status(201).json({ msg: 'User registered successfully', userId: newUser._id });
@@ -92,10 +75,6 @@ const loginLimit = rateLimit({
 router.post('/login', loginLimit, async (req, res) => {
   const { email, password } = req.body;
 
-  // --- ADD THESE LOGS ---
-  console.log('Attempting login with email:', email);
-  console.log('Password received:', password);
-
   try {
     if (!email || !password) {
       return res.status(401).json({ message: 'Email address and Password are required' });
@@ -103,18 +82,11 @@ router.post('/login', loginLimit, async (req, res) => {
 
     const user = await UserModel.findOne({ email });
 
-    // --- ADD THIS LOG ---
-    console.log('Found user:', user);
-
     // Handle unknown user
     if (!user) {
       logger.warn(`Failed login attempt for unknown user with email: ${email} from IP: ${req.ip}`);
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
-
-     // --- ADD THESE LOGS ---
-    console.log('Provided password:', password);
-    console.log('Hashed password from database:', user.password);
 
     // Check if user account is locked
     if (user.lockUntil && user.lockUntil > Date.now()) {
@@ -124,41 +96,18 @@ router.post('/login', loginLimit, async (req, res) => {
 
     const isMatch = await bcrypt.compare(password.trim(), user.password);
 
-    // --- ADD THIS LOG ---
-    console.log('Password comparison result (isMatch):', isMatch);
-
     if (isMatch) {
-      // Successful login, now initiate 2FA
+      // Successful login
       await UserModel.updateOne({ _id: user._id }, { loginAttempts: 0, lockUntil: undefined });
       
-      // Use the permanent secret to generate the OTP
-      const token = speakeasy.totp({
-        secret: user.twoFactorSecret, // Use the secret from the database
-        encoding: 'base32',
-        digits: 6,
+      // Direct login since 2FA is disabled
+      const payload = { id: user.id };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+      return res.status(200).json({
+        message: 'Authentication successful!',
+        token,
+        twoFactorRequired: false
       });
-
-      console.log('Generated OTP:', token);
-
-      // Send the OTP via Twilio SMS
-      try {
-        console.log(`Sending SMS from: ${twilioNumber} to: ${user.phoneNumber}`);
-        await twilioClient.messages.create({
-          body: `Your OTP is: ${token}. It expires in 10 minutes.`,
-          to: user.phoneNumber,
-          from: twilioNumber,
-        });
-
-        res.status(200).json({
-          message: 'OTP sent to your phone number. Please verify to continue.',
-          userId: user._id,
-        });
-      } catch (twilioError) {
-        // Log the full error object for better debugging
-        logger.error("Twilio SMS send error:", twilioError);
-        res.status(500).json({ message: "Failed to send OTP. Please try again." });
-      }
-
     } else {
       // Failed login attempt, increment attempts and potentially lock account
       const updatedUser = await UserModel.findByIdAndUpdate(
@@ -252,60 +201,6 @@ router.post('/reset-password', async (req, res) => {
   } catch (error) {
     logger.error("Reset password server error:", error);
     res.status(500).json({ message: 'An error occurred. Please try again later.' });
-  }
-});
-
-// OTP Verification Route
-router.post('/verify-otp', async (req, res) => {
-  const { userId, otp } = req.body;
-
-  // Check if token is revoked before continuing
-  const token = req.headers.authorization?.split(' ')[1];
-  if (revokedTokens.has(token)) {
-    return res.status(401).json({ message: 'Token has been revoked.' });
-  }
-
-  try {
-    const user = await UserModel.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
-    }
-
-    // Use the speakeasy library's built-in verification method
-    const verified = speakeasy.totp.verify({
-      secret: user.twoFactorSecret,
-      encoding: 'base32',
-      token: otp,
-      window: 1, // Allow for one 30-second window before/after the current time
-    });
-
-    if (verified) {
-      // Generate a JWT for the authenticated user
-      const payload = {
-        id: user.id,
-        username: user.username
-      };
-
-      const token = jwt.sign(
-        payload,
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-      );
-
-      // Send the JWT to the client
-      res.status(200).json({
-        message: 'Authentication successful!',
-        token
-      });
-
-    } else {
-      return res.status(400).json({ message: 'Invalid OTP.' });
-    }
-
-  } catch (error) {
-    logger.error('OTP verification error:', error);
-    res.status(500).json({ message: 'An error occurred during OTP verification.' });
   }
 });
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeClosed } from 'lucide-react';
-import api from '../api/axios.js';
 import './LoginForm.css';
+import axios from 'axios';
 
 function LoginForm({ isOpen, onClose, onForgotPasswordClick, onSignupClick, onLoginSuccess }) {
     const [email, setEmail] = useState('');
@@ -11,67 +11,63 @@ function LoginForm({ isOpen, onClose, onForgotPasswordClick, onSignupClick, onLo
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // set password visibility
-    const togglePasswordVisibility = () => {
+     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setMessage(''); // Clear previous messages
+        setMessage('');
         setIsSuccess(false);
 
         try {
-            const response = await api.post('/auth/login', { email, password });
-
-            // Success: The backend sent a 200 OK status. Our new backend now returns a userId for 2FA.
-            if (response.data.userId) {
-                setIsSuccess(true);
-                setMessage(response.data.message);
-
-                // IMPORTANT: We now pass the userId to the parent handler
-                onLoginSuccess(response.data.userId);
+            // Axios automatically handles JSON parsing and will throw an error
+            // for non-2xx status codes.
+            const response = await axios.post('http://localhost:3001/api/auth/login', {
+                email,
+                password
+            });
+            
+            // If the request is successful (2xx status code), the code continues here.
+            // The parsed JSON data is available directly in response.data.
+            const responseData = response.data;
+            
+            setIsSuccess(true);
+            setMessage(responseData.message || 'Login successful!');
+            
+            // The backend now sends the token directly upon successful login.
+            if (responseData.token) {
+                onLoginSuccess(responseData);
             } else {
-                // This case handles a malformed successful response without a userId.
+                setMessage("Login successful, but the authentication token is missing. Please try again.");
                 setIsSuccess(false);
-                setMessage("An unexpected response was received. Please try again.");
             }
         } catch (error) {
-            // Failure: The backend sent a non-200 status (e.g., 401, 429, 500)
+            // This catch block handles both network errors and non-2xx status codes
+            // thrown by Axios.
             setIsSuccess(false);
-
+            // Check if the error has a response from the server.
             if (error.response) {
-                // The API responded with an error message
-                setMessage(error.response.data.message);
+                // The server responded with a status code outside the 2xx range.
+                // The error message is in error.response.data.message.
+                setMessage(error.response.data.message || 'An unexpected error occurred.');
             } else if (error.request) {
-                // The request was made but no response was received (network error)
-                setMessage('Network error. Please check your internet connection.');
+                // The request was made but no response was received (e.g., server is down).
+                setMessage('No response from the server. Please check your internet connection and the server status.');
             } else {
-                // Something else happened in setting up the request
-                setMessage('An unexpected error occurred.');
+                // Something happened in setting up the request that triggered an error.
+                setMessage('An error occurred during the request setup.');
             }
+            console.error('Login error:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleForgotPasswordClick = (e) => {
-        e.preventDefault();
-        onClose(); // closing the login modal
-        onForgotPasswordClick(); //Opens the forgot password modal
-    };
-
-    const handleSignUpClick = (e) => {
-        e.preventDefault();
-        onClose(); // closing the login modal
-        onSignupClick(); //Opens the signup modal
-    };
-
     if (!isOpen) {
-        return null; //Does not render anything if the modal is not open
+        return null;
     }
-
     return (
         <div className={`login-container ${isOpen ? 'show' : ''}`}>
             <div className='login-form'>
@@ -109,8 +105,8 @@ function LoginForm({ isOpen, onClose, onForgotPasswordClick, onSignupClick, onLo
                         <input type='submit' value={loading ? 'Loading...' : 'Sign in'} className='submit-btn' disabled={loading} />
                     </div>
                     <div className='other-details'>
-                        <a href='#forgot' onClick={handleForgotPasswordClick}>Forgot Password?</a>
-                        <p>New to BetterMind?<a href='#signup' onClick={handleSignUpClick}>Sign up</a></p>
+                        <a href='#forgot' onClick={onForgotPasswordClick}>Forgot Password?</a>
+                        <p>New to BetterMind?<a href='#signup' onClick={onSignupClick}>Sign up</a></p>
                     </div>
                     {/* Display the message to the user based on the state */}
                     {message && (

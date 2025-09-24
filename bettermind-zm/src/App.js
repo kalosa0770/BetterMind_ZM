@@ -58,6 +58,7 @@ const HomePage = ({
 function App () {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeIcon, setActiveIcon] = useState('dashboard');
+  const [activeSideBar, setActiveSideBar] = useState('dashboard');
   const [showMainContent, setShowMainContent] = useState(true);
   const [showHeaderBar, setShowHeaderBar] = useState(true);
   const navigate = useNavigate();
@@ -141,7 +142,19 @@ function App () {
         setShowMainContent(true);
         setShowHeaderBar(true);
       }
-    };
+  };
+
+  const handleSideBarClick = (sidebarName) => {
+    setActiveSideBar(sidebarName);
+
+    if (sidebarName === 'profile') {
+      setShowMainContent(false);
+      setShowHeaderBar(false);
+    } else {
+      setShowMainContent(true);
+      setShowHeaderBar(true);
+    }
+  };
 
 
   return (
@@ -176,6 +189,8 @@ function App () {
                                 handleIconClick={handleIconClick}
                                 showMainContent={showMainContent}
                                 showHeaderBar={showHeaderBar}
+                                activeSideBar={activeSideBar}
+                                handleSideBarClick={handleSideBarClick}
                       />
                   </>
                 }      

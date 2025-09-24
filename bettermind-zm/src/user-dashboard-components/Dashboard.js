@@ -33,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, showHeaderBar }) => {
+const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, handleIconClick, showMainContent, showHeaderBar }) => {
     const navigate = useNavigate();
 
     
@@ -100,7 +100,11 @@ const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, sho
         if (activeIcon === 'dashboard') {
             fetchData();
         }
-    }, [activeIcon, onLogout]);
+
+        if (activeSideBar === 'dashboard') {
+            fetchData();
+        }
+    }, [activeIcon, activeSideBar, onLogout]);
 
     if (loading) {
         return <div>loading...</div>;
@@ -167,13 +171,41 @@ const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, sho
                 <h1 className="sidebar-title">BetterMind ZM</h1>
                 <nav className="sidebar-nav">
                     <ul className="sidebar-nav-links">
-                        <li><a href="/#" className="active"><Home className="w-5 h-5 mr-3" />Dashboard</a></li>
-                        <li><a href="/#"><FilePlus className="w-5 h-5 mr-3" />My Journey</a></li>
-                        <li><a href="/#"><Video className="w-5 h-5 mr-3" />My Resources</a></li>
-                        <li><a href="/#"><Video className="w-5 h-5 mr-3" />My Therapist</a></li>
-                        <li><a href="/#"><MessageCircle className="w-5 h-5 mr-3" />Community Forum</a></li>
-                        <li onClick={() => handleIconClick('profile')}>
-                            <p><User className="w-5 h-5 mr-3" />Account & Settings</p>
+                        <li onClick={() => handleSideBarClick('dashboard')}>
+                            <p className={`sidebar-active ${activeSideBar === 'dashboard' ? 'active' : ''}`}>
+                                <Home className="sidebar-icon" size={18}/>
+                                Dashboard
+                            </p>
+                        </li>
+                        <li>
+                            <p className={`sidebar-active ${activeSideBar === 'journey' ? 'active' : ''}`}>
+                                <FilePlus className="sidebar-icon"size={18} />
+                                My journey
+                            </p>
+                        </li>
+                        <li>
+                            <p className={`sidebar-active ${activeSideBar === 'resources' ? 'active' : ''}`}>
+                                <Video className="sidebar-icon" size={18}/>
+                                My Resources
+                            </p>
+                        </li>
+                        <li>
+                            <p className={`sidebar-active ${activeSideBar === 'teletherapy' ? 'active' : ''}`}>
+                                <Video className="sidebar-icon" size={18}/>
+                                My Therapist
+                            </p>
+                        </li>
+                        <li>
+                            <p className={`sidebar-active ${activeSideBar === 'forum' ? 'active' : ''}`}>
+                                <MessageCircle className="sidebar-icon" size={18} />
+                                Community Forum
+                            </p>
+                        </li>
+                        <li onClick={() => handleSideBarClick('profile')}>
+                            <p className={`sidebar-active ${activeSideBar === 'profile' ? 'active' : ''}`}>
+                                <User className='sidebar-icon'  size={18} />
+                                Account & Settings
+                            </p>
                         </li>
                     </ul>
                 </nav>
@@ -196,6 +228,7 @@ const Dashboard = ({ onLogout, activeIcon, handleIconClick, showMainContent, sho
                 </header>
                 }
                 {activeIcon === 'profile' && <UserProfile showMainContent={showMainContent} journalEntries={journalEntries} />}
+                {activeSideBar === 'profile' && <UserProfile showMainContent={showMainContent} journalEntries={journalEntries} />}
 
                 {showMainContent && 
                     <div className="main-dashboard-content">

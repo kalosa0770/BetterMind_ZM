@@ -742,11 +742,22 @@ body {
 
 .mood-entry-date-rating {
   display: flex;
-  flex-direction: column;
   gap: 5px;
   align-items: flex-start;
+  justify-content: flex-start;
   color: var(--surface-color);
 
+}
+
+.mood-entry-date {
+  font-weight: 500;
+  padding: 5px;
+}
+
+.mood-entry-rating {
+  background-color: var(--accent-color);
+  padding: 5px;
+  border-radius: 50%;
 }
 
 .view-entry-icon {

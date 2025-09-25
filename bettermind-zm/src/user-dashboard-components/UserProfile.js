@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles, Route } from 'lucide-react';
+import { Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles, Route, Activity} from 'lucide-react';
 import './UserDashboard.css';
 import UserSettings from './UserSettings';
 import axios from 'axios';
@@ -45,6 +45,8 @@ const calculateCurrentStreak = (entries) => {
   
   return streak;
 };
+
+
 
 // User Profile component that receives data as props
 function UserProfile({ journalEntries = [], onLogout }) {
@@ -121,6 +123,13 @@ function UserProfile({ journalEntries = [], onLogout }) {
     // Sort entries by timestamp in descending order and get the latest 3
     const latestEntries = journalEntries ? [...journalEntries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 3) : [];
 
+    const getMoodEmoji = (rating) => {
+      if (rating >= 8) return '😊';
+      if (rating >= 5) return '🙂';
+      if (rating >= 3) return '😐';
+      return '😢';
+    };
+
     if (showSettings) {
       return <UserSettings onBack={() => setShowSettings(false)} />;
     }
@@ -173,7 +182,7 @@ function UserProfile({ journalEntries = [], onLogout }) {
               {/* Mood Summary */}
               <div className="mood-summary-section">
                   <div className="mood-summary-header">
-                      <Sparkles size={20} />
+                      <Activity size={20} />
                       <h3 className='mood-title'>Mood Summary</h3>
                       <li className="view-all-entries-btn">Show All</li>
                   </div>
@@ -183,10 +192,11 @@ function UserProfile({ journalEntries = [], onLogout }) {
                               <div key={entry._id} className="mood-entry">
                                   <div className="mood-entry-header">
                                       <div className="mood-entry-date-rating">
+                                        <span className="mood-entry-rating">{getMoodEmoji(entry.moodRating)}</span>
                                         <span className="mood-entry-date">{new Date(entry.timestamp).toLocaleDateString()}</span>
-                                        <span className="mood-entry-rating">Mood: {entry.moodRating}/10</span>
+                                        
                                       </div>
-                                      <div className='view-entry-icon'> <p>view record</p><ArrowRight size={15} /></div>
+                                      <div className='view-entry-icon'> <p>view mood</p><ArrowRight size={15} /></div>
                                   </div>
                                   
                                   <div className="mood-entry-content">

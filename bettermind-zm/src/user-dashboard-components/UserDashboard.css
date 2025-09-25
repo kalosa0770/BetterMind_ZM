@@ -475,8 +475,19 @@ body {
   z-index: 10;
 }
 
+.settings-icon {
+  cursor: pointer;
+  color: var(--accent-color);
+  background-color: var(--text-color-primary);
+  border-radius: 50%;
+  padding: 5px;
+  width: 25px;
+  height: 25px;
+}
+
 .user-profile-header h2 {
     font-size: 1.1rem;
+    color: var(--text-color-primary);
 }
 
 .user-profile-content {
@@ -486,27 +497,30 @@ body {
   gap: 20px;
 }
 
-.settings-icon,
-.close-profile-icon {
-    cursor: pointer;
-    color: var(--text-color-secondary);
-}
-
 .my-journey-section {
-  width: 100%;
-  padding: 20px;
-  background-color: var(--subtitle-color);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin: 20px 0;
+   background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-2xl);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.my-journey-section h2 {
-    color: #ffffff;
-    text-align: left;
-    margin-bottom: 20px;
-    font-size: 1.1rem;
+
+
+.journey-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  color: var(--text-color-primary);
+  margin-bottom: 2rem;
+}
+
+.journey-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
 }
 
 .view-journey-content-btn {
@@ -541,7 +555,7 @@ body {
   flex-direction: column;
   align-items: center;
   margin: 0 3px;
-  color: #fff;
+  color: var(--text-color-secondary);
   gap: 5px;
   width: 100%;
 }
@@ -568,8 +582,8 @@ body {
 
 .streak-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   gap: 0.5rem;
   color: var(--text-color-primary);
   margin-bottom: 0.5rem;
@@ -669,43 +683,40 @@ body {
 /* user mood summary section styles */
 
 .mood-summary-section {
-  width: 100%;
-  padding: 20px;
-  background-color: var(--subtitle-color);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-2xl);
+  box-shadow: var(--shadow-md);
+  text-align: center;
   margin-bottom: 20px;
 }
 
 .mood-summary-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  color: var(--text-color-primary);
+  margin-bottom: 2rem;
+  position: relative;
 }
 
-.mood-summary-section h2 {
-  color: #ffffff;
-  text-align: left;
+.mood-title {
   font-size: 1.1rem;
   font-weight: 600;
+  margin: 0;
 }
 
 .view-all-entries-btn {
-  padding: 10px;
-  background: none;
-  color: #ffffff;
+  color: var(--text-color-primary);
   font-weight: 800;
-  border: none;
-  border-radius: 30px;
   cursor: pointer;
+  list-style: none;
+  text-align: right;
+  position: absolute;
+  right: 2px;
+  top: 3px;
   font-size: 0.85rem;
-  transition: background-color 0.3s ease;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
 }
 
 .mood-summary-card {
@@ -714,9 +725,9 @@ body {
 }
 
 .mood-entry {
-  background-color: var(--surface-color);
+  background-color: var(--text-color-primary);
   border-radius: 10px;
-  padding: 10px;
+  padding: 4px;
   margin-bottom: 20px;
 }
 
@@ -734,6 +745,7 @@ body {
   flex-direction: column;
   gap: 5px;
   align-items: flex-start;
+  color: var(--surface-color);
 
 }
 
@@ -742,7 +754,7 @@ body {
   align-items: center;
   gap: 5px;
   cursor: pointer;
-  color: var(--text-color-primary);
+  color: var(--surface-color);
 }
 
 .mood-summary-footer {
@@ -773,18 +785,80 @@ body {
 .user-settings-container {
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-color);
   width: 100%;
   margin: none;
 }
 
 
 .user-settings-header {
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: space-between;
   background-color: var(--bg-color);
+  box-shadow: var(--shadow-sm);
   padding: 10px;
   width: 100%;
   z-index: 1;
   margin: none;
+}
+
+.back-icon {
+  cursor: pointer;
+  color: var(--accent-color);
+  background-color: var(--text-color-primary);
+  border-radius: 50%;
+  padding: 5px;
+  width: 25px;
+  height: 25px;
+}
+
+.user-settings-header h2 {
+    font-size: 1.1rem;
+    color: var(--text-color-primary); 
+}
+
+.user-settings-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+
+.manage-account-section {
+  width: 100%;
+}
+
+.account-nav {
+  padding: 0;
+  margin: 0;
+  
+}
+
+.account-nav ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.account-nav li {
+  width: 100%;
+  list-style: none;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  color: var(--text-color-secondary);
+  gap: 20px;
+  cursor: pointer;
+}
+
+hr {
+  border: none;
+  width: 100%;
+  height: 0.8px;
+  background-color: #ccc;
 }

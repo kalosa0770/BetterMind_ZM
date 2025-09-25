@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles } from 'lucide-react';
+import { Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles, Route } from 'lucide-react';
 import './UserDashboard.css';
 import UserSettings from './UserSettings';
 import axios from 'axios';
@@ -137,7 +137,10 @@ function UserProfile({ journalEntries = [], onLogout }) {
             <div className='user-profile-content'>
               {/* My journey */}
               <div className="my-journey-section">
-                <h2>My Journey</h2>
+                <div className="journey-header">  
+                  <Route size={20} />
+                  <h3 className='journey-title'>My Journey</h3>
+                </div>
                 <div className="journey-card">
                     {myJourneyData.map((item) => (
                         <div key={item.id} className="journey-detail">
@@ -170,8 +173,9 @@ function UserProfile({ journalEntries = [], onLogout }) {
               {/* Mood Summary */}
               <div className="mood-summary-section">
                   <div className="mood-summary-header">
-                      <h2>Mood Summary</h2>
-                      <button className="view-all-entries-btn">Show All</button>
+                      <Sparkles size={20} />
+                      <h3 className='mood-title'>Mood Summary</h3>
+                      <li className="view-all-entries-btn">Show All</li>
                   </div>
                   <div className="mood-summary-card">
                       {latestEntries.length > 0 ? (

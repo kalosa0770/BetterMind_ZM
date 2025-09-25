@@ -768,3 +768,23 @@ body {
   justify-content: center;
   gap: 8px;
 }
+
+/* User Settings Styles */
+.user-settings-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  width: 100%;
+  margin: none;
+}
+
+
+.user-settings-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--bg-color);
+  padding: 10px;
+  width: 100%;
+  z-index: 1;
+  margin: none;
+}

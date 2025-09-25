@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles } from 'lucide-react';
 import './UserDashboard.css';
+import UserSettings from './UserSettings';
 import axios from 'axios';
 
 // A helper function to calculate the current streak of journal entries
@@ -47,6 +48,15 @@ const calculateCurrentStreak = (entries) => {
 
 // User Profile component that receives data as props
 function UserProfile({ journalEntries = [], onLogout }) {
+  const [showSettings, setShowSettings] = useState(false);
+
+  
+
+  const showUserSettings = () => {
+    setShowSettings(true);
+  };
+
+    // Function to get initials from user's name
     const getInitials = (name) => {
         if (!name) return 'N/A';
         return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -111,12 +121,18 @@ function UserProfile({ journalEntries = [], onLogout }) {
     // Sort entries by timestamp in descending order and get the latest 3
     const latestEntries = journalEntries ? [...journalEntries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 3) : [];
 
+    if (showSettings) {
+      return <UserSettings onBack={() => setShowSettings(false)} />;
+    }
+
     return (
         <div className="user-profile-container">
             <div className="user-profile-header">
-                <Cog size={21} className="settings-icon"/>
+                <Cog size={21} className="settings-icon" onClick={showUserSettings}/>
                 <h2>Profile</h2>
             </div>
+
+            {showSettings && <UserSettings onBack={() => setShowSettings(false)} />}
             
             <div className='user-profile-content'>
               {/* My journey */}

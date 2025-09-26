@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
-  Bell, User, Home, FilePlus, Video, MessageCircle, Plus, ChartBar, LampDesk
+  Bell, User, Home, FilePlus, Video, 
+  MessageCircle, Plus, ChartBar, 
+  LampDesk, ArrowRight, Zap, Droplet, AlertTriangle, Brain, 
+  MoreHorizontal
 } from 'lucide-react';
 import {
   LineChart,
@@ -153,6 +156,13 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
 
       return chartData;
     };
+
+    const moodChartEmojis = (emoji) => {
+        if (emoji >= 8) return '😊';
+        if (emoji >= 5) return '🙂';
+        if (emoji >= 3) return '😐'
+        if (emoji < 3) return '😢';
+    }
 
     const chartData = getChartData();
     
@@ -307,11 +317,11 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                                         </ResponsiveContainer>
                                         <div className="mood-chart-data">
                                             <div className="mood-chart-card">
-                                                <p className="mood-rating">{latestMood}/10</p>
+                                                <p className="mood-rating">{moodChartEmojis(latestMood)}</p>
                                                 <p>Latest Mood</p>
                                             </div>
                                             <div className="mood-chart-card">
-                                                <p className="mood-rating">{averageMood}/10</p>
+                                                <p className="mood-rating">{moodChartEmojis(averageMood)}</p>
                                                 <p>Average Mood</p>
                                             </div>
                                             <div className="mood-chart-card">
@@ -324,32 +334,43 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                         </div>
                         
                         {/* New Journal Entries Section */}
-                        <section className="journal-entries-section">
-                            <h3 className="journal-entries-heading">Your Journal History</h3>
-                            <div className="journal-entries-list">
-                                {journalEntries.length > 0 ? (
-                                    // Sort entries by timestamp in descending order and render each
-                                    journalEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map(entry => (
-                                        <div key={entry._id} className="journal-entry-card" onClick={() => handleViewEntry(entry)}>
-                                            <div className="journal-entry-header">
-                                                <p className="journal-entry-date">
-                                                    {new Date(entry.timestamp).toLocaleDateString()}
-                                                </p>
-                                                <span className="journal-entry-mood">Mood: {entry.moodRating}/10</span>
-                                            </div>
-                                            <p className="journal-entry-text">
-                                                {entry.moodEntryText
-                                                    ? entry.moodEntryText.length > 100
-                                                        ? `${entry.moodEntryText.substring(0, 100)}...`
-                                                        : entry.moodEntryText
-                                                    : 'No entry text available.'
-                                                }
-                                            </p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="journal-entries-empty-text">No journal entries to display.</p>
-                                )}
+                        <section className="recommended-section">
+                            <h3 className='recommended-title'>Recommended for You</h3>
+                            <div className="recommended-card">
+                                <div className="recommended-content">
+                                    <h4 className="recommended-heading">5 Tips to Boost Your Mental Health</h4>
+                                    <p className="recommended-text">Discover simple strategies to enhance your well-being and cultivate a positive mindset.</p>
+                                </div>
+                                <div className="recommended-image">
+                                    <img src="/images/recommended1.jpg" alt="Recommended img" className="recommended-img"/>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Explore Topics */}
+                        <section className="explore-by-topic-section">
+                            <h3 className='explore-by-topic-title'>Explore By Topic</h3> 
+                            <div className="explore-by-topic-content">
+                                <div className="topic-item">
+                                    <Zap size={16} className="topic-icon" />
+                                    Anxiety
+                                </div>
+                                <div className="topic-item">
+                                    <Droplet size={16} className="topic-icon" />
+                                    Depression
+                                </div>
+                                <div className="topic-item">
+                                    <AlertTriangle size={16} className="topic-icon" />
+                                    Stress
+                                </div>
+                                <div className="topic-item">
+                                    <Brain size={16} className="topic-icon" />
+                                    Mindfulness
+                                </div>
+                                <div className='topic-item'>
+                                    <MoreHorizontal size={16} className="topic-icon" />
+                                    Other
+                                </div>
                             </div>
                         </section>
                     </div>

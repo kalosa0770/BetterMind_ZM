@@ -6,38 +6,59 @@ import axios from 'axios';
 // styles will be applied via the class names below.
 import './JournalEntryModal.css'; 
 
-// 1. Refactored Mood Thoughts for simpler filtering and mapping
-const moodThoughts = [
-   { name: 'Depressed', category: 'Negative' },
-   { name: 'Anxious', category: 'Negative' },
-   { name: 'Sad', category: 'Negative' },
-   { name: 'Frustrated', category: 'Negative' },
-   { name: 'Heartbroken', category: 'Negative' },
 
-   { name: 'Grateful', category: 'Positive' },
-   { name: 'Calm', category: 'Positive' },
-   { name: 'Motivated', category: 'Positive' },
-   { name: 'Happy', category: 'Positive' },
-   { name: 'Loved', category: 'Positive' },
+// NOTE: The external CSS import is commented out, assuming the necessary 
+// styles will be applied via the class names below.
+// import './JournalEntryModal.css'; 
+
+// ===================================================================
+// 1. REFACATORED MOOD THOUGHTS WITH RANGES (1-4, 5-7, 8-10)
+// ===================================================================
+const moodThoughts = [
+   // Low Mood Range (1-4)
+   { name: 'Depressed', range: 'Low', emoji: '😔' },
+   { name: 'Anxious', range: 'Low', emoji: '😥' },
+   { name: 'Sad', range: 'Low', emoji: '😢' },
+   { name: 'Heartbroken', range: 'Low', emoji: '💔' },
+   { name: 'Overwhelmed', range: 'Low', emoji: '😵‍💫' },
    
-   { name: 'Other', category: 'Neutral' }, // 'Other' is always available
+   // Mid Mood Range (5-7)
+   { name: 'Tired', range: 'Mid', emoji: '😴' },
+   { name: 'Confused', range: 'Mid', emoji: '🤔' },
+   { name: 'Bored', range: 'Mid', emoji: '😑' },
+   { name: 'Neutral', range: 'Mid', emoji: '😶' },
+   { name: 'Uncertain', range: 'Mid', emoji: '🤷‍♀️' },
+
+   // High Mood Range (8-10)
+   { name: 'Grateful', range: 'High', emoji: '🙏' },
+   { name: 'Calm', range: 'High', emoji: '😌' },
+   { name: 'Motivated', range: 'High', emoji: '🚀' },
+   { name: 'Happy', range: 'High', emoji: '😀' },
+   { name: 'Loved', range: 'High', emoji: '🥰' },
+   
+   // Always available, regardless of rating
+   { name: 'Other', range: 'All', emoji: '✨' }, 
 ];
 
 // Helper Component for Mood Thought Selection (Step 2)
-// Uses original class names for styling hooks
 const MoodThoughtSelector = ({ rating, selectedThought, onSelect }) => {
-    // Determine the required category based on the rating
-    // Rating >= 8 (high) shows Positive tags; Rating < 8 shows Negative tags
-    const requiredCategory = rating >= 8 ? 'Positive' : 'Negative';
+    
+    // Determine the required range based on the rating
+    let requiredRange;
+    if (rating >= 8) {
+        requiredRange = 'High'; // Ratings 8, 9, 10
+    } else if (rating >= 5) {
+        requiredRange = 'Mid';  // Ratings 5, 6, 7
+    } else {
+        requiredRange = 'Low';  // Ratings 1, 2, 3, 4
+    }
 
-    // Filter the mood thoughts based on the rating category
+    // Filter the mood thoughts based on the determined range or 'All'
     const filteredThoughts = moodThoughts.filter(
-        (thought) => thought.category === requiredCategory || thought.category === 'Neutral'
+        (thought) => thought.range === requiredRange || thought.range === 'All'
     );
 
     return (
-        
-        
         <div className="mood-thought-tags-container">
             {filteredThoughts.map((thought) => (
                 // Loop through the filtered array and conditionally apply 'selected-thought' class
@@ -46,6 +67,7 @@ const MoodThoughtSelector = ({ rating, selectedThought, onSelect }) => {
                     className={`mood-thought-card ${selectedThought === thought.name ? 'selected-thought' : ''}`}
                     onClick={() => onSelect(thought.name)} // Calls handleThoughtSelect
                 >
+                    <span className="mood-emoji">{thought.emoji}</span> 
                     {thought.name}
                 </div>
             ))}
@@ -107,6 +129,8 @@ const JournalEntryModal = ({ onClose }) => {
                     Authorization: `Bearer ${token}`, 
                 },
             });
+
+            
 
             if (response.status === 201) {
                 console.log("Journal entry saved successfully:", response.data);

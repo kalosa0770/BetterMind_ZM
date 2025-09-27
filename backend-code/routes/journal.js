@@ -9,7 +9,7 @@ const router = express.Router();
 const { protect } = require('../middleware/auth'); 
 
 // ===================================================================
-// 1. UPDATED JOURNAL ENTRY SCHEMA
+// 1. JOURNAL ENTRY SCHEMA
 // ===================================================================
 
 const journalEntrySchema = new mongoose.Schema({
@@ -47,7 +47,7 @@ const JournalEntry = mongoose.model('JournalEntry', journalEntrySchema);
 
 
 // ===================================================================
-// HELPER FUNCTION (Correct as you implemented it)
+// HELPER FUNCTION
 // ===================================================================
 
 const getSevenDayCutOff = () => {
@@ -84,10 +84,9 @@ router.post('/journal-entries', protect, async (req, res) => {
 
 // ===================================================================
 // 3. CONSOLIDATED API ROUTE TO GET 7-DAY CHART DATA (Requires Auth)
-//    - This is the endpoint your dashboard will call.
 // ===================================================================
 
-// This single GET route replaces your two previous, conflicting GET routes.
+// FIX: Added 'moodThought' to the select statement.
 router.get('/journal-entries', protect, async (req, res) => {
     try {
         const sevenDaysAgo = getSevenDayCutOff();
@@ -100,8 +99,10 @@ router.get('/journal-entries', protect, async (req, res) => {
             timestamp: { $gte: sevenDaysAgo }
         })
         .sort ({ timestamp: 1}) // Oldest to newest for correct chart order
-        // Select only the fields the frontend needs to minimize data transfer
-        .select('timestamp moodRating') 
+        // -----------------------------------------------------------------------
+        // **CRITICAL FIX**: Now including 'moodThought' in the selected fields
+        // -----------------------------------------------------------------------
+        .select('timestamp moodRating moodThought') 
         .exec();
 
         res.status(200).json(sevenDayMoodData);
@@ -112,3 +113,5 @@ router.get('/journal-entries', protect, async (req, res) => {
 });
 
 module.exports = router;
+
+

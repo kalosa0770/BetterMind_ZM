@@ -65,16 +65,15 @@ const UserAvatar = ({fullname}) => {
 
     return (
         
-    <div className="user-avatar-container">
-        <div className="avatar-icon">
-        <span>{initials}</span>
-        </div>
-        <div className="user-info">
-        <p className="user-name">{fullName}</p>
-        <p className="welcome-text">Welcome back!</p>
-        </div>
-    </div>
-      
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-700 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
+                    <span>{initials}</span>
+                </div>
+                <div className="hidden sm:block">
+                    <p className="text-sm font-semibold text-teal-700">{fullname}</p>
+                    <p className="text-xs text-gray-600">Welcome Back</p>
+                </div>
+            </div>
     )
 };
 

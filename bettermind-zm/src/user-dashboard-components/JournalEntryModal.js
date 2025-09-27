@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, XIcon } from 'lucide-react';
+// **FIX**: Import axios for consistent API calls, as used in Dashboard.js
+import axios from 'axios'; 
 
 import './JournalEntryModal.css';
 
@@ -10,6 +12,7 @@ const JournalEntryModal = ({ onClose }) => {
     const [showJournalText, setShowJournalText] = useState(false);
     const [guidedQuestion, setGuidedQuestion] = useState('');
     const [journalText, setJournalText] = useState('');
+    const [isSaving, setIsSaving] = useState(false); // New state for loading indicator
 
     const getMoodQuestion = (rating) => {
         if (rating >= 8) {
@@ -32,35 +35,65 @@ const JournalEntryModal = ({ onClose }) => {
         setShowJournalText(true);
     };
 
+    // **FIX**: Updated function to use axios, include the token, and use dynamic URL
     const saveJournalEntry = async (entryData) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error("Authentication token not found. Cannot save entry.");
+            return false;
+        }
+        
+        // Match the baseURL logic used in Dashboard.js
+        const hostname = window.location.hostname;
+        const baseURL = (hostname === 'localhost' || hostname === '127.0.0.1')
+            ? 'http://localhost:3001'
+            : `http://${hostname}:3001`;
+
         try {
-            const response = await fetch('http://localhost:3001/api/journal-entries', {
-                method: 'POST',
+            const response = await axios.post(`${baseURL}/api/journal-entries`, entryData, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    // **CRITICAL FIX**: Include the JWT token for authentication
+                    Authorization: `Bearer ${token}`, 
                 },
-                body: JSON.stringify(entryData),
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to save journal entry.');
+            if (response.status === 201) {
+                console.log("Journal entry saved successfully:", response.data);
+                return true;
             }
-
-            const result = await response.json();
-            console.log("Journal entry saved:", result);
+            return false;
 
         } catch (error) {
-            console.error("Error saving document: ", error);
+            console.error("Error saving document:", error.response ? error.response.data : error.message);
+            // In a real app, you would show an error message here instead of an alert
+            alert("Failed to save entry. Please ensure you are logged in and try again."); 
+            return false;
         }
     };
 
-    const handleSubmit = () => {
+    // **FIX**: Updated handleSubmit to only call onClose (and thus fetchData) upon success
+    const handleSubmit = async () => {
+        if (journalText.trim() === "") {
+             alert("Please write something about your day before saving.");
+             return;
+        }
+        
+        setIsSaving(true); // Start saving indicator
+
         const entryData = {
             moodRating,
             journalText,
         };
-        saveJournalEntry(entryData);
-        onClose(); // Close the modal
+        
+        const success = await saveJournalEntry(entryData);
+        
+        setIsSaving(false); // Stop saving indicator
+
+        if (success) {
+            // **CRITICAL FIX**: Close the modal ONLY upon successful save. 
+            // This triggers the dashboard's fetchData to update the graph.
+            onClose(); 
+        } 
     };
 
     return (
@@ -68,9 +101,10 @@ const JournalEntryModal = ({ onClose }) => {
             <div className="modal-content">
                 <div className="modal-header">
                     <h2 className='form-modal-title'>Log a New Journal Entry</h2>
-                    <XIcon className="modal-close-button" onClick={onClose} />
+                    <XIcon className="modal-close-button" onClick={isSaving ? null : onClose} />
                 </div>
-                {/* Conditional rendering based on boolean states */}
+                
+                {/* Step 1: Mood Rating Selection */}
                 {!moodRating && !showMoodQuestions && (
                     <div className="modal-step">
                         <p>What is your mood rating today?</p>
@@ -88,6 +122,7 @@ const JournalEntryModal = ({ onClose }) => {
                     </div>
                 )}
                 
+                {/* Step 2: Guided Question and Textarea */}
                 {showMoodQuestions && (
                     <div className="modal-step">
                         <p>{guidedQuestion}</p>
@@ -98,12 +133,13 @@ const JournalEntryModal = ({ onClose }) => {
                             placeholder="Write your thoughts here..."
                             className='form-modal-textarea'
                         ></textarea>
-                        <button className="form-modal-next-button" onClick={handleNextStep}>
+                        <button className="form-modal-next-button" onClick={handleNextStep} disabled={isSaving}>
                             Next <ChevronRight />
                         </button>
                     </div>
                 )}
                 
+                {/* Step 3: Final Submission */}
                 {showJournalText && (
                     <div className="modal-step">
                         <p>Any other thoughts on your mind?</p>
@@ -114,8 +150,12 @@ const JournalEntryModal = ({ onClose }) => {
                             placeholder="Continue writing here..."
                             className='form-modal-textarea'
                         ></textarea>
-                        <button className="form-modal-submit-button" onClick={handleSubmit}>
-                            Save Entry
+                        <button 
+                            className="form-modal-submit-button" 
+                            onClick={handleSubmit} 
+                            disabled={isSaving}
+                        >
+                            {isSaving ? 'Saving...' : 'Save Entry'}
                         </button>
                     </div>
                 )}

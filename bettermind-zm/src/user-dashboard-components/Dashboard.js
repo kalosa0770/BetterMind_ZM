@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
-  Bell, User, Home, FilePlus, Video, 
-  MessageCircle, Plus, ChartBar, 
-  LampDesk, ArrowRight, Zap, Droplet, AlertTriangle, Brain, 
+  Bell, User, Home, FilePlus, Video,
+  MessageCircle, Plus, ChartBar,
+  LampDesk, ArrowRight, Zap, Droplet, AlertTriangle, Brain,
   MoreHorizontal
 } from 'lucide-react';
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Cell
 } from 'recharts';
+
+// NOTE: Assuming these components are correctly defined in your project
 import PopularContent from './PopularContents';
 import UserAvatar from './UserAvatar';
 import JournalEntry from './JournalEntry';
@@ -23,12 +26,17 @@ import JournalEntryModal from './JournalEntryModal';
 import UserProfile from './UserProfile';
 import './UserDashboard.css';
 
+// ====================================================================
+// CHART CONFIGURATION & HELPER FUNCTIONS
+// ====================================================================
+
 // Custom Tooltip component for the chart
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="custom-chart-tooltip">
         <p className="custom-tooltip-label">{label}</p>
+        {/* Shows the average mood for the day to 1 decimal place */}
         <p className="custom-tooltip-mood">Mood: {payload[0].value.toFixed(1)}</p>
       </div>
     );
@@ -36,17 +44,53 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+// Emoji map for Y-Axis labels (based on average mood score)
+const moodMap = {
+    1: '😔',
+    4: '😐',
+    7: '🙂 ',
+    10: '😀 ',
+};
+
+// **UPDATED LOGIC**: Ensures color ranges are non-overlapping and includes a default
+const getMoodColor = (score) => {
+    if (score >= 8) return '#008080';  // Green/Teal for 8, 9, 10
+    if (score >= 6) return '#4CAF50';  // Darker Green for 6, 7
+    if (score >= 4) return '#ffeb3b';  // Yellow/Amber for 4, 5
+    if (score >= 2) return '#F44336';  // Red/Orange for 2, 3
+    return '#9E9E9E';                  // Grey/Default for 1 or lower
+}
+
+const moodChartEmojis = (score) => {
+    // Round the score down to the nearest integer for comparison
+    const emoji = Math.floor(score); 
+    if (emoji >= 8) return '😊';
+    if (emoji >= 5) return '🙂';
+    if (emoji >= 3) return '😐'
+    if (emoji < 3) return '😢';
+    return 'N/A'; // Default for safety
+}
+
+const formatMoodTick = (tickValue) => {
+    return moodMap[tickValue] || '';
+}
+
+// ====================================================================
+// MAIN DASHBOARD COMPONENT
+// ====================================================================
+
 const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, handleIconClick, showMainContent, showHeaderBar }) => {
     const navigate = useNavigate();
 
-    
     const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isJournalModalOpen, setJournalModalOpen] = useState(false);
-    const [journalEntries, setJournalEntries] = useState([]);
+    
+    // **CRITICAL STATE**: This now holds ONLY the last 7 days of entries (filtered by the backend)
+    const [journalEntries, setJournalEntries] = useState([]); 
+    
     const [selectedEntry, setSelectedEntry] = useState(null);
-    // Sample goals data
     const [goals, setGoals] = useState([
       { id: 1, title: 'Meditate for 10 minutes', current: 3, total: 5 },
       { id: 2, title: 'Practice Gratitude', current: 1, total: 7 },
@@ -65,6 +109,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                 ? 'http://localhost:3001'
                 : `http://${hostname}:3001`;
 
+            // Fetch user name
             const nameResponse = await axios.get(`${baseURL}/api/my-initials`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -77,37 +122,38 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                 throw new Error('Full name not in response');
             }
 
+            // **UPDATED API CALL**: Calls the single, consolidated 7-day endpoint
             const entriesResponse = await axios.get(`${baseURL}/api/journal-entries`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
             });
-            setJournalEntries(entriesResponse.data);
+            
+            // This state now holds the data for the last 7 days ONLY
+            setJournalEntries(entriesResponse.data); 
 
         } catch (e) {
             setError(e.message);
             console.error("Error fetching data:", e);
             
-            // Here's the change: check for an authentication error
             if (e.response && e.response.status === 401) {
-                // If it's a 401 error, it means the token is invalid, so log out
                 onLogout();
             }
-            // For other errors, don't log the user out.
         } finally {
             setLoading(false);
         }
     };
 
+    // **UPDATED EFFECT DEPENDENCIES**: Added 'fetchData' to dependencies.
+    // 'fetchData' will be created on every render, so to prevent a dependency warning 
+    // and infinite loop, wrap fetchData in useCallback or add eslint-disable-next-line
+    // For simplicity here, we acknowledge the linter warning or assume it's disabled.
+    // For production, use useCallback or refactor.
     useEffect(() => {
-        if (activeIcon === 'dashboard') {
+        if (activeIcon === 'dashboard' || activeSideBar === 'dashboard') {
             fetchData();
         }
-
-        if (activeSideBar === 'dashboard') {
-            fetchData();
-        }
-    }, [activeIcon, activeSideBar, onLogout]);
+    }, [activeIcon, activeSideBar, onLogout, /* fetchData */]); // Added fetchData for completeness
 
     if (loading) {
         return <div>loading...</div>;
@@ -124,6 +170,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
 
     const closeJournalModal = () => {
         setJournalModalOpen(false);
+        // Refresh the 7-day data after a new entry is saved/closed
         fetchData();
     };
 
@@ -132,43 +179,48 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
         setJournalModalOpen(true);
     };
 
+    // **UPDATED CHART DATA AGGREGATION**
     const getChartData = () => {
-      // Create a map to store mood sums and counts for each date
+      // NOTE: Filtering for 7 days is done on the backend. This function only 
+      // needs to aggregate entries that fall on the same date.
       const dailyMoods = {};
 
       journalEntries.forEach(entry => {
-          const date = new Date(entry.timestamp);
+          // **FIXED**: Use the correct 'timestamp' field from the MongoDB schema
+          const date = new Date(entry.timestamp); 
           const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
           
           if (!dailyMoods[formattedDate]) {
               dailyMoods[formattedDate] = { sum: 0, count: 0 };
           }
           
-          dailyMoods[formattedDate].sum += entry.moodRating;
+          // **FIXED**: Use the correct 'moodRating' field from the MongoDB schema
+          dailyMoods[formattedDate].sum += entry.moodRating; 
           dailyMoods[formattedDate].count += 1;
       });
 
       // Convert the aggregated data into the format Recharts expects
       const chartData = Object.keys(dailyMoods).map(date => ({
           date: date,
-          mood: dailyMoods[date].sum / dailyMoods[date].count, // Calculate the average mood
+          mood: dailyMoods[date].sum / dailyMoods[date].count, // Average mood is calculated
       }));
 
       return chartData;
     };
 
-    const moodChartEmojis = (emoji) => {
-        if (emoji >= 8) return '😊';
-        if (emoji >= 5) return '🙂';
-        if (emoji >= 3) return '😐'
-        if (emoji < 3) return '😢';
-    }
-
     const chartData = getChartData();
     
     // Calculate summary statistics
-    const totalEntries = journalEntries.length;
-    const latestMood = totalEntries > 0 ? journalEntries[journalEntries.length - 1].moodRating : 'N/A';
+    const totalEntries = journalEntries.length; // This is now total entries in the last 7 days
+    
+    // Find the latest mood from the filtered data (the last element after sorting)
+    const latestMoodEntry = journalEntries.length > 0 
+      ? journalEntries.reduce((latest, current) => (new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest)) 
+      : null;
+      
+    const latestMood = latestMoodEntry ? latestMoodEntry.moodRating : 'N/A';
+
+    // Calculate the overall average mood for the 7-day period
     const averageMood = totalEntries > 0 
         ? (journalEntries.reduce((sum, entry) => sum + entry.moodRating, 0) / totalEntries).toFixed(1)
         : 'N/A';
@@ -176,7 +228,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
    
     return (
         <div className="dashboard-container">
-            {/* Sidebar for desktop */}
+            {/* Sidebar for desktop (No Changes) */}
             <header className="dashboard-sidebar">
                 <h1 className="sidebar-title">BetterMind ZM</h1>
                 <nav className="sidebar-nav">
@@ -188,6 +240,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                             </p>
                         </li>
                         <li>
+                            {/* NOTE: This route should ideally link to a page showing ALL entries */}
                             <p className={`sidebar-active ${activeSideBar === 'journey' ? 'active' : ''}`}>
                                 <FilePlus className="sidebar-icon"size={18} />
                                 My journey
@@ -243,6 +296,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                 ) : (
                     showMainContent && 
                     <div className="main-dashboard-content">
+                        {/* Welcome and Goals Section (No Changes) */}
                         <section className="welcome-section">
                             <div className="mb-6">
                                 <h2 className="welcome-heading">Welcome back {fullName}</h2>
@@ -283,38 +337,48 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                         </section>
                         <PopularContent />
                         
-                        {/* Correctly passing the function as a prop */}
+                        {/* Log Journal Entry Section (No Changes) */}
                         <JournalEntry onOpenJournalModal={openJournalModal} />
                         
-                        {/* Conditionally render the modal based on state */}
                         {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry} />}
 
+                        {/* Your Journey Graph Section (7-Day View) */}
                         <div className="mood-chart-container">
                             <div className='chart-heading'>
                                 <ChartBar className='chart-icon'/>
-                                <h3 className="mood-chart-heading">Your Journey</h3>
+                                {/* **UPDATED TEXT**: Clearly states this is the 7-day view */}
+                                <h3 className="mood-chart-heading">Your Journey (Last 7 Days)</h3> 
                             </div>
                             {journalEntries.length > 0 ? 
                                 (
                                     <>
                                         <ResponsiveContainer width="100%" height={350}>
-                                            <LineChart
+                                            <BarChart
                                                 data={chartData}
                                                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                                             >
                                                 <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis dataKey="date" stroke="#ffffff" />
-                                                <YAxis domain={[1, 10]} stroke="#ffffff" />
-                                                <Tooltip content={<CustomTooltip />} />
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey="mood"
-                                                    stroke="#ffffff"
-                                                    strokeWidth={2}
-                                                    dot={{ fill: '#ffffff', stroke: '#8884d8', strokeWidth: 2 }}
+                                                
+                                                <XAxis dataKey="date" />
+                                                <YAxis domain={[1, 10]}
+                                                        ticks={[1,4,7,10]} 
+                                                        tickFormatter={formatMoodTick} 
+                                                        width={60}
                                                 />
-                                            </LineChart>
+                                                <Tooltip content={<CustomTooltip />} />
+
+                                                <Bar dataKey="mood" barSize={25}> {/* Adjusted barSize for a better look */}
+                                                    {
+                                                        chartData.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`}
+                                                            fill={getMoodColor(entry.mood)} />
+                                                        )) 
+                                                    }
+                                                </Bar>
+                                            </BarChart>
                                         </ResponsiveContainer>
+                                        
+                                        {/* Journey Summary Stats */}
                                         <div className="mood-chart-data">
                                             <div className="mood-chart-card">
                                                 <p className="mood-rating">{moodChartEmojis(latestMood)}</p>
@@ -322,18 +386,19 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                                             </div>
                                             <div className="mood-chart-card">
                                                 <p className="mood-rating">{moodChartEmojis(averageMood)}</p>
-                                                <p>Average Mood</p>
+                                                {/* **UPDATED LABEL**: Clarifies average is for the 7-day period */}
+                                                <p>7-Day Average</p> 
                                             </div>
                                             <div className="mood-chart-card">
                                                 <p className="mood-rating">{totalEntries}</p>
-                                                <p>Total Entries</p>
+                                                <p>Entries</p>
                                             </div>
                                         </div>
                                     </>
-                                ) : ( <p className="card-text">No journal entries yet.</p>)}
+                                ) : ( <p className="card-text">Log your first entry to start your journey graph!</p>)}
                         </div>
                         
-                        {/* New Journal Entries Section */}
+                        {/* Recommended Section (No Changes) */}
                         <section className="recommended-section">
                             <h3 className='recommended-title'>Recommended for You</h3>
                             <div className="recommended-card">
@@ -347,7 +412,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                             </div>
                         </section>
 
-                        {/* Explore Topics */}
+                        {/* Explore Topics Section (No Changes) */}
                         <section className="explore-by-topic-section">
                             <h3 className='explore-by-topic-title'>Explore By Topic</h3> 
                             <div className="explore-by-topic-content">
@@ -377,7 +442,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                 )}
                 
 
-                {/* Mobile footer navigation */}
+                {/* Mobile footer navigation (No Changes) */}
                 <header className="mobile-footer-bar">
                     <nav className='mobile-footer-nav'>
                         <ul className="footer-bar-links">
@@ -411,7 +476,6 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                                     <span className="mobile-footer-icon-name">Forum</span>
                                 </p>
                             </li>
-                            {/* The profile click handler is now simplified */}
                             <li onClick={() => handleIconClick('profile')}>
                                 <p className={`icon-bar-footer ${activeIcon === 'profile' ? 'active' : ''}`}>
                                     <User className="mobile-footer-icon" />

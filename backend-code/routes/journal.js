@@ -2,8 +2,22 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-// Define the Journal Entry Schema.
+// -------------------------------------------------------------------
+// IMPORTANT: Replace './authMiddleware' with the correct path to your 
+// authentication middleware that sets req.user.id
+// -------------------------------------------------------------------
+const { protect } = require('../middleware/auth'); 
+
+// ===================================================================
+// 1. UPDATED JOURNAL ENTRY SCHEMA
+// ===================================================================
+
 const journalEntrySchema = new mongoose.Schema({
+    userId: { // <<--- NEW: Links the entry to the user
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
     moodRating: {
         type: Number,
         required: true,
@@ -20,15 +34,32 @@ const journalEntrySchema = new mongoose.Schema({
     }
 });
 
-// Create the Mongoose model from the schema.
 const JournalEntry = mongoose.model('JournalEntry', journalEntrySchema);
 
-// API route to save a new journal entry.
-router.post('/journal-entries', async (req, res) => {
+
+// ===================================================================
+// HELPER FUNCTION (Correct as you implemented it)
+// ===================================================================
+
+const getSevenDayCutOff = () => {
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    return sevenDaysAgo;
+};
+
+
+// ===================================================================
+// 2. API ROUTE TO SAVE A NEW JOURNAL ENTRY (Requires Auth)
+// ===================================================================
+
+// Use the 'protect' middleware to ensure the user is logged in
+router.post('/journal-entries', protect, async (req, res) => {
     try {
         const { moodRating, journalText } = req.body;
-        
-        const newEntry = new JournalEntry({ moodRating, journalText });
+        const userId = req.user.id; // Get ID from the middleware
+
+        const newEntry = new JournalEntry({ moodRating, journalText, userId });
         await newEntry.save();
 
         res.status(201).json({ 
@@ -41,15 +72,33 @@ router.post('/journal-entries', async (req, res) => {
     }
 });
 
-// New API route to retrieve all journal entries.
-router.get('/journal-entries', async (req, res) => {
+
+// ===================================================================
+// 3. CONSOLIDATED API ROUTE TO GET 7-DAY CHART DATA (Requires Auth)
+//    - This is the endpoint your dashboard will call.
+// ===================================================================
+
+// This single GET route replaces your two previous, conflicting GET routes.
+router.get('/journal-entries', protect, async (req, res) => {
     try {
-        // Find all entries and sort them by timestamp in ascending order.
-        const entries = await JournalEntry.find().sort({ timestamp: 1 });
-        res.status(200).json(entries);
+        const sevenDaysAgo = getSevenDayCutOff();
+        const userId = req.user.id;
+
+        const sevenDayMoodData = await JournalEntry.find({
+            // Secure filter: only entries belonging to the current user
+            userId: userId, 
+            // Date filter: only entries within the last 7 days
+            timestamp: { $gte: sevenDaysAgo }
+        })
+        .sort ({ timestamp: 1}) // Oldest to newest for correct chart order
+        // Select only the fields the frontend needs to minimize data transfer
+        .select('timestamp moodRating') 
+        .exec();
+
+        res.status(200).json(sevenDayMoodData);
     } catch (error) {
-        console.error('Error fetching journal entries:', error);
-        res.status(500).json({ error: 'Failed to fetch journal entries.' });
+        console.error('Error fetching 7-day journal entries:', error);
+        res.status(500).json({ error: 'Failed to fetch journal data.' });
     }
 });
 

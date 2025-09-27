@@ -24,10 +24,19 @@ const journalEntrySchema = new mongoose.Schema({
         min: 1,
         max: 10
     },
+
+     moodThought: {
+        type: String,
+        // Example: 'Anxious', 'Happy', 'Calm'
+        required: true, 
+        trim: true,
+    },
+
     journalText: {
         type: String,
         required: true
     },
+    
     timestamp: {
         type: Date,
         default: Date.now
@@ -56,10 +65,10 @@ const getSevenDayCutOff = () => {
 // Use the 'protect' middleware to ensure the user is logged in
 router.post('/journal-entries', protect, async (req, res) => {
     try {
-        const { moodRating, journalText } = req.body;
+        const { moodRating, moodThought, journalText } = req.body;
         const userId = req.user.id; // Get ID from the middleware
 
-        const newEntry = new JournalEntry({ moodRating, journalText, userId });
+        const newEntry = new JournalEntry({ moodRating, moodThought, journalText, userId });
         await newEntry.save();
 
         res.status(201).json({ 

@@ -1,34 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ChevronRight, XIcon } from 'lucide-react';
-// **FIX**: Import axios for consistent API calls, as used in Dashboard.js
 import axios from 'axios'; 
 
-import './JournalEntryModal.css';
+// NOTE: The external CSS import is commented out, assuming the necessary 
+// styles will be applied via the class names below.
+import './JournalEntryModal.css'; 
 
+// 1. Refactored Mood Thoughts for simpler filtering and mapping
 const moodThoughts = [
-   { depressed: 'depressed'},
-   { anxious : 'anxious'},
-    {sad: 'sad'},
-    {grateful: 'grateful'},
-    {calm: 'calm'},
-     {motivated: 'motivated'},
-    {frustrated: 'frustrated'},
-   {heartbroken: 'heartbroken'},
-   {happy: 'happy'},
-    {loved: 'loved'},
-    {other: 'other'},  
+   { name: 'Depressed', category: 'Negative' },
+   { name: 'Anxious', category: 'Negative' },
+   { name: 'Sad', category: 'Negative' },
+   { name: 'Frustrated', category: 'Negative' },
+   { name: 'Heartbroken', category: 'Negative' },
+
+   { name: 'Grateful', category: 'Positive' },
+   { name: 'Calm', category: 'Positive' },
+   { name: 'Motivated', category: 'Positive' },
+   { name: 'Happy', category: 'Positive' },
+   { name: 'Loved', category: 'Positive' },
+   
+   { name: 'Other', category: 'Neutral' }, // 'Other' is always available
 ];
 
+// Helper Component for Mood Thought Selection (Step 2)
+// Uses original class names for styling hooks
+const MoodThoughtSelector = ({ rating, selectedThought, onSelect }) => {
+    // Determine the required category based on the rating
+    // Rating >= 8 (high) shows Positive tags; Rating < 8 shows Negative tags
+    const requiredCategory = rating >= 8 ? 'Positive' : 'Negative';
+
+    // Filter the mood thoughts based on the rating category
+    const filteredThoughts = moodThoughts.filter(
+        (thought) => thought.category === requiredCategory || thought.category === 'Neutral'
+    );
+
+    return (
+        
+        
+        <div className="mood-thought-tags-container">
+            {filteredThoughts.map((thought) => (
+                // Loop through the filtered array and conditionally apply 'selected-thought' class
+                <div
+                    key={thought.name}
+                    className={`mood-thought-card ${selectedThought === thought.name ? 'selected-thought' : ''}`}
+                    onClick={() => onSelect(thought.name)} // Calls handleThoughtSelect
+                >
+                    {thought.name}
+                </div>
+            ))}
+        </div>
+    );
+};
+
 const JournalEntryModal = ({ onClose }) => {
-    // State to manage the visibility of each step
+    // State to manage the visibility and data
     const [moodRating, setMoodRating] = useState(null);
     const [showMoodThought, setShowMoodThought] = useState(false);
-    const [moodThought, setMoodThought] = useState('')
-    const [showMoodQuestions, setShowMoodQuestions] = useState(false);
+    const [moodThought, setMoodThought] = useState(''); // Stores the selected tag name
     const [showJournalText, setShowJournalText] = useState(false);
     const [guidedQuestion, setGuidedQuestion] = useState('');
     const [journalText, setJournalText] = useState('');
-    const [isSaving, setIsSaving] = useState(false); // New state for loading indicator
+    const [isSaving, setIsSaving] = useState(false); 
 
     const getMoodQuestion = (rating) => {
         if (rating >= 8) {
@@ -40,44 +73,29 @@ const JournalEntryModal = ({ onClose }) => {
         }
     };
 
-    const getMoodThought = (thought) => {
-        if (thought >= 8) {
-            return moodThoughts.map((index) => {
-                <>
-                    <div className='card'>{index.calm}</div>
-                    <div className='card'>{index.grateful}</div>
-                    <div className='card'>{index.happy}</div>
-                    <div className='card'>{index.loved}</div>
-                    <div className='card'>{index.motivated}</div>
-                    <div className='card'>{index.other}</div>
-
-                </>
-            });
-        }
-    }
-
+    // Handler to select the mood rating and transition to the thought selection
     const handleRatingSelect = (rating) => {
         setMoodRating(rating);
+        setGuidedQuestion(getMoodQuestion(rating)); // Pre-set the question
         setShowMoodThought(true);
-        getMoodThought();
     };
 
-    const handleNextStep = () => {
-        setShowMoodQuestions(false);
+    // Handler to select the mood thought and transition to the main journal step
+    const handleThoughtSelect = (thoughtName) => {
+        setMoodThought(thoughtName);
+        setShowMoodThought(false);
         setShowJournalText(true);
     };
 
-    
-
-    // **FIX**: Updated function to use axios, include the token, and use dynamic URL
+    // Function to handle the saving of the entry
     const saveJournalEntry = async (entryData) => {
         const token = localStorage.getItem('token');
         if (!token) {
             console.error("Authentication token not found. Cannot save entry.");
+            console.warn("Authentication required. Please ensure you are logged in.");
             return false;
         }
         
-        // Match the baseURL logic used in Dashboard.js
         const hostname = window.location.hostname;
         const baseURL = (hostname === 'localhost' || hostname === '127.0.0.1')
             ? 'http://localhost:3001'
@@ -86,7 +104,6 @@ const JournalEntryModal = ({ onClose }) => {
         try {
             const response = await axios.post(`${baseURL}/api/journal-entries`, entryData, {
                 headers: {
-                    // **CRITICAL FIX**: Include the JWT token for authentication
                     Authorization: `Bearer ${token}`, 
                 },
             });
@@ -99,38 +116,38 @@ const JournalEntryModal = ({ onClose }) => {
 
         } catch (error) {
             console.error("Error saving document:", error.response ? error.response.data : error.message);
-            // In a real app, you would show an error message here instead of an alert
-            alert("Failed to save entry. Please ensure you are logged in and try again."); 
+            console.warn("Failed to save entry. Please ensure you are logged in and try again."); 
             return false;
         }
     };
 
-    // **FIX**: Updated handleSubmit to only call onClose (and thus fetchData) upon success
+    // Final Submission Handler
     const handleSubmit = async () => {
         if (journalText.trim() === "") {
-             alert("Please write something about your day before saving.");
+             console.warn("Please write something about your day before saving.");
              return;
         }
         
-        setIsSaving(true); // Start saving indicator
+        setIsSaving(true); 
 
+        // Include the selected moodThought in the payload
         const entryData = {
             moodRating,
+            moodThought, // New field being saved
             journalText,
         };
         
         const success = await saveJournalEntry(entryData);
         
-        setIsSaving(false); // Stop saving indicator
+        setIsSaving(false); 
 
         if (success) {
-            // **CRITICAL FIX**: Close the modal ONLY upon successful save. 
-            // This triggers the dashboard's fetchData to update the graph.
             onClose(); 
         } 
     };
 
     return (
+        
         <div className="modal-overlay">
             <div className="modal-content">
                 <div className="modal-header">
@@ -139,7 +156,7 @@ const JournalEntryModal = ({ onClose }) => {
                 </div>
                 
                 {/* Step 1: Mood Rating Selection */}
-                {!moodRating && !showMoodQuestions && (
+                {moodRating === null && !showMoodThought && !showJournalText && (
                     <div className="modal-step">
                         <p>What is your mood rating today?</p>
                         <div className="mood-rating-container">
@@ -156,44 +173,36 @@ const JournalEntryModal = ({ onClose }) => {
                     </div>
                 )}
 
-                {/* Show the mood thoughts */}
-                {
-                    showMoodThought && 
-                    <div className='mood-thought-section'>
-                        <h1>How are you feeling?</h1>
-                        {getMoodThought}
-
-                    </div>
-                }
-                
-                {/* Step 2: Guided Question and Textarea */}
-                {showMoodQuestions && (
-                    <div className="modal-step">
-                        <p>{guidedQuestion}</p>
-                        <textarea
-                            value={journalText}
-                            onChange={(e) => setJournalText(e.target.value)}
-                            rows="8"
-                            placeholder="Write your thoughts here..."
-                            className='form-modal-textarea'
-                        ></textarea>
-                        <button className="form-modal-next-button" onClick={handleNextStep} disabled={isSaving}>
-                            Next <ChevronRight />
-                        </button>
+                {/* Step 2: Mood Thought Selection */}
+                {showMoodThought && (
+                    <div className='modal-step'>
+                        <h1>How are you feeling right now, based on your mood rating?</h1>
+                        <p className="mood-thought-subtitle">Select the most dominant emotion.</p>
+                        
+                        {/* Call the component that handles filtering and rendering */}
+                        <MoodThoughtSelector 
+                            rating={moodRating}
+                            selectedThought={moodThought}
+                            onSelect={handleThoughtSelect} 
+                        />
                     </div>
                 )}
                 
-                {/* Step 3: Final Submission */}
+                {/* Step 3: Guided Question and Journal Text (Final Step) */}
                 {showJournalText && (
                     <div className="modal-step">
-                        <p>Any other thoughts on your mind?</p>
+                        <p className='guided-question-text'>
+                            {guidedQuestion}
+                        </p>
                         <textarea
                             value={journalText}
                             onChange={(e) => setJournalText(e.target.value)}
                             rows="8"
-                            placeholder="Continue writing here..."
+                            placeholder="Start writing here..."
                             className='form-modal-textarea'
+                            disabled={isSaving}
                         ></textarea>
+                        
                         <button 
                             className="form-modal-submit-button" 
                             onClick={handleSubmit} 
@@ -205,6 +214,7 @@ const JournalEntryModal = ({ onClose }) => {
                 )}
             </div>
         </div>
+        
     );
 };
 

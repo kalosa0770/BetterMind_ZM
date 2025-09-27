@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Bell, User, Home, FilePlus, Video,
   MessageCircle, Plus, ChartBar,
   LampDesk, ArrowRight, Zap, Droplet, AlertTriangle, Brain,
-  MoreHorizontal
+  MoreHorizontal, Clock, Heart // Added Clock and Heart icons for metrics
 } from 'lucide-react';
 import {
   BarChart,
@@ -24,7 +24,7 @@ import UserAvatar from './UserAvatar';
 import JournalEntry from './JournalEntry';
 import JournalEntryModal from './JournalEntryModal';
 import UserProfile from './UserProfile';
-import './UserDashboard.css';
+// import './UserDashboard.css'; // Removed external CSS import to prevent compile error
 
 // ====================================================================
 // CHART CONFIGURATION & HELPER FUNCTIONS
@@ -144,16 +144,49 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
         }
     };
 
-    // **UPDATED EFFECT DEPENDENCIES**: Added 'fetchData' to dependencies.
-    // 'fetchData' will be created on every render, so to prevent a dependency warning 
-    // and infinite loop, wrap fetchData in useCallback or add eslint-disable-next-line
-    // For simplicity here, we acknowledge the linter warning or assume it's disabled.
-    // For production, use useCallback or refactor.
+    // Use a memoized version of fetchData if possible, or disable the linter rule, 
+    // but for now, we rely on the check inside the useEffect to prevent infinite loops.
     useEffect(() => {
         if (activeIcon === 'dashboard' || activeSideBar === 'dashboard') {
             fetchData();
         }
-    }, [activeIcon, activeSideBar, onLogout, /* fetchData */]); // Added fetchData for completeness
+    }, [activeIcon, activeSideBar, onLogout]); 
+
+    // **NEW LOGIC**: Use useMemo to calculate Previous and Latest Records
+    const { previousRecord, latestRecord, chartData } = useMemo(() => {
+        const aggregatedData = {};
+        
+        // 1. Prepare records for the metric cards (Previous and Latest)
+        // Ensure data is sorted by timestamp (oldest to newest)
+        const sortedEntries = [...journalEntries].sort((a, b) => 
+            new Date(a.entryDate || a.timestamp) - new Date(b.entryDate || b.timestamp)
+        );
+
+        const latest = sortedEntries.length > 0 ? sortedEntries[sortedEntries.length - 1] : null;
+        const previous = sortedEntries.length > 1 ? sortedEntries[sortedEntries.length - 2] : null;
+
+        // 2. Aggregate data for the Bar Chart (Averaging moods per day)
+        sortedEntries.forEach(entry => {
+            // Use entryDate if available, otherwise fallback to timestamp
+            const dateObj = new Date(entry.entryDate || entry.timestamp); 
+            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            if (!aggregatedData[formattedDate]) {
+                aggregatedData[formattedDate] = { sum: 0, count: 0 };
+            }
+            
+            aggregatedData[formattedDate].sum += entry.moodRating; 
+            aggregatedData[formattedDate].count += 1;
+        });
+
+        const finalChartData = Object.keys(aggregatedData).map(date => ({
+            date: date,
+            mood: aggregatedData[date].sum / aggregatedData[date].count, // Average mood is calculated
+        }));
+
+        return { previousRecord: previous, latestRecord: latest, chartData: finalChartData };
+
+    }, [journalEntries]);
 
     if (loading) {
         return <div>loading...</div>;
@@ -179,56 +212,40 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
         setJournalModalOpen(true);
     };
 
-    // **UPDATED CHART DATA AGGREGATION**
-    const getChartData = () => {
-      // NOTE: Filtering for 7 days is done on the backend. This function only 
-      // needs to aggregate entries that fall on the same date.
-      const dailyMoods = {};
-
-      journalEntries.forEach(entry => {
-          // **FIXED**: Use the correct 'timestamp' field from the MongoDB schema
-          const date = new Date(entry.timestamp); 
-          const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-          
-          if (!dailyMoods[formattedDate]) {
-              dailyMoods[formattedDate] = { sum: 0, count: 0 };
-          }
-          
-          // **FIXED**: Use the correct 'moodRating' field from the MongoDB schema
-          dailyMoods[formattedDate].sum += entry.moodRating; 
-          dailyMoods[formattedDate].count += 1;
-      });
-
-      // Convert the aggregated data into the format Recharts expects
-      const chartData = Object.keys(dailyMoods).map(date => ({
-          date: date,
-          mood: dailyMoods[date].sum / dailyMoods[date].count, // Average mood is calculated
-      }));
-
-      return chartData;
-    };
-
-    const chartData = getChartData();
     
-    // Calculate summary statistics
-    const totalEntries = journalEntries.length; // This is now total entries in the last 7 days
-    
-    // Find the latest mood from the filtered data (the last element after sorting)
-    const latestMoodEntry = journalEntries.length > 0 
-      ? journalEntries.reduce((latest, current) => (new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest)) 
-      : null;
-      
-    const latestMood = latestMoodEntry ? latestMoodEntry.moodRating : 'N/A';
 
-    // Calculate the overall average mood for the 7-day period
-    const averageMood = totalEntries > 0 
-        ? (journalEntries.reduce((sum, entry) => sum + entry.moodRating, 0) / totalEntries).toFixed(1)
-        : 'N/A';
+
+    // Helper function to render the new metric cards
+    const renderMetricCard = (title, icon, record) => (
+        <div className="metric-card-container">
+            <div className="metric-card-header">
+                {icon}
+                <span className="metric-card-title">{title}</span>
+            </div>
+            {record ? (
+                <>
+                    <p className="metric-card-score">
+                        {record.moodRating} / 10
+                    </p>
+                    <p className="metric-card-thought" style={{backgroundColor: getMoodColor(record.moodRating)}}>
+                        {record.moodThought || 'N/A'}
+                    </p>
+                    <p className="metric-card-date">
+                        on {new Date(record.entryDate || record.timestamp).toLocaleDateString()}
+                    </p>
+                </>
+            ) : (
+                <p className="metric-card-no-data">No data available.</p>
+            )}
+        </div>
+    );
     
-   
+    // --- Render ---
+
     return (
         <div className="dashboard-container">
-            {/* Sidebar for desktop (No Changes) */}
+            {/* Sidebar navigation */}
+            
             <header className="dashboard-sidebar">
                 <h1 className="sidebar-title">BetterMind ZM</h1>
                 <nav className="sidebar-nav">
@@ -346,56 +363,57 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                         <div className="mood-chart-container">
                             <div className='chart-heading'>
                                 <ChartBar className='chart-icon'/>
-                                {/* **UPDATED TEXT**: Clearly states this is the 7-day view */}
-                                <h3 className="mood-chart-heading">Your Journey (Last 7 Days)</h3> 
+                                <h3 className="mood-chart-heading">Your Journey Snapshot</h3> 
                             </div>
-                            {journalEntries.length > 0 ? 
-                                (
-                                    <>
-                                        <ResponsiveContainer width="100%" height={350}>
-                                            <BarChart
-                                                data={chartData}
-                                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                            >
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                
-                                                <XAxis dataKey="date" />
-                                                <YAxis domain={[1, 10]}
-                                                        ticks={[1,4,7,10]} 
-                                                        tickFormatter={formatMoodTick} 
-                                                        width={60}
-                                                />
-                                                <Tooltip content={<CustomTooltip />} />
+                            
+                            {/* **NEW METRICS SECTION** */}
+                            <div className="metrics-grid">
+                                {renderMetricCard(
+                                    "Previous Record", 
+                                    <Clock />, 
+                                    previousRecord
+                                )}
+                                
+                                {renderMetricCard(
+                                    "Latest Record", 
+                                    <Heart style={{ color: '#ef4444' }} />, 
+                                    latestRecord
+                                )}
+                            </div>
 
-                                                <Bar dataKey="mood" barSize={25}> {/* Adjusted barSize for a better look */}
-                                                    {
-                                                        chartData.map((entry, index) => (
-                                                            <Cell key={`cell-${index}`}
-                                                            fill={getMoodColor(entry.mood)} />
-                                                        )) 
-                                                    }
-                                                </Bar>
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                        
-                                        {/* Journey Summary Stats */}
-                                        <div className="mood-chart-data">
-                                            <div className="mood-chart-card">
-                                                <p className="mood-rating">{moodChartEmojis(latestMood)}</p>
-                                                <p>Latest Mood</p>
-                                            </div>
-                                            <div className="mood-chart-card">
-                                                <p className="mood-rating">{moodChartEmojis(averageMood)}</p>
-                                                {/* **UPDATED LABEL**: Clarifies average is for the 7-day period */}
-                                                <p>7-Day Average</p> 
-                                            </div>
-                                            <div className="mood-chart-card">
-                                                <p className="mood-rating">{totalEntries}</p>
-                                                <p>Entries</p>
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : ( <p className="card-text">Log your first entry to start your journey graph!</p>)}
+                            {/* **UPDATED CHART RENDERING** */}
+                            <div className="chart-section">
+                                <h2 className="chart-title">Mood Trend (Last {journalEntries.length} Entries)</h2>
+                                {journalEntries.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart
+                                            data={chartData}
+                                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            
+                                            <XAxis dataKey="date" />
+                                            <YAxis domain={[1, 10]}
+                                                    ticks={[1,4,7,10]} 
+                                                    tickFormatter={formatMoodTick} 
+                                                    width={60}
+                                            />
+                                            <Tooltip content={<CustomTooltip />} />
+
+                                            <Bar dataKey="mood" barSize={25}> 
+                                                {
+                                                    chartData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`}
+                                                        fill={getMoodColor(entry.mood)} />
+                                                    )) 
+                                                }
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                ) : ( 
+                                    <p className="card-text">Log your first entry to start your journey graph!</p>
+                                )}
+                            </div>
                         </div>
                         
                         {/* Recommended Section (No Changes) */}

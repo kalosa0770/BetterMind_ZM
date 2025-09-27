@@ -550,6 +550,101 @@ body {
 }
 
 
+.metrics-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 16px;
+                    margin-bottom: 30px;
+                }
+                .metric-card-container {
+                    background-color: #ffffff;
+                    padding: 20px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                    border: 1px solid #f0f0f0;
+                }
+                .metric-card-header {
+                    display: flex;
+                    align-items: center;
+                    color: #6b7280; /* Gray 500 */
+                    margin-bottom: 10px;
+                    font-weight: 500;
+                }
+                .metric-card-header svg {
+                    width: 20px;
+                    height: 20px;
+                    margin-right: 8px;
+                }
+                .metric-card-title {
+                    font-size: 16px;
+                }
+                .metric-card-score {
+                    font-size: 40px;
+                    font-weight: 800;
+                    color: #4f46e5; /* Indigo 600 */
+                    line-height: 1;
+                    margin-top: 5px;
+                }
+                .metric-card-thought {
+                    margin-top: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    padding: 4px 8px;
+                    border-radius: 6px;
+                    color: white; 
+                    display: inline-block;
+                }
+                .metric-card-date {
+                    font-size: 12px;
+                    color: #9ca3af; /* Gray 400 */
+                    margin-top: 8px;
+                }
+                .metric-card-no-data {
+                    font-size: 14px;
+                    color: #9ca3af;
+                    margin-top: 10px;
+                }
+
+                .chart-section {
+                    background-color: #ffffff;
+                    padding: 24px;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #f0f0f0;
+                }
+                .chart-title {
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #4b5563; /* Gray 700 */
+                    margin-bottom: 16px;
+                }
+                .chart-no-data {
+                    text-align: center;
+                    padding: 40px 0;
+                    color: #6b7280;
+                }
+                .dashboard-loading {
+                    padding: 20px;
+                    text-align: center;
+                    color: #4f46e5;
+                    font-weight: 600;
+                }
+                .dashboard-error-message {
+                    padding: 20px;
+                    text-align: center;
+                    color: #ef4444;
+                    font-weight: 600;
+                    border: 1px solid #fca5a5;
+                    background-color: #fef2f2;
+                    border-radius: 8px;
+                }
+
+                /* Original classes that were previously in the JSX, now preserved in structure */
+                .custom-chart-tooltip { /* Assuming custom tooltip CSS exists */ }
+                .custom-tooltip-label { /* Assuming custom tooltip CSS exists */ }
+                .custom-tooltip-mood { /* Assuming custom tooltip CSS exists */ }
+
+
 
 
 /* -- End of Dashboard Styles ---*/

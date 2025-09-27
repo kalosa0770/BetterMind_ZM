@@ -5,9 +5,25 @@ import axios from 'axios';
 
 import './JournalEntryModal.css';
 
+const moodThoughts = [
+   { depressed: 'depressed'},
+   { anxious : 'anxious'},
+    {sad: 'sad'},
+    {grateful: 'grateful'},
+    {calm: 'calm'},
+     {motivated: 'motivated'},
+    {frustrated: 'frustrated'},
+   {heartbroken: 'heartbroken'},
+   {happy: 'happy'},
+    {loved: 'loved'},
+    {other: 'other'},  
+];
+
 const JournalEntryModal = ({ onClose }) => {
     // State to manage the visibility of each step
     const [moodRating, setMoodRating] = useState(null);
+    const [showMoodThought, setShowMoodThought] = useState(false);
+    const [moodThought, setMoodThought] = useState('')
     const [showMoodQuestions, setShowMoodQuestions] = useState(false);
     const [showJournalText, setShowJournalText] = useState(false);
     const [guidedQuestion, setGuidedQuestion] = useState('');
@@ -24,16 +40,34 @@ const JournalEntryModal = ({ onClose }) => {
         }
     };
 
+    const getMoodThought = (thought) => {
+        if (thought >= 8) {
+            return moodThoughts.map((index) => {
+                <>
+                    <div className='card'>{index.calm}</div>
+                    <div className='card'>{index.grateful}</div>
+                    <div className='card'>{index.happy}</div>
+                    <div className='card'>{index.loved}</div>
+                    <div className='card'>{index.motivated}</div>
+                    <div className='card'>{index.other}</div>
+
+                </>
+            });
+        }
+    }
+
     const handleRatingSelect = (rating) => {
         setMoodRating(rating);
-        setGuidedQuestion(getMoodQuestion(rating));
-        setShowMoodQuestions(true);
+        setShowMoodThought(true);
+        getMoodThought();
     };
 
     const handleNextStep = () => {
         setShowMoodQuestions(false);
         setShowJournalText(true);
     };
+
+    
 
     // **FIX**: Updated function to use axios, include the token, and use dynamic URL
     const saveJournalEntry = async (entryData) => {
@@ -121,6 +155,16 @@ const JournalEntryModal = ({ onClose }) => {
                         </div>
                     </div>
                 )}
+
+                {/* Show the mood thoughts */}
+                {
+                    showMoodThought && 
+                    <div className='mood-thought-section'>
+                        <h1>How are you feeling?</h1>
+                        {getMoodThought}
+
+                    </div>
+                }
                 
                 {/* Step 2: Guided Question and Textarea */}
                 {showMoodQuestions && (

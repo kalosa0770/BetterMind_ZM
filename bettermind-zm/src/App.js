@@ -24,9 +24,11 @@ const HomePage = ({
   openLoginModal, openSignupForm,
   isLoginModalOpen, closeLoginModal, isSignUpFormOpen, closeSignUpForm,
   openForgotPasswordModal, isForgotPasswordModalOpen, goBack,
-  onLoginSuccess, // Pass this new handler down to the LoginForm
+  onLoginSuccess,
 }) => (
-  <>
+  // CRITICAL: Adds padding to the bottom on mobile (pb-16) to prevent content 
+  // from being hidden behind the fixed bottom navigation bar introduced in Header.js.
+  <div className="pb-16 lg:pb-0">
     <Header openLoginModal={openLoginModal} openSignupForm={openSignupForm} openForgotPasswordModal={openForgotPasswordModal}/>
     <HeroSection />
     <FeaturedProducts />
@@ -52,7 +54,7 @@ const HomePage = ({
       onClose={goBack}
     />
     <Footer />
-  </>
+  </div>
 );
 
 function App () {
@@ -64,10 +66,10 @@ function App () {
   const navigate = useNavigate();
 
   // Fetch CSRF token on app load
-
   useEffect (() => {
     const fetchCsrfToken = async () => {
       try {
+        // Assuming api is configured to handle the full path correctly
         const { data } = await api.get('csrf-token');
         api.defaults.headers.common['csrf-token'] = data.csrfToken;
         console.log ('CSRF token fetched successfully.');
@@ -108,6 +110,7 @@ function App () {
   const handleLoginSuccess = (data) => {
     closeModal('login'); // Close the login modal
     localStorage.setItem('token', data.token); // Store the JWT token
+    setIsLoggedIn(true); // Set logged in state
     navigate('/dashboard'); // Navigate directly to the dashboard
   };
 
@@ -120,6 +123,7 @@ function App () {
           headers: { Authorization: `Bearer ${token}` }
         });
       } catch (error) {
+        // Log failure but proceed with client-side cleanup
         console.error("Logout failed:", error);
       }
     }
@@ -158,7 +162,7 @@ function App () {
 
 
   return (
-    <div className="App">
+    <div className="App bg-gray-50 font-sans">
       <Routes>
         <Route
           path="/"
@@ -183,16 +187,14 @@ function App () {
         />
         <Route path="/dashboard" 
                element={
-                  <>
-                    <Dashboard onLogout={onLogout}
-                                activeIcon={activeIcon} 
-                                handleIconClick={handleIconClick}
-                                showMainContent={showMainContent}
-                                showHeaderBar={showHeaderBar}
-                                activeSideBar={activeSideBar}
-                                handleSideBarClick={handleSideBarClick}
-                      />
-                  </>
+                  <Dashboard onLogout={onLogout}
+                             activeIcon={activeIcon} 
+                             handleIconClick={handleIconClick}
+                             showMainContent={showMainContent}
+                             showHeaderBar={showHeaderBar}
+                             activeSideBar={activeSideBar}
+                             handleSideBarClick={handleSideBarClick}
+                  />
                 }      
         />
       </Routes>

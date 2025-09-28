@@ -1,42 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles, Route, Activity, ChevronLeft } from 'lucide-react';
-import UserSettings from './UserSettings'
-// --- MOCK DATA AND UTILITIES ---
+import { 
+  Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles, Route, Activity, ChevronLeft 
+} from 'lucide-react';
+import UserSettings from './UserSettings';
 
-// Mocking UserSettings component for single-file deployment
-// const UserSettings = ({ onBack }) => {
-//   return (
-//     <div className="flex flex-col w-full h-full bg-gray-50 animate-in fade-in slide-in-from-right duration-500">
-//       <div className="sticky top-0 flex items-center justify-between p-4 bg-white shadow-sm z-10">
-//         <ChevronLeft size={24} className="cursor-pointer text-teal-600 bg-gray-100 rounded-full p-1" onClick={onBack} />
-//         <h2 className="text-lg font-semibold text-gray-800">Settings & Privacy</h2>
-//         <div className="w-6"></div> {/* Spacer */}
-//       </div>
-//       <div className="p-5 flex flex-col gap-5">
-//         <div className="w-full bg-white p-5 rounded-xl shadow-sm">
-//           <h3 className="text-md font-semibold text-gray-800 mb-4">Manage Account</h3>
-//           <ul className="flex flex-col gap-3 list-none p-0 m-0">
-//             <li className="flex items-center gap-4 text-gray-600 cursor-pointer hover:text-teal-600 transition-colors">
-//               <ClipboardCheck size={20} /> Update Profile
-//             </li>
-//             <hr className="w-full border-gray-200 my-1" />
-//             <li className="flex items-center gap-4 text-gray-600 cursor-pointer hover:text-teal-600 transition-colors">
-//               <Cog size={20} /> Preferences
-//             </li>
-//             <hr className="w-full border-gray-200 my-1" />
-//             <li className="flex items-center gap-4 text-red-500 cursor-pointer hover:text-red-700 transition-colors">
-//               <Activity size={20} /> Sign Out
-//             </li>
-//           </ul>
-//         </div>
-//         <p className="text-sm text-gray-400 text-center mt-4">Version 1.0.0</p>
-//       </div>
-//     </div>
-//   );
-// };
+// --- HELPER FUNCTIONS ---
 
-
-// A helper function to calculate the current streak of journal entries
+/**
+ * Calculates the current consecutive daily streak of journal entries.
+ * @param {Array<Object>} entries - List of journal entries.
+ * @returns {number} The current streak length.
+ */
 const calculateCurrentStreak = (entries) => {
   if (!entries || entries.length === 0) return 0;
 
@@ -46,49 +20,67 @@ const calculateCurrentStreak = (entries) => {
   // Create a set of unique normalized dates (start of the day)
   const uniqueDates = Array.from(new Set(sortedEntries.map(entry => {
     const date = new Date(entry.timestamp);
+    // Normalize date to midnight UTC for consistent comparison
     return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
   })));
   
   let streak = 0;
-  let today = new Date();
-  today.setHours(0, 0, 0, 0);
+  let now = new Date();
+  let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
+  // The streak can start today, but only if an entry exists for today.
   // Check if the most recent entry is today
-  if (uniqueDates[0] === today.getTime()) {
+  if (uniqueDates[0] === today) {
     streak = 1;
   }
   
-  for (let i = 1; i < uniqueDates.length; i++) {
-    const previousDate = new Date(uniqueDates[i - 1]);
-    const currentDate = new Date(uniqueDates[i]);
-    const daysDiff = (previousDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
+  for (let i = (uniqueDates[0] === today ? 1 : 0); i < uniqueDates.length; i++) {
+    const previousDate = new Date(uniqueDates[i]);
+    const requiredPreviousDay = new Date(previousDate);
+    requiredPreviousDay.setDate(previousDate.getDate() + 1);
     
-    // Check if the current date is exactly one day before the previous date
-    if (Math.round(daysDiff) === 1) {
-      streak++;
-    } else {
-      // If there's a gap or the date is older, the streak is broken
-      break;
+    // Check if the next unique date exists and is the required previous day
+    const nextDateTimestamp = uniqueDates[i - 1];
+    
+    // If we are past the first entry (i=0) and the previous entry date (i-1) is exactly one day ahead of the current date (i)
+    if (i > 0) {
+      const differenceInDays = (nextDateTimestamp - uniqueDates[i]) / (1000 * 60 * 60 * 24);
+      if (Math.round(differenceInDays) === 1) {
+        streak++;
+      } else {
+        // If there's a gap or the date is older, the streak is broken
+        break;
+      }
+    } else if (uniqueDates[0] === today) {
+        // If the very first unique date is today, the streak is 1. We already handled this.
+        // The loop logic starts checking the day before today.
     }
   }
   
   return streak;
 };
 
-// Generates the calendar array for the last 14 days
+
+/**
+ * Generates the calendar array for the last 14 days for the streak display.
+ * @param {Array<Object>} journalEntries - List of journal entries.
+ * @returns {Array<Object>} Calendar data with date and entry status.
+ */
 const generateCalendar = (journalEntries) => {
   const today = new Date();
   const calendarDays = [];
+  // Use a map to store normalized date strings for quick lookup
   const entryDates = new Set(journalEntries.map(entry => {
     const d = new Date(entry.timestamp);
-    // Use toLocaleDateString for easy string comparison of normalized dates
-    return d.toLocaleDateString(); 
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toLocaleDateString();
   }));
 
   for (let i = 13; i >= 0; i--) {
     const day = new Date(today);
     day.setDate(today.getDate() - i);
-    const isJournalDay = entryDates.has(day.toLocaleDateString());
+    
+    const dayNormalizedString = new Date(day.getFullYear(), day.getMonth(), day.getDate()).toLocaleDateString();
+    const isJournalDay = entryDates.has(dayNormalizedString);
     const dayOfWeek = day.toLocaleDateString('en-US', { weekday: 'narrow' });
     
     calendarDays.push({
@@ -100,6 +92,11 @@ const generateCalendar = (journalEntries) => {
   return calendarDays;
 };
 
+/**
+ * Gets an appropriate emoji for a mood rating.
+ * @param {number} rating - Mood rating from 1 to 10.
+ * @returns {string} Emoji character.
+ */
 const getMoodEmoji = (rating) => {
   if (rating >= 8) return '😊'; // Happy
   if (rating >= 5) return '🙂'; // Neutral-Happy
@@ -107,12 +104,14 @@ const getMoodEmoji = (rating) => {
   return '😢'; // Sad
 };
 
-// --- USER PROFILE COMPONENT (TAILWIND REFACTOR) ---
 
-function UserProfile({ journalEntries = [], onLogout }) {
+
+// --- USER PROFILE COMPONENT ---
+
+function UserProfile({ journalEntries = [], onLogout, onOpenJournalModal }) {
   const [showSettings, setShowSettings] = useState(false);
 
-  // Derived state calculations are memoized or calculated once
+  // Derived state calculations are memoized for performance
   const currentStreak = useMemo(() => calculateCurrentStreak(journalEntries), [journalEntries]);
   const totalEntries = journalEntries ? journalEntries.length : 0;
   const calendarDays = useMemo(() => generateCalendar(journalEntries), [journalEntries]);
@@ -131,25 +130,15 @@ function UserProfile({ journalEntries = [], onLogout }) {
     { id: 3, title: 'Journal Entries', number: totalEntries, icon: <ClipboardCheck size={20} /> },
   ];
 
-  // The original useEffect was loading data but not setting state, 
-  // which caused an ESLint warning and an API call to localhost.
-  // I will remove the logic that causes the unused variable warning and unnecessary mock calls.
-  useEffect(() => {
-    // Placeholder for real-time listener or initial data load
-    // The `journalEntries` are now expected via props.
-    console.log("UserProfile mounted. Current journal entry count:", totalEntries);
-  }, [totalEntries]);
-
   const handleShowSettings = () => setShowSettings(true);
   const handleHideSettings = () => setShowSettings(false);
 
-
+  // If settings are toggled, render the UserSettings component
   if (showSettings) {
-    // If settings are shown, render the mock UserSettings component
-    return <UserSettings onBack={handleHideSettings} />;
+    return <UserSettings onBack={handleHideSettings} onLogout={onLogout} />;
   }
 
-  // Use 'animate-in' classes for a smooth slide-in effect, replicating the original CSS animation
+  // Use 'animate-in' classes for a smooth slide-in effect
   return (
     <div className="flex flex-col bg-gray-50 min-h-screen w-full animate-in fade-in slide-in-from-right duration-500">
         
@@ -206,7 +195,8 @@ function UserProfile({ journalEntries = [], onLogout }) {
                 <div className={`w-6 h-6 rounded-full transition-colors duration-200 flex items-center justify-center text-white text-xs ${
                   day.isJournalDay ? 'bg-teal-600 shadow-md' : 'bg-gray-200'
                 }`}>
-                  {/* Optionally display the day of the month or just leave empty */}
+                  {/* The use of index to display day number is problematic for responsive design,
+                      so we leave it as a filled/unfilled circle for clarity. */}
                 </div>
               </div>
             ))}
@@ -228,7 +218,7 @@ function UserProfile({ journalEntries = [], onLogout }) {
           <div className="flex flex-col gap-4">
             {latestEntries.length > 0 ? (
               latestEntries.map((entry) => (
-                <div key={entry._id} className="bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200">
+                <div key={entry._id || entry.timestamp} className="bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-start gap-3 w-full">
                       <span className="text-2xl p-2 rounded-full bg-teal-100">{getMoodEmoji(entry.moodRating)}</span>
@@ -248,9 +238,9 @@ function UserProfile({ journalEntries = [], onLogout }) {
                   </div>
                   
                   <div className="text-sm text-gray-700 px-1 pt-1 border-t border-gray-100">
-                    { (entry.moodEntryText || '').length > 100 
-                      ? (entry.moodEntryText || '').substring(0, 100) + '...' 
-                      : (entry.moodEntryText || '') }
+                    { (entry.journalText || '').length > 100 
+                      ? (entry.journalText || '').substring(0, 100) + '...' 
+                      : (entry.journalText || 'No detailed text available.') }
                   </div>
                 </div>
               ))
@@ -262,7 +252,10 @@ function UserProfile({ journalEntries = [], onLogout }) {
           </div>
           
           <div className="mt-5 flex justify-center w-full">
-            <button className="w-full py-3 bg-teal-600 text-white font-semibold rounded-full text-sm transition-all flex justify-center items-center gap-2 hover:bg-teal-700 active:scale-[.99]">
+            <button 
+              onClick={onOpenJournalModal}
+              className="w-full py-3 bg-teal-600 text-white font-semibold rounded-full text-sm transition-all flex justify-center items-center gap-2 hover:bg-teal-700 active:scale-[.99]"
+            >
               <FilePlus size={18} /> Add New Entry
             </button>
           </div>
@@ -272,7 +265,5 @@ function UserProfile({ journalEntries = [], onLogout }) {
   );
 }
 
-// NOTE: Since the real app likely uses a router and multiple files, 
-// this component is exported stand-alone but includes a mock UserSettings 
-// for demonstration purposes within this single file environment.
+
 export default UserProfile;

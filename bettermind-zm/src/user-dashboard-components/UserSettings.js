@@ -1,95 +1,151 @@
-import React from 'react';
-import { ArrowLeft, User, CreditCard, LogOut, Lock, CircleHelp, Info, Link, Bell } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, User, CreditCard, LogOut, Lock, CircleHelp, Info, Link, Bell, Settings } from 'lucide-react';
 
-// Reusable List Item component to maintain consistent styling and spacing
+// --- Local Components ---
+
+/**
+ * Reusable List Item component with the Teal/Gray palette.
+ */
 const SettingsListItem = ({ icon, label, onClick, isDestructive = false }) => {
-  // Matches original CSS: margin: 10px 0, gap: 20px, text-align: left
-  const baseClasses = "flex items-center text-left gap-5 py-2 cursor-pointer transition-colors";
+  // Styling uses the Teal/Gray palette
+  const baseClasses = "flex items-center text-left gap-5 px-4 py-3 cursor-pointer transition-all duration-200 rounded-lg";
   
-  // Accent color mapping: --accent-color (teal) & --text-color-secondary (gray)
+  // Apply Teal accent for hover states
   const colorClasses = isDestructive
-    ? "text-red-500 font-semibold hover:bg-red-50"
-    : "text-gray-600 hover:text-teal-600"; // Simple list item style (no hover background)
+    ? "text-red-600 font-semibold hover:bg-red-50"
+    : "text-gray-700 hover:bg-teal-50 hover:text-teal-700";
 
   return (
     <li className={`${baseClasses} ${colorClasses}`} onClick={onClick}>
-      {icon}
-      <span>{label}</span>
+      <div className="text-xl">{icon}</div>
+      <span className="text-base font-medium">{label}</span>
     </li>
   );
 };
 
-const UserSettings = ({ onBack }) => {
+/**
+ * Custom styled header component for sections.
+ */
+const SectionHeader = ({ title }) => (
+    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 ml-4">
+        {title}
+    </h3>
+);
 
-  const handleLogout = () => {
-    // Clear token and redirect to homepage/login.
-    localStorage.removeItem('token');
-    window.location.href = '/'; 
+// --- Main Application Component (Must be named App) ---
+
+const UserSettings = () => {
+  // State to manage the view: true for settings, false for dashboard
+  const [showSettings, setShowSettings] = useState(false);
+  
+  // Mock User State
+  const user = {
+    name: "Alex Johnson",
+    email: "alex.j@example.com"
   };
 
-  // Grouped Navigation Items
+  // --- Utility Functions ---
+
+  const handleLogout = () => {
+    // Note: Using alert() instead of window.location.href for safe iframe execution.
+    console.log("Logging out user...");
+    setShowSettings(false); 
+    alert('Logged out successfully (Simulated)'); 
+  };
+  
+  const handleBack = () => {
+    setShowSettings(true); // Go back to the dashboard view
+  };
+  
+  // --- Navigation Data Configuration ---
+
   const accountNavItems = [
-    { icon: <Bell size={18} />, label: "Notifications" },
-    { icon: <User size={18} />, label: "Manage Account" },
-    { icon: <CreditCard size={18} />, label: "Manage Subscription" },
-    { icon: <Link size={18} />, label: "Link Organisation Subscription" },
+    { icon: <Bell size={20} />, label: "Notifications", action: () => alert("Notifications clicked") },
+    { icon: <User size={20} />, label: "Manage Account", action: () => alert("Account clicked") },
+    { icon: <CreditCard size={20} />, label: "Manage Subscription", action: () => alert("Subscription clicked") },
+    { icon: <Link size={20} />, label: "Link Organisation Subscription", action: () => alert("Organization Link clicked") },
   ];
 
   const supportNavItems = [
-    { icon: <Lock size={18} />, label: "Privacy & Security" },
-    { icon: <CircleHelp size={18} />, label: "Help & Support" },
-    { icon: <Info size={18} />, label: "About BetterMind" },
+    { icon: <Lock size={20} />, label: "Privacy & Security", action: () => alert("Privacy clicked") },
+    { icon: <CircleHelp size={20} />, label: "Help & Support", action: () => alert("Help clicked") },
+    { icon: <Info size={20} />, label: "About BetterMind", action: () => alert("About clicked") },
   ];
 
+
+  // User Settings View
   return (
-    // Equivalent to .user-settings-container
-    <div className="flex flex-col w-full h-full min-h-screen bg-gray-50 animate-in fade-in slide-in-from-right duration-500">
+    <div className="relative flex flex-col w-full vh-100 bg-gray-50 font-sans shadow-2xl">
       
-      {/* Header (Equivalent to .user-settings-header) */}
-      <div className="sticky top-0 flex items-center justify-start p-4 bg-white shadow-sm z-10">
-        {/* Equivalent to .back-icon */}
+      {/* Header (Sticky top for navigation with White background) */}
+      <div className="fixed top-0 left-0 right-0 flex items-center justify-start p-4 bg-white shadow-md z-10 border-b border-gray-200">
         <ArrowLeft 
           size={25} 
+          // Teal accent color for the back button
           className="cursor-pointer text-teal-600 bg-gray-100 rounded-full p-1 w-8 h-8 transition-colors hover:bg-gray-200" 
-          onClick={onBack} 
+          onClick={handleBack} 
         />
-        {/* Equivalent to .user-settings-header h2 */}
-        <h2 className="text-lg font-bold text-gray-800 ml-4">User Settings</h2>
+        <h2 className="text-xl font-bold text-gray-800 ml-4">Account & Settings</h2>
       </div>
 
-      {/* Content Area (Equivalent to .user-settings-content) */}
-      <div className="p-5 flex flex-col gap-5 w-full">
+     
+
+      {/* Settings Navigation Sections */}
+      <div className="p-5 flex flex-col gap-6 w-full">
         
-        {/* Equivalent to .manage-account-section */}
-        <div className='w-full'>
-          <nav className='p-0 m-0'>
-            <ul className='list-none p-0 m-0 space-y-1'>
-              
-              {/* Account Management Group */}
-              {accountNavItems.map((item, index) => (
-                <SettingsListItem key={index} icon={item.icon} label={item.label} />
-              ))}
+        {/* Account Management Section */}
+        <section>
+            <SectionHeader title="Your Account" />
+            <nav className='bg-white rounded-xl shadow-sm overflow-hidden'>
+                <ul className='list-none p-0 m-0 divide-y divide-gray-100'>
+                {accountNavItems.map((item, index) => (
+                    <SettingsListItem 
+                        key={`account-${index}`} 
+                        icon={item.icon} 
+                        label={item.label} 
+                        onClick={item.action}
+                    />
+                ))}
+                </ul>
+            </nav>
+        </section>
 
-              {/* Equivalent to hr (height: 0.8px, background-color: #ccc) */}
-              <hr className="border-gray-300 my-4" />
+        {/* Support and Legal Section */}
+        <section>
+            <SectionHeader title="Application & Support" />
+            <nav className='bg-white rounded-xl shadow-sm overflow-hidden'>
+                <ul className='list-none p-0 m-0 divide-y divide-gray-100'>
+                {supportNavItems.map((item, index) => (
+                    <SettingsListItem 
+                        key={`support-${index}`} 
+                        icon={item.icon} 
+                        label={item.label} 
+                        onClick={item.action}
+                    />
+                ))}
+                </ul>
+            </nav>
+        </section>
 
-              {/* Privacy and Support Group */}
-              {supportNavItems.map((item, index) => (
-                <SettingsListItem key={index} icon={item.icon} label={item.label} />
-              ))}
+        {/* Action Button Section (Logout) */}
+        <section>
+            <nav className='bg-white rounded-xl shadow-sm overflow-hidden'>
+                <ul className='list-none p-0 m-0'>
+                    <SettingsListItem 
+                        icon={<LogOut size={20} />} 
+                        label="Log Out" 
+                        onClick={handleLogout}
+                        isDestructive={true}
+                    />
+                </ul>
+            </nav>
+        </section>
 
-              <hr className="border-gray-300 my-4" />
+        {/* Footer info */}
+        <p className="text-xs text-center text-gray-400 mt-4 pb-4">
+            BetterMind Version 1.2.0 | All Rights Reserved
+        </p>
 
-              {/* Logout Button */}
-              <SettingsListItem 
-                icon={<LogOut size={18} />} 
-                label="Log Out" 
-                onClick={handleLogout}
-                isDestructive={true}
-              />
-            </ul>
-          </nav>
-        </div>
       </div>
     </div>
   );

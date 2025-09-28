@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import UserAvatar from './UserAvatar';
-import UserProfile from './UserProfile'
 import {
   Bell, User, Home, FilePlus, Video,
   MessageCircle, Plus, ChartBar,
-  LampDesk, Zap, Droplet, AlertTriangle, Brain,
-  MoreHorizontal, Clock, Heart, XIcon 
+  XIcon, Zap, Droplet, Clock, Heart, Brain, MoreHorizontal,
+  Activity, CloudDrizzle, Feather 
 } from 'lucide-react';
 import {
   BarChart,
@@ -19,92 +17,126 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
 
-import './PopularContent.css';
-import 'swiper/css';
-import 'swiper/css/pagination';
-
+import UserProfile from './UserProfile';
 // ====================================================================
-// PLACEHOLDER COMPONENTS (Required for Single-File Mandate)
+// UPDATED: UserAvatar Component (Integrated and optimized to use parent state)
 // ====================================================================
 
-
+const UserAvatar = ({ fullName, loading, error }) => {
+    // Calculate initials based on the received fullName prop
+    const initials = useMemo(() => {
+        if (!fullName) return 'U';
+        const parts = fullName.split(' ').filter(p => p.length > 0);
+        if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+        if (parts.length >= 2) return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+        return 'U';
+    }, [fullName]);
     
+    if (loading) {
+        return <div className="w-10 h-10 bg-gray-300 rounded-full animate-pulse"></div>;
+    }
 
+    if (error || !fullName) {
+        // Fallback to the default placeholder if loading failed
+        return (
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-teal-200 flex items-center justify-center text-teal-900 font-bold text-lg border-2 border-teal-400">
+                    U
+                </div>
+                <p className="font-semibold text-gray-800 hidden sm:block">Hello, User</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex items-center gap-3">
+            {/* Applied user's requested gradient style */}
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-700 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
+                <span>{initials}</span>
+            </div>
+            <div className="hidden sm:block">
+                <p className="text-sm font-semibold text-teal-700">{fullName}</p>
+                <p className="text-xs text-gray-600">Welcome Back</p>
+            </div>
+        </div>
+    );
+};
+
+
+
+/**
+ * Replaces Swiper component with a pure Tailwind CSS horizontal scroll container.
+ * Styles maintained to use Teal/Gray palette.
+ */
 const PopularContent = () => {
     const contentData = [
         {
-          cardImg: "https://via.placeholder.com/300x160.png?text=Card+1",
-          cardTitle: "Card title 1",
-          cardText: "This is a description for card 1."
+          cardImg: "https://placehold.co/300x160/2c3e50/ffffff?text=Mindfulness+Guide",
+          cardTitle: "Guided Relaxation for Sleep",
+          cardText: "A 15-minute audio session to prepare your mind for a deep, restful night."
         },
         {
-          cardImg: "https://via.placeholder.com/300x160.png?text=Card+2",
-          cardTitle: "Card title 2",
-          cardText: "This is a description for card 2."
+          cardImg: "https://placehold.co/300x160/3498db/ffffff?text=Stress+Buster",
+          cardTitle: "5 Tips to Manage Work Stress",
+          cardText: "Quick and actionable strategies to maintain balance during busy weeks."
         },
         {
-          cardImg: "https://via.placeholder.com/300x160.png?text=Card+3",
-          cardTitle: "Card title 3",
-          cardText: "This is a description for card 3."
+          cardImg: "https://placehold.co/300x160/95a5a6/333333?text=Coping+Skills",
+          cardTitle: "Beginner's Guide to Journaling",
+          cardText: "Learn how to structure your entries to maximize emotional clarity."
         },
         {
-          cardImg: "https://via.placeholder.com/300x160.png?text=Card+4",
-          cardTitle: "Card title 4",
-          cardText: "This is a description for card 4."
+          cardImg: "https://placehold.co/300x160/e74c3c/ffffff?text=Therapy+Intro",
+          cardTitle: "Understanding Teletherapy",
+          cardText: "Your questions answered about meeting with a mental health professional online."
         }
     ];
      
     return (
         <div className="my-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Popular Resources</h3>
-            <Swiper
-              modules={[Pagination]}
-              slidesPerView={1.1} 
-              spaceBetween={15}
-              grabCursor
-              pagination={{ clickable: true }}
-              style={{
-                '--swiper-pagination-color': '#008080',
-                '--swiper-pagination-bullet-inactive-color': '#333333',
-                '--swiper-pagination-bullet-inactive-opacity': '0.5',
-                '--swiper-pagination-bullet-size': '10px',
-              }}
-    
-              breakpoints={
-                  {
-                      768: {slidesPerView: 2, spaceBetween: 20},
-                      1020: {slidesPerView: 2, spaceBetween: 50},
-                  }
-    
-              }
-            
-            >
-            {contentData.map((data, index) => (
-              <SwiperSlide key={index}>
-                <div className="bg-white p-4 rounded-xl shadow-md">
-                    <div className="content-card">
-                        <div className="card-img-placeholder">
-                            <img src={data.cardImg} alt={data.cardTitle} />
+            <div className="flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-4 scrollbar-hide">
+                {contentData.map((data, index) => (
+                    <div 
+                        key={index} 
+                        className="flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[30%] snap-start bg-white p-4 rounded-xl shadow-md border border-gray-100 h-full hover:shadow-lg transition-shadow duration-200"
+                    >
+                        <div className="flex flex-col space-y-3 h-full">
+                            <div className="h-40 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                <img 
+                                    src={data.cardImg} 
+                                    alt={data.cardTitle} 
+                                    className="w-full h-full object-cover" 
+                                    onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/300x160/f0f0f0/333333?text=Content+Card"; }}
+                                />
+                            </div>
+                            <h2 className="text-lg font-semibold text-gray-800">{data.cardTitle}</h2>
+                            <p className="text-sm text-gray-600 line-clamp-2 flex-grow">{data.cardText}</p>
                         </div>
-                        <h2 className="text-gray-600">{data.cardTitle}</h2>
-                        <p className="text-gray-600">{data.cardText}</p>
                     </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-            
+                ))}
+            </div>
+            {/* Custom CSS to hide the scrollbar for aesthetic purposes */}
+            <style jsx="true">{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none; 
+                    scrollbar-width: none; 
+                }
+            `}</style>
         </div>
       );
 };
 
 
-
+/**
+ * Journal Entry quick button, styled with Teal.
+ */
 const JournalEntry = ({ onOpenJournalModal }) => (
-    <div className="bg-teal-100 p-6 rounded-2xl shadow-lg mb-8 flex items-center justify-between">
+    <div className="bg-teal-100 p-6 rounded-2xl shadow-lg mb-8 flex items-center justify-between border-l-4 border-teal-400">
         <div className="flex items-center gap-4">
             <FilePlus className="text-teal-700 w-6 h-6" />
             <p className="text-lg font-medium text-teal-800">How was your day?</p>
@@ -119,9 +151,8 @@ const JournalEntry = ({ onOpenJournalModal }) => (
     </div>
 );
 
-
 // ===================================================================
-// JOURNAL ENTRY MODAL
+// JOURNAL ENTRY MODAL (Teal Palette Applied)
 // ===================================================================
 
 const moodThoughts = [
@@ -164,8 +195,8 @@ const MoodThoughtSelector = ({ rating, selectedThought, onSelect }) => {
                     key={thought.name}
                     className={`cursor-pointer p-3 rounded-xl transition-all duration-200 text-sm font-medium shadow-sm border
                         ${selectedThought === thought.name 
-                            ? 'bg-teal-600 text-white border-teal-700' 
-                            : 'bg-gray-100 text-gray-800 hover:bg-teal-100 border-gray-200'
+                            ? 'bg-teal-600 text-white border-teal-700' // Teal for selection
+                            : 'bg-gray-100 text-gray-800 hover:bg-teal-100 border-gray-200' // Teal for hover
                         }`}
                     onClick={() => onSelect(thought.name)} 
                 >
@@ -307,7 +338,6 @@ const JournalEntryModal = ({ onClose, entry }) => {
                                         if (moodThought) {
                                             handleThoughtSelect(moodThought);
                                         } else {
-                                            // Fallback for safety if they skip selection (not ideal, but allows progress)
                                             handleThoughtSelect('Neutral'); 
                                         }
                                     }}
@@ -352,6 +382,64 @@ const JournalEntryModal = ({ onClose, entry }) => {
 
 
 // ====================================================================
+// EXPLORE TOPICS COMPONENT (Horizontally scrolling)
+// ====================================================================
+
+const TopicCard = ({ icon: Icon, title, description, color }) => (
+    <div 
+        // Added flex-shrink-0, specific width, and snap-start for horizontal scrolling
+        className={`bg-white p-4 rounded-xl shadow-md flex flex-col items-center text-center transition-all duration-200 
+                    border border-gray-100 cursor-pointer hover:shadow-lg hover:bg-${color}-50 flex-shrink-0 w-36 sm:w-40 snap-start`}
+    >
+        <div className={`p-3 rounded-full mb-3 bg-${color}-100 text-${color}-700`}>
+            <Icon size={24} />
+        </div>
+        <h4 className="font-semibold text-gray-800 text-base mb-1">{title}</h4>
+        <p className="text-xs text-gray-500 line-clamp-2">{description}</p>
+    </div>
+);
+
+const ExploreTopics = () => {
+    // Defined topics with new icons and descriptions
+    const topics = [
+        { icon: Zap, title: "Anxiety", description: "Strategies for managing worry and fear." },
+        { icon: CloudDrizzle, title: "Depression", description: "Finding support and boosting motivation." },
+        { icon: Activity, title: "Stress", description: "Techniques for instant relief and calm." },
+        { icon: Feather, title: "Mindfulness", description: "Guided practices for presence and focus." },
+        { icon: MoreHorizontal, title: "Other", description: "Explore all topics in our health library." },
+    ];
+    
+    return (
+        <section className="mt-8">
+            <h3 className='text-xl font-bold text-gray-800 mb-4'>Explore Mental Wellness Topics</h3>
+            {/* Horizontal scroll container */}
+            <div className="flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-4 scrollbar-hide">
+                {topics.map((topic, index) => (
+                    <TopicCard 
+                        key={index} 
+                        icon={topic.icon} 
+                        title={topic.title} 
+                        description={topic.description} 
+                        color="teal" 
+                    />
+                ))}
+            </div>
+            {/* Custom CSS to hide the scrollbar (defined globally but safe to re-include) */}
+            <style jsx="true">{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none; 
+                    scrollbar-width: none; 
+                }
+            `}</style>
+        </section>
+    );
+};
+
+
+// ====================================================================
 // CHART CONFIGURATION & HELPER FUNCTIONS
 // ====================================================================
 
@@ -373,7 +461,7 @@ const moodMap = {
     1: '😔', 4: '😐', 7: '🙂 ', 10: '😀 ',
 };
 
-// Color mapping for bars and metric card backgrounds
+// Color mapping for bars and metric card backgrounds (using colors from your snippet)
 const getMoodColor = (score) => {
     if (score >= 8) return '#047857';  // Emerald 700 (High)
     if (score >= 5) return '#fbbf24';  // Amber 400 (Mid)
@@ -394,7 +482,7 @@ const formatMoodTick = (tickValue) => {
 }
 
 // ====================================================================
-// MAIN DASHBOARD COMPONENT (Refactored with Tailwind)
+// MAIN DASHBOARD COMPONENT
 // ====================================================================
 
 const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, handleIconClick, showMainContent, showHeaderBar }) => {
@@ -426,18 +514,22 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                 ? 'http://localhost:3001'
                 : `http://${hostname}:3001`;
 
+            // Fetch user name and initials
             const nameResponse = await axios.get(`${baseURL}/api/my-initials`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setFullName(nameResponse.data.fullName || 'User');
+            setFullName(nameResponse.data.fullName || 'User'); // Set fullName state for greeting and Avatar component
 
+            // Fetch journal entries
             const entriesResponse = await axios.get(`${baseURL}/api/journal-entries`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
             const mappedEntries = entriesResponse.data.map(entry => ({
                 ...entry,
-                moodThought: entry.moodThought || 'Not Logged'
+                moodThought: entry.moodThought || 'Not Logged',
+                entryDate: entry.entryDate || entry.timestamp, 
+                moodRating: entry.moodRating || 5, // Default to 5 if missing
             }));
             
             setJournalEntries(mappedEntries); 
@@ -462,14 +554,15 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
         const aggregatedData = {};
         
         const sortedEntries = [...journalEntries].sort((a, b) => 
-            new Date(a.entryDate || a.timestamp) - new Date(b.entryDate || b.timestamp)
+            new Date(a.entryDate) - new Date(b.entryDate)
         );
 
         const latest = sortedEntries.length > 0 ? sortedEntries[sortedEntries.length - 1] : null;
         const previous = sortedEntries.length > 1 ? sortedEntries[sortedEntries.length - 2] : null;
 
+        // Group by date and calculate average mood for the chart
         sortedEntries.forEach(entry => {
-            const dateObj = new Date(entry.entryDate || entry.timestamp); 
+            const dateObj = new Date(entry.entryDate); 
             const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             
             if (!aggregatedData[formattedDate]) {
@@ -480,17 +573,28 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
             aggregatedData[formattedDate].count += 1;
         });
 
-        const finalChartData = Object.keys(aggregatedData).map(date => ({
+        // Convert aggregated data to chart format, only keeping the last 7 days
+        const allChartData = Object.keys(aggregatedData).map(date => ({
             date: date,
             mood: aggregatedData[date].sum / aggregatedData[date].count,
         }));
+        
+        const finalChartData = allChartData.slice(-7);
+
 
         return { previousRecord: previous, latestRecord: latest, chartData: finalChartData };
 
     }, [journalEntries]);
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-700 bg-gray-100 min-h-screen">Loading dashboard data...</div>;
+        // Return a cleaner loading state for the whole dashboard
+        return <div className="p-8 text-center text-gray-700 bg-gray-100 min-h-screen flex items-center justify-center">
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-teal-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading dashboard data...
+        </div>;
     }
 
     if (error) {
@@ -509,7 +613,6 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
     
     // Helper function to render the new metric cards
     const renderMetricCard = (title, icon, record) => (
-        // Mapped from .metric-card-container
         <div className="bg-white p-4 rounded-xl shadow-md border border-gray-200">
             <div className="flex items-center gap-2 mb-2 text-gray-800">
                 {icon}
@@ -520,13 +623,13 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                     <p className="text-3xl font-extrabold mb-1">{moodChartEmojis(record.moodRating)}</p>
                     <p 
                         className="text-sm font-medium text-white p-2 rounded-lg"
-                        // Keeping inline style here because color is determined dynamically by score
+                        // Color determined dynamically by score
                         style={{backgroundColor: getMoodColor(record.moodRating)}}
                     >
                         {record.moodThought || 'No Thought Logged'}
                     </p>
                     <p className="text-xs text-gray-500 mt-2">
-                        on {new Date(record.entryDate || record.timestamp).toLocaleDateString()}
+                        on {new Date(record.entryDate).toLocaleDateString()}
                     </p>
                 </>
             ) : (
@@ -538,25 +641,25 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
     // --- Render ---
 
     return (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-100">
             
-            {/* Sidebar (Desktop) */}
-            <header className="hidden md:flex flex-col w-64 bg-teal-700 shadow-xl p-6 z-20">
+            {/* Sidebar (Desktop) - Teal Primary Color */}
+            <header className="fixed left-0 bottom-0 top-0 hidden md:flex flex-col w-64 bg-teal-700 shadow-xl p-6 z-20">
                 <h1 className="text-2xl font-extrabold text-white mb-8 text-left">BetterMind ZM</h1>
                 <nav className="flex-grow">
                     <ul className="flex flex-col gap-4">
-                        {/* Sidebar Link Mapping */}
+                        {/* Sidebar Link Mapping - Uses Teal for hover/active */}
                         {['dashboard', 'journey', 'resources', 'teletherapy', 'forum', 'profile'].map(item => (
                             <li key={item} onClick={() => handleSideBarClick(item)}>
                                 <p className={`flex items-center p-3 rounded-xl font-semibold transition-all duration-200 cursor-pointer gap-2 
                                     ${activeSideBar === item ? 'bg-teal-800 text-white shadow-inner' : 'text-white hover:bg-teal-600'}`}>
                                     {item === 'dashboard' && <Home size={18}/>}
                                     {item === 'journey' && <FilePlus size={18} />}
-                                    {item === 'resources' && <Video size={18}/>}
+                                    {item === 'resources' && <Zap size={18}/>}
                                     {item === 'teletherapy' && <Video size={18}/>}
                                     {item === 'forum' && <MessageCircle size={18} />}
                                     {item === 'profile' && <User size={18} />}
-                                    {item.charAt(0).toUpperCase() + item.slice(1).replace('teletherapy', 'My Therapist')}
+                                    {item === 'teletherapy' ? 'My Therapist' : item.charAt(0).toUpperCase() + item.slice(1)}
                                 </p>
                             </li>
                         ))}
@@ -573,21 +676,22 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
             </header>
 
             {/* Main Content Area */}
-            <main className="flex-1 overflow-y-auto">
+            <main className="flex-1 md:ml-64 overflow-y-auto pb-20 md:pb-0">
                 {showHeaderBar &&
                     <header className="flex items-center justify-between p-4 bg-white rounded-b-lg shadow-sm sticky top-0 z-10 mb-6">
-                    <UserAvatar />
+                    {/* Updated UserAvatar to use state passed as props */}
+                    <UserAvatar fullName={fullName} loading={loading} error={error} />
                     <div className="flex items-center gap-4">
                         <Bell className="w-6 h-6 text-gray-700 cursor-pointer hover:text-teal-600" />
                         <div className="md:hidden">
-                            <User className="w-6 h-6 text-gray-700 cursor-pointer hover:text-teal-600" />
+                            <User className="w-6 h-6 text-gray-700 cursor-pointer hover:text-teal-600" onClick={() => handleIconClick('profile')} />
                         </div>
                     </div>
                 </header>
                 }
                 
                 {(activeIcon === 'profile' || activeSideBar === 'profile') ? (
-                    <UserProfile showMainContent={showMainContent} journalEntries={journalEntries} />
+                    <UserProfile journalEntries={journalEntries} />
                 ) : (
                     showMainContent && 
                     <div className="p-4 md:p-6">
@@ -599,13 +703,13 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                                {/* Daily Tip Card */}
+                                {/* Daily Tip Card - Teal Border */}
                                 <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] border-t-4 border-teal-600 lg:col-span-1">
                                     <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left">Daily Tip</h3>
                                     <p className="text-sm text-gray-500">Mindfulness can reduce stress. Try a 5-minute breathing exercise today.</p>
                                 </div>
                                 
-                                {/* Goals Card */}
+                                {/* Goals Card - Teal Border and Gradient */}
                                 <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] border-t-4 border-teal-600 lg:col-span-2">
                                     <h3 className="flex justify-between items-center text-lg font-semibold text-gray-800 mb-4">
                                         My Goals
@@ -632,9 +736,10 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                                 </div>
                             </div>
                         </section>
+                        
                         <PopularContent />
                         
-                        {/* Log Journal Entry Section */}
+                        {/* Log Journal Entry Section - Teal styling */}
                         <JournalEntry onOpenJournalModal={openJournalModal} />
                         
                         {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry} />}
@@ -697,67 +802,60 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                             </div>
                         </div>
                         
-                        {/* Recommended Section */}
+                        {/* Recommended Section - Teal styling */}
                         <section className="mt-8">
                             <h3 className='text-xl font-bold text-gray-800 mb-4'>Recommended for You</h3>
                             <div className="bg-white p-4 rounded-xl shadow-lg flex flex-col md:flex-row items-center gap-4">
-                                <div className="flex-1 text-left">
-                                    <h4 className="text-lg font-semibold text-gray-800 mb-1">5 Tips to Boost Your Mental Health</h4>
-                                    <p className="text-sm text-gray-600">Discover simple strategies to enhance your well-being and cultivate a positive mindset.</p>
+                                {/* Recommendation Card 1: Breathing */}
+                                <div className="flex items-center p-4 bg-teal-50 rounded-lg w-full md:w-1/2 border border-teal-200 transition-shadow hover:shadow-md">
+                                    <Zap className="w-8 h-8 text-teal-700 mr-4 flex-shrink-0" />
+                                    <div>
+                                        <p className="font-semibold text-gray-800">Quick 3-Minute Reset</p>
+                                        <p className="text-sm text-gray-600">A guided box breathing exercise to instantly lower anxiety.</p>
+                                    </div>
                                 </div>
-                                <div className="md:w-32 md:h-20 w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-                                    {/* Placeholder for recommended image */}
-                                    <span className='text-gray-500 text-xs'>Image Placeholder</span>
+                                {/* Recommendation Card 2: Hydration */}
+                                <div className="flex items-center p-4 bg-teal-50 rounded-lg w-full md:w-1/2 border border-teal-200 transition-shadow hover:shadow-md">
+                                    <Droplet className="w-8 h-8 text-teal-700 mr-4 flex-shrink-0" />
+                                    <div>
+                                        <p className="font-semibold text-gray-800">Hydration Check</p>
+                                        <p className="text-sm text-gray-600">Reminder: Have you had enough water today? Physical health impacts mental health!</p>
+                                    </div>
                                 </div>
                             </div>
                         </section>
+                        
+                        {/* UPDATED: Explore Topics Section (Horizontal Scroll) */}
+                        <ExploreTopics />
 
-                        {/* Explore Topics Section */}
-                        <section className="mt-8 mb-20">
-                            <h3 className='text-xl font-bold text-gray-800 mb-4'>Explore By Topic</h3> 
-                            <div className="flex flex-wrap gap-3">
-                                <div className="flex items-center gap-2 bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-teal-200 transition">
-                                    <Zap size={16} /> Anxiety
-                                </div>
-                                <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-200 transition">
-                                    <Droplet size={16} /> Depression
-                                </div>
-                                <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-yellow-200 transition">
-                                    <AlertTriangle size={16} /> Stress
-                                </div>
-                                <div className="flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-purple-200 transition">
-                                    <Brain size={16} /> Mindfulness
-                                </div>
-                                <div className='flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition'>
-                                    <MoreHorizontal size={16} /> Other
-                                </div>
-                            </div>
-                        </section>
+
                     </div>
                 )}
-                
-
-                {/* Mobile footer navigation (MAPPED TO TAILWIND) */}
-                <header className="md:hidden fixed bottom-0 left-0 right-0 z-10 bg-teal-700 rounded-t-xl shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
-                    <nav>
-                        <ul className="flex justify-around items-center p-2">
-                            {['dashboard', 'journal', 'explore', 'teletherapy', 'forum', 'profile'].map(icon => (
-                                <li key={icon} onClick={() => handleIconClick(icon)} className="p-2">
-                                    <p className={`flex flex-col items-center text-xs transition-colors duration-200 ${activeIcon === icon ? 'text-white font-bold' : 'text-teal-200 hover:text-white'}`}>
-                                        {icon === 'dashboard' && <Home className="w-6 h-6" />}
-                                        {icon === 'journal' && <FilePlus className="w-6 h-6" />}
-                                        {icon === 'explore' && <LampDesk className="w-6 h-6" />}
-                                        {icon === 'teletherapy' && <Video className="w-6 h-6" />}
-                                        {icon === 'forum' && <MessageCircle className="w-6 h-6" />}
-                                        {icon === 'profile' && <User className="w-6 h-6" />}
-                                        <span className="mt-1">{icon.charAt(0).toUpperCase() + icon.slice(1)}</span>
-                                    </p>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-                </header>
             </main>
+            
+            {/* Mobile Fixed Bottom Navigation (Teal styling) */}
+            <footer className='fixed bottom-0 left-0 w-full md:hidden bg-white border-t border-gray-200 shadow-2xl z-40'>
+                <nav className='flex justify-around items-center h-16'>
+                    {[
+                        { name: 'dashboard', label: 'Home', icon: Home },
+                        { name: 'journey', label: 'Journal', icon: FilePlus },
+                        { name: 'teletherapy', label: 'Therapy', icon: Video },
+                        { name: 'forum', label: 'Forum', icon: MessageCircle },
+                        { name: 'profile', label: 'Profile', icon: User },
+                    ].map((item) => (
+                        <div
+                            key={item.name} 
+                            onClick={() => handleIconClick(item.name)} 
+                            className={`flex flex-col items-center justify-center p-1 text-xs font-medium transition-colors cursor-pointer 
+                                ${activeIcon === item.name ? 'text-teal-700' : 'text-gray-500 hover:text-teal-600'}`
+                            }
+                        >
+                            <item.icon size={20} className='mb-0.5' />
+                            {item.label}
+                        </div>
+                    ))}
+                </nav>
+            </footer>
         </div>
     );
 };

@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
-  Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles, Route, Activity, ChevronLeft 
+  Cog, CheckCircle, FileCheck, ClipboardCheck, ArrowRight, FilePlus, Sparkles, Route, Activity, ChevronLeft, Brain, 
+  ChevronRight
 } from 'lucide-react';
 import UserSettings from './UserSettings';
-
+import api from '../api/axios.js';
+import { useNavigate } from 'react-router-dom';
 // --- HELPER FUNCTIONS ---
 
 /**
@@ -108,8 +110,10 @@ const getMoodEmoji = (rating) => {
 
 // --- USER PROFILE COMPONENT ---
 
-function UserProfile({ journalEntries = [], onLogout, onOpenJournalModal }) {
+function UserProfile({ journalEntries = [], onOpenJournalModal }) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const navigate = useNavigate();
 
   // Derived state calculations are memoized for performance
   const currentStreak = useMemo(() => calculateCurrentStreak(journalEntries), [journalEntries]);
@@ -133,9 +137,30 @@ function UserProfile({ journalEntries = [], onLogout, onOpenJournalModal }) {
   const handleShowSettings = () => setShowSettings(true);
   const handleHideSettings = () => setShowSettings(false);
 
+  // handle logout
+  const handleLogout = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        await api.post('/auth/logout', null, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (error) {
+        // Log failure but proceed with client-side cleanup
+        console.error("Logout failed:", error);
+      }
+    }
+    // Clear token and state regardless of API response
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
+  const onLogout = useCallback(handleLogout, []);
+
   // If settings are toggled, render the UserSettings component
   if (showSettings) {
-    return <UserSettings onBack={handleHideSettings} onLogout={onLogout} />;
+    return <UserSettings onBack={handleHideSettings} onLogout={onLogout} showSettings={setShowSettings}/>;
   }
 
   // Use 'animate-in' classes for a smooth slide-in effect
@@ -259,6 +284,14 @@ function UserProfile({ journalEntries = [], onLogout, onOpenJournalModal }) {
               <FilePlus size={18} /> Add New Entry
             </button>
           </div>
+        </section>
+
+        <section className=''>
+            <button className='relative flex jusitify-between items-center p-4 bg-teal-50 rounded-lg w-full md:w-1/2 border border-teal-200 transition-shadow hover:shadow-md'>
+              <Brain className='flex-none w-8 h-8 text-teal-700 mr-4 flex-shrink-0' />
+              <p className='flex-1 text-start font-semibold text-gray-800'>My Journey</p>
+              <ArrowRight className='absolute right-0 flex-1 items-center w-6 h-6 text-teal-700 mr-4 flex-shrink-0'/>
+            </button>
         </section>
       </div>
     </div>

@@ -4,7 +4,7 @@
 import { Mail, Facebook, MessageCircle } from 'lucide-react'; 
 // Tailwind CSS replaces the need for './Footer.css'
 // import './Footer.css'; 
-import greenTealIcon from './assets/emoji-icon.png'; 
+import greenTealIcon from './assets/emoji.png'; 
 
 const Footer = () => {
   return (
@@ -12,7 +12,7 @@ const Footer = () => {
     <footer className="bg-[#f4f5f6] text-[#333333] pt-10 pb-4">
       
       {/* Footer Content Wrapper: Centered, responsive layout (stacked on mobile, row on desktop) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center md:items-start space-y-8 md:space-y-0">
+      <div className="max-w-7xl mx-4 px-4 sm:px-4 lg:px-8 flex flex-col md:flex-row justify-between items-start md:items-start space-y-8 md:space-y-0">
         
         {/* Footer Logo Container */}
         <div className="flex items-center space-x-3">

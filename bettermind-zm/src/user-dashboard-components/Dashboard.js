@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Bell, User, Home, FilePlus, Video,
   MessageCircle, Plus, ChartBar,
-  XIcon, Zap, Droplet, Clock, Heart, Brain, MoreHorizontal,
-  Activity, CloudDrizzle, Feather 
+  XIcon, Zap, Droplet, Clock, Heart, MoreHorizontal,
+  Activity, CloudDrizzle, Feather
 } from 'lucide-react';
 import {
   BarChart,
@@ -19,6 +19,8 @@ import {
 } from 'recharts';
 
 import UserProfile from './UserProfile';
+import Resources from './Resources'; // Ensure this is imported
+
 // ====================================================================
 // UPDATED: UserAvatar Component (Integrated and optimized to use parent state)
 // ====================================================================
@@ -136,17 +138,16 @@ const PopularContent = () => {
  * Journal Entry quick button, styled with Teal.
  */
 const JournalEntry = ({ onOpenJournalModal }) => (
-    <div className="bg-teal-100 p-6 rounded-2xl shadow-lg mb-8 flex items-center justify-between border-l-4 border-teal-400">
-        <div className="flex items-center gap-4">
+    <div className="bg-teal-100 p-6 rounded-2xl shadow-lg mb-8 flex items-center justify-between ">
+        <div className="flex text-start gap-4">
             <FilePlus className="text-teal-700 w-6 h-6" />
             <p className="text-lg font-medium text-teal-800">How was your day?</p>
         </div>
         <button
             onClick={onOpenJournalModal}
-            className="bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-xl shadow-md transition duration-200 flex items-center gap-1"
+            className="bg-teal-700 hover:bg-teal-800 text-white font-bold py-2 px-3 rounded-xl shadow-md transition duration-200 flex items-center gap-1"
         >
             <Plus size={18} />
-            Log Entry
         </button>
     </div>
 );
@@ -215,6 +216,7 @@ const JournalEntryModal = ({ onClose, entry }) => {
     const [showJournalText, setShowJournalText] = useState(entry?.journalText || false);
     const [guidedQuestion, setGuidedQuestion] = useState(entry?.moodRating ? getMoodQuestion(entry.moodRating) : '');
     const [journalText, setJournalText] = useState(entry?.journalText || '');
+    
     const [isSaving, setIsSaving] = useState(false); 
 
     function getMoodQuestion(rating) {
@@ -486,12 +488,13 @@ const formatMoodTick = (tickValue) => {
 // ====================================================================
 
 const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, handleIconClick, showMainContent, showHeaderBar }) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isJournalModalOpen, setJournalModalOpen] = useState(false);
+    // Removed old showOtherContent state and logic
     
     const [journalEntries, setJournalEntries] = useState([]); 
     
@@ -545,7 +548,9 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
     }, [onLogout]);
 
     useEffect(() => {
-        if (activeIcon === 'dashboard' || activeSideBar === 'dashboard') {
+        // Only fetch data if we are on the 'dashboard' view
+        const currentView = activeSideBar || activeIcon;
+        if (currentView === 'dashboard') {
             fetchData();
         }
     }, [activeIcon, activeSideBar, fetchData]); 
@@ -638,6 +643,106 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
         </div>
     );
     
+    // === NEW LOGIC: CONDITIONAL CONTENT RENDERER ===
+    const renderActiveContent = () => {
+        // Determine the current active view, prioritizing sidebar (desktop)
+        const activeView = activeSideBar || activeIcon; 
+
+        if (activeView === 'profile') {
+            return <UserProfile journalEntries={journalEntries} onLogout={onLogout} />;
+        }
+
+        if (activeView === 'resources') {
+            // Renders the Resources component when 'resources' is active
+            return <Resources />;
+        }
+
+        // Default or 'dashboard' view content
+        return (
+            <div className="p-4 md:p-6">
+                {/* Welcome and Goals Section */}
+                <section className="mb-6">
+                    <div className="mb-8 text-left">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome back {fullName}</h2>
+                        <p className="text-gray-600">Let's make today a great day.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        {/* Daily Tip Card - Teal Border */}
+                        <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] lg:col-span-1">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left">Daily Tip</h3>
+                            <p className="text-sm text-gray-500 text-start">Mindfulness can reduce stress. Try a 5-minute breathing exercise today.</p>
+                        </div>
+                        
+                        {/* Goals Card - Teal Border and Gradient (Content moved from below) */}
+                        <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] lg:col-span-2">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left flex items-center gap-2">
+                                <Droplet size={20} className="text-teal-600" />
+                                Wellness Goals
+                            </h3>
+                            <ul className="space-y-3">
+                                {goals.map(goal => (
+                                    <li key={goal.id} className="text-left">
+                                        <p className="text-sm font-medium text-gray-700">{goal.title}</p>
+                                        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                                            <div 
+                                                className="h-2.5 rounded-full bg-teal-500 transition-all duration-500" 
+                                                style={{ width: `${(goal.current / goal.total) * 100}%` }}
+                                                aria-valuenow={goal.current} 
+                                                aria-valuemax={goal.total}
+                                            ></div>
+                                        </div>
+                                        <span className="text-xs text-gray-500">{goal.current} / {goal.total} completed</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+                <JournalEntry onOpenJournalModal={openJournalModal} />
+
+                {/* Metric Cards (Latest Mood, Previous Mood) */}
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8'>
+                    {renderMetricCard('Latest Mood', <Heart size={18} className="text-teal-600" />, latestRecord)}
+                    {renderMetricCard('Previous Mood', <Clock size={18} className="text-gray-600" />, previousRecord)}
+                    {/* Empty column for alignment with the 3-column layout */}
+                    <div className="hidden lg:block"></div> 
+                </div>
+
+                {/* Mood Trend Chart */}
+                <section className="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 text-left">Mood Trend (Last 7 Days)</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                            <XAxis dataKey="date" stroke="#6b7280" style={{ fontSize: '12px' }} />
+                            <YAxis 
+                                domain={[1, 10]} 
+                                ticks={[1, 4, 7, 10]} 
+                                tickFormatter={formatMoodTick}
+                                stroke="#6b7280"
+                                style={{ fontSize: '14px' }}
+                            />
+                            <Tooltip content={<CustomTooltip />} />
+                            <Bar dataKey="mood" radius={[4, 4, 0, 0]}>
+                                {chartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={getMoodColor(entry.mood)} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </section>
+                
+                <PopularContent />
+                <ExploreTopics />
+
+                {/* Journal Modal */}
+                {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry}/>}
+            </div>
+        );
+    };
+    
     // --- Render ---
 
     return (
@@ -648,13 +753,12 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                 <h1 className="text-2xl font-extrabold text-white mb-8 text-left">BetterMind ZM</h1>
                 <nav className="flex-grow">
                     <ul className="flex flex-col gap-4">
-                        {/* Sidebar Link Mapping - Uses Teal for hover/active */}
-                        {['dashboard', 'journey', 'resources', 'teletherapy', 'forum', 'profile'].map(item => (
+                        {/* Sidebar Link Mapping - Now correctly uses handleSideBarClick */}
+                        {['dashboard', 'resources', 'teletherapy', 'forum', 'profile'].map(item => (
                             <li key={item} onClick={() => handleSideBarClick(item)}>
                                 <p className={`flex items-center p-3 rounded-xl font-semibold transition-all duration-200 cursor-pointer gap-2 
                                     ${activeSideBar === item ? 'bg-teal-800 text-white shadow-inner' : 'text-white hover:bg-teal-600'}`}>
                                     {item === 'dashboard' && <Home size={18}/>}
-                                    {item === 'journey' && <FilePlus size={18} />}
                                     {item === 'resources' && <Zap size={18}/>}
                                     {item === 'teletherapy' && <Video size={18}/>}
                                     {item === 'forum' && <MessageCircle size={18} />}
@@ -683,162 +787,25 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                     <UserAvatar fullName={fullName} loading={loading} error={error} />
                     <div className="flex items-center gap-4">
                         <Bell className="w-6 h-6 text-gray-700 cursor-pointer hover:text-teal-600" />
-                        <div className="md:hidden">
-                            <User className="w-6 h-6 text-gray-700 cursor-pointer hover:text-teal-600" onClick={() => handleIconClick('profile')} />
-                        </div>
                     </div>
                 </header>
                 }
                 
-                {(activeIcon === 'profile' || activeSideBar === 'profile') ? (
-                    <UserProfile journalEntries={journalEntries} />
-                ) : (
-                    showMainContent && 
-                    <div className="p-4 md:p-6">
-                        {/* Welcome and Goals Section */}
-                        <section className="mb-6">
-                            <div className="mb-8 text-left">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome back {fullName}</h2>
-                                <p className="text-gray-600">Let's make today a great day.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                                {/* Daily Tip Card - Teal Border */}
-                                <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] border-t-4 border-teal-600 lg:col-span-1">
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left">Daily Tip</h3>
-                                    <p className="text-sm text-gray-500">Mindfulness can reduce stress. Try a 5-minute breathing exercise today.</p>
-                                </div>
-                                
-                                {/* Goals Card - Teal Border and Gradient */}
-                                <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] border-t-4 border-teal-600 lg:col-span-2">
-                                    <h3 className="flex justify-between items-center text-lg font-semibold text-gray-800 mb-4">
-                                        My Goals
-                                        <button className="bg-teal-600 hover:bg-teal-700 text-white p-2 rounded-full shadow-md transition duration-200">
-                                            <Plus className="w-4 h-4"/>
-                                        </button>
-                                    </h3>
-                                    <div className="flex flex-col gap-4">
-                                        {goals.map(goal => (
-                                            <div key={goal.id} className="flex flex-col">
-                                                <p className="font-medium text-gray-800 text-left">{goal.title}</p>
-                                                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                                                    <div 
-                                                        className="h-2.5 rounded-full bg-gradient-to-r from-teal-300 to-teal-600 transition-all duration-500" 
-                                                        style={{ width: `${(goal.current / goal.total) * 100}%` }}
-                                                    ></div>
-                                                </div>
-                                                <div className="text-right text-xs text-gray-700 mt-1">
-                                                    {goal.current}/{goal.total} completed
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                        
-                        <PopularContent />
-                        
-                        {/* Log Journal Entry Section - Teal styling */}
-                        <JournalEntry onOpenJournalModal={openJournalModal} />
-                        
-                        {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry} />}
-
-                        {/* Your Journey Graph Section (7-Day View) */}
-                        <div className="bg-white p-6 shadow-lg rounded-xl mt-8">
-                            <div className='flex items-center gap-3 text-teal-700 mb-4'>
-                                <ChartBar className='w-6 h-6'/>
-                                <h3 className="text-xl font-bold">Your Journey Snapshot</h3> 
-                            </div>
-                            
-                            {/* NEW METRICS SECTION */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 mb-8">
-                                {renderMetricCard(
-                                    "Previous Record", 
-                                    <Clock className='w-5 h-5 text-gray-500' />, 
-                                    previousRecord
-                                )}
-                                {renderMetricCard(
-                                    "Latest Record", 
-                                    <Heart className='w-5 h-5 text-red-500' />, 
-                                    latestRecord
-                                )}
-                            </div>
-
-                            {/* CHART RENDERING */}
-                            <div className="chart-section p-4">
-                                <h2 className="text-lg font-semibold mb-4 text-gray-700">Mood Trend (Last 7 Days)</h2>
-                                {journalEntries.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <BarChart
-                                            data={chartData}
-                                            margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                            
-                                            <XAxis dataKey="date" stroke="#374151" className="text-xs" />
-                                            <YAxis domain={[1, 10]}
-                                                    ticks={[1,4,7,10]} 
-                                                    tickFormatter={formatMoodTick} 
-                                                    width={40}
-                                                    stroke="#374151"
-                                                    className="text-sm"
-                                            />
-                                            <Tooltip content={<CustomTooltip />} />
-
-                                            <Bar dataKey="mood" barSize={30} radius={[5, 5, 0, 0]}> 
-                                                {
-                                                    chartData.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`}
-                                                        fill={getMoodColor(entry.mood)} />
-                                                    )) 
-                                                }
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                ) : ( 
-                                    <p className="text-gray-500 p-8 text-center">Log your first entry to start your journey graph!</p>
-                                )}
-                            </div>
-                        </div>
-                        
-                        {/* Recommended Section - Teal styling */}
-                        <section className="mt-8">
-                            <h3 className='text-xl font-bold text-gray-800 mb-4'>Recommended for You</h3>
-                            <div className="bg-white p-4 rounded-xl shadow-lg flex flex-col md:flex-row items-center gap-4">
-                                {/* Recommendation Card 1: Breathing */}
-                                <div className="flex items-center p-4 bg-teal-50 rounded-lg w-full md:w-1/2 border border-teal-200 transition-shadow hover:shadow-md">
-                                    <Zap className="w-8 h-8 text-teal-700 mr-4 flex-shrink-0" />
-                                    <div>
-                                        <p className="font-semibold text-gray-800">Quick 3-Minute Reset</p>
-                                        <p className="text-sm text-gray-600">A guided box breathing exercise to instantly lower anxiety.</p>
-                                    </div>
-                                </div>
-                                {/* Recommendation Card 2: Hydration */}
-                                <div className="flex items-center p-4 bg-teal-50 rounded-lg w-full md:w-1/2 border border-teal-200 transition-shadow hover:shadow-md">
-                                    <Droplet className="w-8 h-8 text-teal-700 mr-4 flex-shrink-0" />
-                                    <div>
-                                        <p className="font-semibold text-gray-800">Hydration Check</p>
-                                        <p className="text-sm text-gray-600">Reminder: Have you had enough water today? Physical health impacts mental health!</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                        
-                        {/* UPDATED: Explore Topics Section (Horizontal Scroll) */}
-                        <ExploreTopics />
+                {/* Conditional rendering based on active view state */}
+                {renderActiveContent()}
+                
+                {/* Journal Modal needs to stay here to overlay all content */}
+                {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry}/>}
 
 
-                    </div>
-                )}
             </main>
             
-            {/* Mobile Fixed Bottom Navigation (Teal styling) */}
-            <footer className='fixed bottom-0 left-0 w-full md:hidden bg-white border-t border-gray-200 shadow-2xl z-40'>
+            {/* Sticky Footer Bar (Mobile) - Uses activeIcon and handleIconClick */}
+           <footer className='fixed bottom-0 left-0 w-full md:hidden bg-white border-t border-gray-200 shadow-2xl z-40'>
                 <nav className='flex justify-around items-center h-16'>
                     {[
                         { name: 'dashboard', label: 'Home', icon: Home },
-                        { name: 'journey', label: 'Journal', icon: FilePlus },
+                        { name: 'resources', label: 'Resources', icon: Zap },
                         { name: 'teletherapy', label: 'Therapy', icon: Video },
                         { name: 'forum', label: 'Forum', icon: MessageCircle },
                         { name: 'profile', label: 'Profile', icon: User },
@@ -847,7 +814,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                             key={item.name} 
                             onClick={() => handleIconClick(item.name)} 
                             className={`flex flex-col items-center justify-center p-1 text-xs font-medium transition-colors cursor-pointer 
-                                ${activeIcon === item.name ? 'text-teal-700' : 'text-gray-500 hover:text-teal-600'}`
+                                ${activeIcon === item.name ? 'text-teal-700 font-black' : 'text-gray-500 hover:text-teal-600'}`
                             }
                         >
                             <item.icon size={20} className='mb-0.5' />
@@ -858,6 +825,6 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
             </footer>
         </div>
     );
-};
+}
 
 export default Dashboard;

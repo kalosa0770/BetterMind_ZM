@@ -108,7 +108,7 @@ const SignUpForm = ({ signUpOpen, signUpClose, onLoginClick }) => {
   // Tailwind Modal structure
   return (
     // Modal Container: fixed, full screen, overlay
-    <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm'>
+    <div className='fixed inset-0 z-50 flex items-center text-start justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm'>
       
       {/* Sign Up Form Card: bg-white, rounded corners, max width */}
       <div className='bg-[#f4f5f6] text-[#333333] rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto transform transition-all duration-300 relative'>

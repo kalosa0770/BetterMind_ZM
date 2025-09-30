@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, User, CreditCard, LogOut, Lock, CircleHelp, Info, Link, Bell, Settings } from 'lucide-react';
+import { ArrowLeft, User, CreditCard, LogOut, Lock, CircleHelp, Info, Link, Bell } from 'lucide-react';
 
 // --- Local Components ---
 
@@ -27,16 +27,15 @@ const SettingsListItem = ({ icon, label, onClick, isDestructive = false }) => {
  * Custom styled header component for sections.
  */
 const SectionHeader = ({ title }) => (
-    <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 ml-4">
+    <h3 className=" text-start text-xs font-bold uppercase tracking-widest text-gray-500 mb-4 ml-4">
         {title}
     </h3>
 );
 
 // --- Main Application Component (Must be named App) ---
 
-const UserSettings = () => {
-  // State to manage the view: true for settings, false for dashboard
-  const [showSettings, setShowSettings] = useState(false);
+const UserSettings = ({onLogout, showSettings}) => {
+  
   
   // Mock User State
   const user = {
@@ -46,15 +45,9 @@ const UserSettings = () => {
 
   // --- Utility Functions ---
 
-  const handleLogout = () => {
-    // Note: Using alert() instead of window.location.href for safe iframe execution.
-    console.log("Logging out user...");
-    setShowSettings(false); 
-    alert('Logged out successfully (Simulated)'); 
-  };
   
   const handleBack = () => {
-    setShowSettings(true); // Go back to the dashboard view
+    showSettings(); // Go back to the dashboard view
   };
   
   // --- Navigation Data Configuration ---
@@ -75,10 +68,10 @@ const UserSettings = () => {
 
   // User Settings View
   return (
-    <div className="relative flex flex-col w-full vh-100 bg-gray-50 font-sans shadow-2xl">
+    <div className="flex flex-col w-full vh-100 bg-gray-50 font-sans shadow-2xl">
       
       {/* Header (Sticky top for navigation with White background) */}
-      <div className="fixed top-0 left-0 right-0 flex items-center justify-start p-4 bg-white shadow-md z-10 border-b border-gray-200">
+      <div className="sticky top-0 flex items-center justify-between p-4 bg-white shadow-md z-10 border-b border-gray-200">
         <ArrowLeft 
           size={25} 
           // Teal accent color for the back button
@@ -134,7 +127,7 @@ const UserSettings = () => {
                     <SettingsListItem 
                         icon={<LogOut size={20} />} 
                         label="Log Out" 
-                        onClick={handleLogout}
+                        onClick={onLogout}
                         isDestructive={true}
                     />
                 </ul>

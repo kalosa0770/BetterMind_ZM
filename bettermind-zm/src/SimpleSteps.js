@@ -17,8 +17,8 @@ function SimpleSteps() {
     {
       number: '02',
       title: 'Connect',
-      description: 'Connect with a professional and get personalized support.',
-      buttonText: 'Find a Therapist',
+      description: 'Connect with wellness tools to get personalized support.',
+      buttonText: 'Explore Resources',
       buttonIcon: <Search size={18} />,
       // Using Function Color 2 (#c28257)
       buttonClass: 'bg-[#c28257] hover:bg-orange-700/90', 
@@ -27,7 +27,7 @@ function SimpleSteps() {
       number: '03',
       title: 'Thrive',
       description: 'Journey through a path of mental well-being',
-      buttonText: 'Explore Resources',
+      buttonText: 'Start Journey',
       buttonIcon: <BookOpen size={18} />,
       // Using Primary Action color (#008080)
       buttonClass: 'bg-[#008080] hover:bg-[#008080]/90', 
@@ -56,12 +56,11 @@ function SimpleSteps() {
                 bg-[#9bb8a1]
                 rounded-2xl shadow-xl transition-all duration-300 
                 hover:shadow-2xl hover:scale-[1.02] 
-                /* Border uses Primary Action color */
-                border-t-8 border-[#008080]
+                relative
               '
             >
               {/* Step Number: Uses Primary Action color with reduced opacity */}
-              <p className='text-5xl font-extrabold text-[#008080] opacity-50 mb-4'>{step.number}</p>
+              <p className='text-4xl font-extrabold text-[#ffffff] mb-4 absolute top-2 left-2 p-3'>{step.number}</p>
               
               {/* Title: Uses Primary Text color */}
               <h3 className='text-2xl font-bold text-[#333333] mb-2'>

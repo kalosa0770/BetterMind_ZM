@@ -63,6 +63,7 @@ function App () {
   const [activeSideBar, setActiveSideBar] = useState('dashboard');
   const [showMainContent, setShowMainContent] = useState(true);
   const [showHeaderBar, setShowHeaderBar] = useState(true);
+  
   const navigate = useNavigate();
 
   // Fetch CSRF token on app load
@@ -142,7 +143,12 @@ function App () {
       if (iconName === 'profile') {
         setShowMainContent(false);
         setShowHeaderBar(false);
-      } else {
+      } else if (iconName === 'resources') {
+        setShowMainContent(false);
+        setShowHeaderBar(false);
+      }
+      
+      else {
         setShowMainContent(true);
         setShowHeaderBar(true);
       }
@@ -154,13 +160,17 @@ function App () {
     if (sidebarName === 'profile') {
       setShowMainContent(false);
       setShowHeaderBar(false);
+    } else if (sidebarName === 'resources') {
+      setShowMainContent(false);
+      setShowHeaderBar(false);
     } else {
       setShowMainContent(true);
       setShowHeaderBar(true);
     }
   };
 
-
+  
+  
   return (
     <div className="App bg-gray-50 font-sans">
       <Routes>

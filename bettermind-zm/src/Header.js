@@ -67,10 +67,10 @@ function Header({ openLoginModal, openSignupForm }) {
                 </div>
 
                 {/* Mobile Logo Only (Visible below lg, fixed nav is separate) */}
-                <div className='flex lg:hidden justify-center items-center w-full py-3 px-4'>
-                    <div className="flex items-center space-x-2">
+                <div className='flex lg:hidden justify-betweenitems-center w-full py-5 px-4'>
+                    <div className="flex justify-between space-x-4">
                         <Brain size={28} className="text-[#008080]" />
-                        <h1 className='text-lg font-extrabold text-[#333333] tracking-tight'>
+                        <h1 className='text-lg font-extrabold text-[#333333] tracking-tight text-end'>
                             BetterMind Zm
                         </h1>
                     </div>
@@ -119,7 +119,7 @@ function Header({ openLoginModal, openSignupForm }) {
                 </nav>
             </div>
             {/* Added padding to the body for mobile to prevent content from hiding behind the fixed nav */}
-            <div className='lg:hidden' style={{ paddingBottom: '4rem' }}></div>
+            <div className='lg:hidden' style={{ paddingBottom: '0px' }}></div>
         </>
     );
 }

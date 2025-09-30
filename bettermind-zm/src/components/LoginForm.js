@@ -21,9 +21,16 @@ function LoginForm({ isOpen, onClose, onForgotPasswordClick, onSignupClick, onLo
         setMessage('');
         setIsSuccess(false);
 
+         const hostname = window.location.hostname;
+        const baseURL = (hostname === 'localhost' || hostname === '127.0.0.1')
+        ? 'http://localhost:3001'
+        : `http://${hostname}:3001`;
+
+        const loginURL = `${baseURL}/api/auth/login`;
+
         try {
             // Using a relative path or defining base URL outside of localhost check for generality
-            const response = await axios.post('http://localhost:3001/api/auth/login', {
+            const response = await axios.post(loginURL, {
                 email,
                 password
             });
@@ -63,7 +70,7 @@ function LoginForm({ isOpen, onClose, onForgotPasswordClick, onSignupClick, onLo
     // Tailwind Modal Structure
     return (
         // Modal Container: fixed, full screen, dark overlay
-        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm'>
+        <div className='fixed inset-0 z-50 flex items-center text-start justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm'>
             
             {/* Login Form Card: Background Neutral color, rounded, max width */}
             <div className='bg-[#f4f5f6] text-[#333333] rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 relative'>
@@ -85,7 +92,7 @@ function LoginForm({ isOpen, onClose, onForgotPasswordClick, onSignupClick, onLo
                         
                         {/* Email Field */}
                         <div className='space-y-1'>
-                            <label htmlFor='email-address' className='text-sm font-medium text-[#333333]'>Email Address</label>
+                            <label htmlFor='email-address' className=' text-start text-sm font-medium text-[#333333]'>Email Address</label>
                             <input
                                 type='email'
                                 className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9bb8a1] transition duration-200'
@@ -99,7 +106,7 @@ function LoginForm({ isOpen, onClose, onForgotPasswordClick, onSignupClick, onLo
                         
                         {/* Password Field */}
                         <div className='space-y-1'>
-                            <label htmlFor='password' className='text-sm font-medium text-[#333333]'>Password</label>
+                            <label htmlFor='password' className='text-start text-sm font-medium text-[#333333]'>Password</label>
                             <div className='relative'>
                                 <input
                                     type={showPassword ? 'text' : 'password'}

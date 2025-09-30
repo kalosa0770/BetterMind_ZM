@@ -46,8 +46,6 @@ const FeaturedProducts = () => {
                             /* Card Background uses Secondary Accent color */
                             bg-[#9bb8a1] p-6 rounded-2xl shadow-xl transition-all duration-300 
                             hover:shadow-2xl hover:translate-y-[-4px] 
-                            /* Border uses Primary Action color */
-                            border-t-4 border-[#008080]
                             flex flex-col items-center text-center
                         "
                     >

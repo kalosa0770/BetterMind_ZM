@@ -15,7 +15,7 @@ import ForgotPassword from './components/ForgotPassword.js';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Dashboard from './user-dashboard-components/Dashboard.js';
-import UserProfile from './user-dashboard-components/UserProfile.js';
+
 import api from './api/axios.js';
 
 
@@ -60,7 +60,6 @@ const HomePage = ({
 function App () {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeIcon, setActiveIcon] = useState('dashboard');
-  const [activeSideBar, setActiveSideBar] = useState('dashboard');
   const [showMainContent, setShowMainContent] = useState(true);
   const [showHeaderBar, setShowHeaderBar] = useState(true);
   
@@ -136,41 +135,13 @@ function App () {
 
   const onLogout = useCallback(handleLogout, []);
 
-  const handleIconClick = (iconName) => {
-      setActiveIcon(iconName);
-      
-      // Logic to show/hide content based on the clicked icon
-      if (iconName === 'profile') {
-        setShowMainContent(false);
-        setShowHeaderBar(false);
-      } else if (iconName === 'resources') {
-        setShowMainContent(false);
-        setShowHeaderBar(false);
-      }
-      
-      else {
-        setShowMainContent(true);
-        setShowHeaderBar(true);
-      }
+  const IconClick = (iconName) => {
+    setActiveIcon(iconName);
+    setShowMainContent(true);
+    setShowHeaderBar(true);
   };
 
-  const handleSideBarClick = (sidebarName) => {
-    setActiveSideBar(sidebarName);
 
-    if (sidebarName === 'profile') {
-      setShowMainContent(false);
-      setShowHeaderBar(false);
-    } else if (sidebarName === 'resources') {
-      setShowMainContent(false);
-      setShowHeaderBar(false);
-    } else {
-      setShowMainContent(true);
-      setShowHeaderBar(true);
-    }
-  };
-
-  
-  
   return (
     <div className="App bg-gray-50 font-sans">
       <Routes>
@@ -199,11 +170,10 @@ function App () {
                element={
                   <Dashboard onLogout={onLogout}
                              activeIcon={activeIcon} 
-                             handleIconClick={handleIconClick}
+                            iconClick={IconClick}
                              showMainContent={showMainContent}
                              showHeaderBar={showHeaderBar}
-                             activeSideBar={activeSideBar}
-                             handleSideBarClick={handleSideBarClick}
+                             
                   />
                 }      
         />

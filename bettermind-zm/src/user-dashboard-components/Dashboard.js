@@ -19,7 +19,7 @@ import {
 } from 'recharts';
 
 import UserProfile from './UserProfile';
-import Resources from './Resources'; // Ensure this is imported
+import Resources from './Resources'; 
 
 // ====================================================================
 // UPDATED: UserAvatar Component (Integrated and optimized to use parent state)
@@ -487,7 +487,7 @@ const formatMoodTick = (tickValue) => {
 // MAIN DASHBOARD COMPONENT
 // ====================================================================
 
-const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, handleIconClick, showMainContent, showHeaderBar }) => {
+const Dashboard = ({ onLogout, activeIcon, iconClick, showMainContent, showHeaderBar }) => {
     // const navigate = useNavigate();
 
     const [fullName, setFullName] = useState('');
@@ -549,11 +549,11 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
 
     useEffect(() => {
         // Only fetch data if we are on the 'dashboard' view
-        const currentView = activeSideBar || activeIcon;
+        const currentView = activeIcon;
         if (currentView === 'dashboard') {
             fetchData();
         }
-    }, [activeIcon, activeSideBar, fetchData]); 
+    }, [activeIcon,  fetchData]); 
 
     const { previousRecord, latestRecord, chartData } = useMemo(() => {
         const aggregatedData = {};
@@ -646,101 +646,122 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
     // === NEW LOGIC: CONDITIONAL CONTENT RENDERER ===
     const renderActiveContent = () => {
         // Determine the current active view, prioritizing sidebar (desktop)
-        const activeView = activeSideBar || activeIcon; 
+        if(!showMainContent) return null;
+        
+        switch (activeIcon) {
+            case 'resources':
+                return <Resources />;
+            case 'teletherapy':
+                return <div><h1>Therapy Section</h1></div>;
+            case 'forum':
+                return <div><h1>Community Forum Section</h1></div>;
+            case 'profile':
+                return <UserProfile journalEntries={journalEntries} onLogout={onLogout} />;
+            default:
+                return (
+                    <>
+                        {
+                            showHeaderBar &&
+                            <header className="flex items-center justify-between p-4 bg-white rounded-b-lg shadow-sm sticky top-0 z-10 mb-6">
+                                {/* Updated UserAvatar to use state passed as props */}
+                                <UserAvatar fullName={fullName} loading={loading} error={error} />
+                                <div className="flex items-center gap-4">
+                                    <Bell className="w-6 h-6 text-gray-700 cursor-pointer hover:text-teal-600" />
+                                </div>
+                            </header>
+                        }
+                        <div className="p-4 md:p-6">
+                            {/* Welcome and Goals Section */}
+                            <section className="mb-6">
+                                <div className="mb-8 text-left">
+                                    <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome back {fullName}</h2>
+                                    <p className="text-gray-600">Let's make today a great day.</p>
+                                </div>
 
-        if (activeView === 'profile') {
-            return <UserProfile journalEntries={journalEntries} onLogout={onLogout} />;
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                    {/* Daily Tip Card - Teal Border */}
+                                    <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] lg:col-span-1">
+                                        <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left">Daily Tip</h3>
+                                        <p className="text-sm text-gray-500 text-start">Mindfulness can reduce stress. Try a 5-minute breathing exercise today.</p>
+                                    </div>
+                                    
+                                    {/* Goals Card - Teal Border and Gradient (Content moved from below) */}
+                                    <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] lg:col-span-2">
+                                        <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left flex items-center gap-2">
+                                            <Droplet size={20} className="text-teal-600" />
+                                            Wellness Goals
+                                        </h3>
+                                        <ul className="space-y-3">
+                                            {goals.map(goal => (
+                                                <li key={goal.id} className="text-left">
+                                                    <p className="text-sm font-medium text-gray-700">{goal.title}</p>
+                                                    <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                                                        <div 
+                                                            className="h-2.5 rounded-full bg-teal-500 transition-all duration-500" 
+                                                            style={{ width: `${(goal.current / goal.total) * 100}%` }}
+                                                            aria-valuenow={goal.current} 
+                                                            aria-valuemax={goal.total}
+                                                        ></div>
+                                                    </div>
+                                                    <span className="text-xs text-gray-500">{goal.current} / {goal.total} completed</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <JournalEntry onOpenJournalModal={openJournalModal} />
+
+                            {/* Metric Cards (Latest Mood, Previous Mood) */}
+                            <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8'>
+                                {renderMetricCard('Latest Mood', <Heart size={18} className="text-teal-600" />, latestRecord)}
+                                {renderMetricCard('Previous Mood', <Clock size={18} className="text-gray-600" />, previousRecord)}
+                                {/* Empty column for alignment with the 3-column layout */}
+                                <div className="hidden lg:block"></div> 
+                            </div>
+
+                            {/* Mood Trend Chart */}
+                            <section className="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                                <h3 className="text-xl font-bold text-gray-800 mb-4 text-left">Mood Trend (Last 7 Days)</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="date" stroke="#6b7280" style={{ fontSize: '12px' }} />
+                                        <YAxis 
+                                            domain={[1, 10]} 
+                                            ticks={[1, 4, 7, 10]} 
+                                            tickFormatter={formatMoodTick}
+                                            stroke="#6b7280"
+                                            style={{ fontSize: '14px' }}
+                                        />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Bar dataKey="mood" radius={[4, 4, 0, 0]}>
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={getMoodColor(entry.mood)} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </section>
+                            
+                            <PopularContent />
+                            <ExploreTopics />
+
+                            {/* Journal Modal */}
+                            {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry}/>}
+                        </div>
+                
+                    
+                    </>
+                );
+            
+                
         }
 
-        if (activeView === 'resources') {
-            // Renders the Resources component when 'resources' is active
-            return <Resources />;
-        }
-
+        
         // Default or 'dashboard' view content
-        return (
-            <div className="p-4 md:p-6">
-                {/* Welcome and Goals Section */}
-                <section className="mb-6">
-                    <div className="mb-8 text-left">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome back {fullName}</h2>
-                        <p className="text-gray-600">Let's make today a great day.</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        {/* Daily Tip Card - Teal Border */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] lg:col-span-1">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left">Daily Tip</h3>
-                            <p className="text-sm text-gray-500 text-start">Mindfulness can reduce stress. Try a 5-minute breathing exercise today.</p>
-                        </div>
-                        
-                        {/* Goals Card - Teal Border and Gradient (Content moved from below) */}
-                        <div className="bg-white p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] lg:col-span-2">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2 text-left flex items-center gap-2">
-                                <Droplet size={20} className="text-teal-600" />
-                                Wellness Goals
-                            </h3>
-                            <ul className="space-y-3">
-                                {goals.map(goal => (
-                                    <li key={goal.id} className="text-left">
-                                        <p className="text-sm font-medium text-gray-700">{goal.title}</p>
-                                        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                                            <div 
-                                                className="h-2.5 rounded-full bg-teal-500 transition-all duration-500" 
-                                                style={{ width: `${(goal.current / goal.total) * 100}%` }}
-                                                aria-valuenow={goal.current} 
-                                                aria-valuemax={goal.total}
-                                            ></div>
-                                        </div>
-                                        <span className="text-xs text-gray-500">{goal.current} / {goal.total} completed</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-                
-                <JournalEntry onOpenJournalModal={openJournalModal} />
-
-                {/* Metric Cards (Latest Mood, Previous Mood) */}
-                <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8'>
-                    {renderMetricCard('Latest Mood', <Heart size={18} className="text-teal-600" />, latestRecord)}
-                    {renderMetricCard('Previous Mood', <Clock size={18} className="text-gray-600" />, previousRecord)}
-                    {/* Empty column for alignment with the 3-column layout */}
-                    <div className="hidden lg:block"></div> 
-                </div>
-
-                {/* Mood Trend Chart */}
-                <section className="bg-white p-6 rounded-2xl shadow-lg mb-8">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4 text-left">Mood Trend (Last 7 Days)</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                            <XAxis dataKey="date" stroke="#6b7280" style={{ fontSize: '12px' }} />
-                            <YAxis 
-                                domain={[1, 10]} 
-                                ticks={[1, 4, 7, 10]} 
-                                tickFormatter={formatMoodTick}
-                                stroke="#6b7280"
-                                style={{ fontSize: '14px' }}
-                            />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Bar dataKey="mood" radius={[4, 4, 0, 0]}>
-                                {chartData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={getMoodColor(entry.mood)} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </section>
-                
-                <PopularContent />
-                <ExploreTopics />
-
-                {/* Journal Modal */}
-                {isJournalModalOpen && <JournalEntryModal onClose={closeJournalModal} entry={selectedEntry}/>}
-            </div>
-        );
+        
     };
     
     // --- Render ---
@@ -755,9 +776,9 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                     <ul className="flex flex-col gap-4">
                         {/* Sidebar Link Mapping - Now correctly uses handleSideBarClick */}
                         {['dashboard', 'resources', 'teletherapy', 'forum', 'profile'].map(item => (
-                            <li key={item} onClick={() => handleSideBarClick(item)}>
+                            <li key={item} onClick={() => iconClick(item)}>
                                 <p className={`flex items-center p-3 rounded-xl font-semibold transition-all duration-200 cursor-pointer gap-2 
-                                    ${activeSideBar === item ? 'bg-teal-800 text-white shadow-inner' : 'text-white hover:bg-teal-600'}`}>
+                                    ${activeIcon === item ? 'bg-teal-800 text-white shadow-inner' : 'text-white hover:bg-teal-600'}`}>
                                     {item === 'dashboard' && <Home size={18}/>}
                                     {item === 'resources' && <Zap size={18}/>}
                                     {item === 'teletherapy' && <Video size={18}/>}
@@ -781,15 +802,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
 
             {/* Main Content Area */}
             <main className="flex-1 md:ml-64 overflow-y-auto pb-20 md:pb-0">
-                {showHeaderBar &&
-                    <header className="flex items-center justify-between p-4 bg-white rounded-b-lg shadow-sm sticky top-0 z-10 mb-6">
-                    {/* Updated UserAvatar to use state passed as props */}
-                    <UserAvatar fullName={fullName} loading={loading} error={error} />
-                    <div className="flex items-center gap-4">
-                        <Bell className="w-6 h-6 text-gray-700 cursor-pointer hover:text-teal-600" />
-                    </div>
-                </header>
-                }
+               
                 
                 {/* Conditional rendering based on active view state */}
                 {renderActiveContent()}
@@ -812,7 +825,7 @@ const Dashboard = ({ onLogout, activeSideBar, activeIcon, handleSideBarClick, ha
                     ].map((item) => (
                         <div
                             key={item.name} 
-                            onClick={() => handleIconClick(item.name)} 
+                            onClick={() => iconClick(item.name)} 
                             className={`flex flex-col items-center justify-center p-1 text-xs font-medium transition-colors cursor-pointer 
                                 ${activeIcon === item.name ? 'text-teal-700 font-black' : 'text-gray-500 hover:text-teal-600'}`
                             }
